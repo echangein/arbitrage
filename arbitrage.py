@@ -41,7 +41,6 @@ for action in curSite.actions:
 	else:
 		prefix = Fore.GREEN
 	print('{0}: {1}{2}\t{3}{4} @ {5}\t= {6}'.format(action['pair'], prefix, action['action'], Fore.RESET, action['operationAmount'], action['price'], action['resultAmount']))
-
 	
 #print u'Press ENTER to exit'
 #raw_input()

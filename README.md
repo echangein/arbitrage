@@ -10,7 +10,7 @@ tradeSequence = 'usd', 'nvc', 'btc'
 startAmount = 7.25
 ```
 
-_Внимание!_
+**Внимание!**
 В `tradeSequence` должно быть ровно 3 валюты
 
 В том случае мы производим обмен usd->nvc nvc->btc и обратно btc->usd

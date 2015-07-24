@@ -10,7 +10,10 @@ tradeSequence = 'usd', 'nvc', 'btc'
 startAmount = 7.25
 ```
 
-Э том случае мы производим обмен usd->nvc nvc->btc и обратно btc->usd
+*Внимание*
+В `tradeSequence` должно быть ровно 3 валюты
+
+В том случае мы производим обмен usd->nvc nvc->btc и обратно btc->usd
 
 Запускаем arbitrage.py
 

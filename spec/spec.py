@@ -51,8 +51,6 @@ class Spec:
 			self.lastErrorMessage = 'Not enough values in tradeSequence at config.py'
 			return False
 			
-		#allSeq = [items for items in __getAllCombinations(seq) if len(s) == length and s[0] == start]
-		
 		self.seqs = []
 		for seqItem in [items for items in self.__getAllCombinations(seq) if len(items) == length and items[0] == start]:
 			success = True

@@ -21,7 +21,7 @@ if not curSite.loadTradeConditions():
 
 print('Trade conditions is ' + Fore.GREEN + 'loading' + Fore.RESET + '.')
 	
-if not curSite.generateTradeSequence(config.tradeSequence):
+if not curSite.generateTradeSequence(config.startCurrency, config.tradeSequence):
 	print('Can\'t ' + Fore.RED + 'generate' + Fore.RESET + ' trade sequence.')
 	print('Error: ' + Fore.RED + curSite.getLastErrorMessage() + Fore.RESET)
 	quit()

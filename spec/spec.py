@@ -42,10 +42,16 @@ class Spec:
 		self.pairs = res['pairs']
 		return True
 	
-	def generateTradeSequence(self, seq = None):
-		if len(seq) < 2:
+	def generateTradeSequence(self, start, seq = None, length = 3):
+		if length < 2:
+			self.lastErrorMessage = 'tradeLength at config.py too small'
+			return False
+		
+		if len(seq) < length:
 			self.lastErrorMessage = 'Not enough values in tradeSequence at config.py'
 			return False
+			
+		allSeq = [items for items in getAllCombinations(seq) if len(s) == length and s[0] == start]
 		
 		self.seq = []
 		for idx, val in enumerate(seq):
@@ -84,6 +90,23 @@ class Spec:
 			actionAmount = actionItem['resultAmount']
 		
 		return True
+	
+	def __getAllCombinations(seq = None):
+		if not(hasattr(seq, '__iter__')):
+			return
+		
+		seq = list(seq)
+		if len(seq) == 1:
+			return [seq]
+		
+		ret = []
+		for elem in seq:
+			ret.append([elem])
+			for sub in getAllCombinations(seq[:seq.index(elem)] + seq[seq.index(elem)+1:]):
+				if sub != None:
+					ret.append([elem] + sub)
+		return ret
+	
 	
 	def __sell(self, amount = None, depth = None, condition = None):
 		price = round(depth['asks'][0][0]-10**(-condition['decimal_places']), 8)

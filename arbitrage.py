@@ -27,7 +27,11 @@ if not curSite.generateTradeSequence(config.startCurrency, config.tradeSequence)
 	quit()
 
 print('Trade sequence ' + Fore.GREEN + 'successfully' + Fore.RESET + ' generated.')
-	
+
+for item in curSite.seqs:
+	print(item)
+
+"""	
 if not curSite.generateTradeAmount(config.startAmount):
 	print('Can\'t ' + Fore.RED + 'generate' + Fore.RESET + ' trade amounts.')
 	print('Error: ' + Fore.RED + curSite.getLastErrorMessage() + Fore.RESET)
@@ -41,6 +45,7 @@ for action in curSite.actions:
 	else:
 		prefix = Fore.GREEN
 	print('{0}: {1}{2}\t{3}{4} @ {5}\t= {6}'.format(action['pair'], prefix, action['action'], Fore.RESET, action['operationAmount'], action['price'], action['resultAmount']))
+"""
 	
 #print u'Press ENTER to exit'
 #raw_input()

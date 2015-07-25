@@ -8,7 +8,7 @@ class Spec:
 	baseUrl = None
 	pairs = None
 	depth = None
-	seq = []
+	seqs = []
 	actions = []
 	
 	def __init__(self, baseUrl):
@@ -51,19 +51,28 @@ class Spec:
 			self.lastErrorMessage = 'Not enough values in tradeSequence at config.py'
 			return False
 			
-		allSeq = [items for items in getAllCombinations(seq) if len(s) == length and s[0] == start]
+		#allSeq = [items for items in __getAllCombinations(seq) if len(s) == length and s[0] == start]
 		
-		self.seq = []
-		for idx, val in enumerate(seq):
-			if idx + 1 == len(seq):
-				idx = -1
-			seqItem = self.__searchPair(val, seq[idx+1])
-			if not seqItem:
-				self.lastErrorMessage = 'Not found pair for ' + val + ' and ' + seq[idx+1]
-				return False
-			self.seq.append(seqItem)
+		self.seqs = []
+		for seqItem in [items for items in self.__getAllCombinations(seq) if len(items) == length and items[0] == start]:
+			success = True
+			seq = []
+			for idx, val in enumerate(seqItem):
+				if success:
+					if idx + 1 == len(seqItem):
+						idx = -1
+					pair = self.__searchPair(val, seqItem[idx+1])
+					if not pair:
+						success = False
+					seq.append(pair)
+			if success:
+				self.seqs.append(seq)
 		
-		return True
+		if len(self.seqs)>0:
+			return True
+		
+		self.lastErrorMessage = 'Can\'t choose pair for any sequence'
+		return False
 	
 	def generateTradeAmount(self, startAmount = 0.0):
 		keys = []
@@ -91,7 +100,7 @@ class Spec:
 		
 		return True
 	
-	def __getAllCombinations(seq = None):
+	def __getAllCombinations(self, seq = None):
 		if not(hasattr(seq, '__iter__')):
 			return
 		
@@ -102,7 +111,7 @@ class Spec:
 		ret = []
 		for elem in seq:
 			ret.append([elem])
-			for sub in getAllCombinations(seq[:seq.index(elem)] + seq[seq.index(elem)+1:]):
+			for sub in self.__getAllCombinations(seq[:seq.index(elem)] + seq[seq.index(elem)+1:]):
 				if sub != None:
 					ret.append([elem] + sub)
 		return ret

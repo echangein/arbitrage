@@ -9,7 +9,6 @@ class Spec:
 	pairs = None
 	depth = None
 	seqs = []
-	#actions = []
 	
 	def __init__(self, baseUrl):
 		self.baseUrl = baseUrl

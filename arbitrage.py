@@ -1,6 +1,16 @@
 #-*-coding:utf-8-*-
-from colorama import init, Fore, Back, Style
+from colorama import init, Fore #, Back, Style
 init()
+
+def formatTrades(trades):
+	res = ''
+	for trade in trades:
+		if trade['action'] == 'buy':
+			res += trade['pair'][:3] + '->'
+		else:
+			res += trade['pair'][4:] + '->'
+			
+	return res[:-2]
 
 import config
 from spec import Spec
@@ -35,16 +45,6 @@ if not curSite.generateTradeAmount(config.startAmount):
 
 print('Depth ' + Fore.GREEN + 'successfully' + Fore.RESET + ' imported.')
 
-def formatTrades(trades):
-	res = ''
-	for trade in trades:
-		if trade['action'] == 'buy':
-			res += trade['pair'][:3] + '->'
-		else:
-			res += trade['pair'][4:] + '->'
-			
-	return res[:-2]
-				
 print('')
 variant = 0
 for trades in curSite.seqs:

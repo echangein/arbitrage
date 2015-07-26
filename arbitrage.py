@@ -1,5 +1,6 @@
 #-*-coding:utf-8-*-
 from colorama import init, Fore #, Back, Style
+from msvcrt import getch
 init()
 
 def formatTrades(trades):
@@ -52,17 +53,34 @@ for trades in curSite.seqs:
 		variant += 1
 		print('{0}{1}{2}: {3}->{4}\tprofit: {5}{6}{2}'.format(Fore.YELLOW, variant, Fore.RESET, config.startCurrency, formatTrades(trades['trades']), Fore.GREEN, trades['options']['resultAmount']))
 		
+if not(variant):
+	print('Profitable trading sequence ' + Fore.RED + 'not found' + Fore.RESET + '. Try later please.')
+	quit()
 
-#print(curSite.seqs)
+print('')
+print('Press ' + Fore.YELLOW + 'number' + Fore.RESET + ' to select trading sequence to show detail or press ' + Fore.YELLOW + 'ESC' + Fore.RESET + ' to exit.')
 
-"""
-for action in curSite.actions:
-	if action['action'] == 'sell':
-		prefix = Fore.RED
-	else:
-		prefix = Fore.GREEN
-	print('{0}: {1}{2}\t{3}{4} @ {5}\t= {6}'.format(action['pair'], prefix, action['action'], Fore.RESET, action['operationAmount'], action['price'], action['resultAmount']))
-"""
-	
-#print u'Press ENTER to exit'
-#raw_input()
+key = ord(getch())
+while key != 27:
+	if (key >= ord('1')) and (key <= ord('9')):
+		variant = 0
+		selectedTrades = None
+		for trades in curSite.seqs:
+			if trades['options']['resultAmount'] > config.startAmount:
+				variant += 1
+				if variant == (key - ord('0')):
+					selectedTrades = trades['trades']
+		if selectedTrades <> None:
+			print('')
+			for action in selectedTrades:
+				if action['action'] == 'sell':
+					prefix = Fore.RED
+				else:
+					prefix = Fore.GREEN
+
+				print('{0}: {1}{2}\t{3}{4} @ {5}\t= {6}'.format(action['pair'], prefix, action['action'], Fore.RESET, action['operationAmount'], action['price'], action['resultAmount']))
+			
+			print('')
+			print('Press ' + Fore.YELLOW + 'number' + Fore.RESET + ' to select trading sequence to show detail or press ' + Fore.YELLOW + 'ESC' + Fore.RESET + ' to exit.')
+
+	key = ord(getch())

@@ -97,28 +97,8 @@ class Spec:
 					tradeItem.update(actionItem)
 					actionAmount = actionItem['resultAmount']
 			seq['options']['resultAmount'] = actionItem['resultAmount']
-			#for trade in seq:
 			
 		return True
-		"""
-		self.actions = []
-		actionAmount = startAmount
-		for seqItem in self.seq:
-			if (seqItem['action']=='sell'):
-				actionItem = self.__sell(actionAmount, self.depth[seqItem['pair']], self.pairs[seqItem['pair']])
-			else:
-				actionItem = self.__buy(actionAmount, self.depth[seqItem['pair']], self.pairs[seqItem['pair']])
-			
-			if not actionItem:
-				self.lastErrorMessage = 'Can\'t ' + seqItem['action'] + ' ' + str(actionAmount) + ' in ' + seqItem['pair']
-				return False
-			
-			actionItem['pair'] = seqItem['pair']
-			self.actions.append(actionItem)
-			actionAmount = actionItem['resultAmount']
-		
-		return True
-		"""
 	
 	def __getAllCombinations(self, seq = None):
 		if not(hasattr(seq, '__iter__')):

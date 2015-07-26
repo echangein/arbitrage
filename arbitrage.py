@@ -28,17 +28,23 @@ if not curSite.generateTradeSequence(config.startCurrency, config.tradeSequence,
 
 print('Trade sequences ' + Fore.GREEN + 'successfully' + Fore.RESET + ' generated.')
 
-for item in curSite.seqs:
-	print(item)
-
-"""	
 if not curSite.generateTradeAmount(config.startAmount):
 	print('Can\'t ' + Fore.RED + 'generate' + Fore.RESET + ' trade amounts.')
 	print('Error: ' + Fore.RED + curSite.getLastErrorMessage() + Fore.RESET)
 	quit()
 
-print('')
+print('Depth ' + Fore.GREEN + 'successfully' + Fore.RESET + ' imported.')
 
+print('')
+for trades in curSite.seqs:
+	#print(trades['options']['resultAmount'])
+	if trades['options']['resultAmount'] > config.startAmount:
+		print(trades)
+		print()
+
+#print(curSite.seqs)
+
+"""
 for action in curSite.actions:
 	if action['action'] == 'sell':
 		prefix = Fore.RED

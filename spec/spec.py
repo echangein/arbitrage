@@ -9,7 +9,7 @@ class Spec:
 	pairs = None
 	depth = None
 	seqs = []
-	actions = []
+	#actions = []
 	
 	def __init__(self, baseUrl):
 		self.baseUrl = baseUrl
@@ -64,7 +64,7 @@ class Spec:
 						success = False
 					seq.append(pair)
 			if success:
-				self.seqs.append(seq)
+				self.seqs.append({'trades': seq})
 		
 		if len(self.seqs)>0:
 			return True
@@ -73,13 +73,34 @@ class Spec:
 		return False
 	
 	def generateTradeAmount(self, startAmount = 0.0):
-		keys = []
-		for seqItem in self.seq:
-			keys.append(seqItem['pair'])
-			
-		if not self.__getDepth(keys):
+		pairs = set()
+		for row in self.seqs:
+			for trade in row['trades']:
+				pairs.update([trade['pair']])
+				
+		if not self.__getDepth(pairs):
 			return False
 		
+		for seq in self.seqs:
+			seq['options'] = {'startAmount': startAmount}
+			actionAmount = startAmount
+			contFlag = True
+			for tradeIdx, tradeItem in enumerate(seq['trades']):
+				if contFlag:
+					if (tradeItem['action']=='sell'):
+						actionItem = self.__sell(actionAmount, self.depth[tradeItem['pair']], self.pairs[tradeItem['pair']])
+					else:
+						actionItem = self.__buy(actionAmount, self.depth[tradeItem['pair']], self.pairs[tradeItem['pair']])
+					if not actionItem:
+						seq['options']['error'] = 'Can\'t ' + tradeItem['action'] + ' ' + str(actionAmount) + ' in ' + tradeItem['pair']
+						contFlag = False
+					tradeItem.update(actionItem)
+					actionAmount = actionItem['resultAmount']
+			seq['options']['resultAmount'] = actionItem['resultAmount']
+			#for trade in seq:
+			
+		return True
+		"""
 		self.actions = []
 		actionAmount = startAmount
 		for seqItem in self.seq:
@@ -97,6 +118,7 @@ class Spec:
 			actionAmount = actionItem['resultAmount']
 		
 		return True
+		"""
 	
 	def __getAllCombinations(self, seq = None):
 		if not(hasattr(seq, '__iter__')):

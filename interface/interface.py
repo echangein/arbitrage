@@ -1,4 +1,7 @@
 import urllib2
+import urllib
+import hmac
+import hashlib
 import json
 import time
 
@@ -8,10 +11,15 @@ class Interface:
 	lastBody = None
 	baseUrl = None
 	tradeUrl = None
+	
+	apiKey = None
+	apiSecret = None
 	nonce = None
 	
-	def __init__(self, baseUrl, tradeUrl = 'https://btc-e.com/tapi'):
-		Nonce = int(time.time())
+	def __init__(self, baseUrl, tradeUrl = 'https://btc-e.com/tapi', apiKey = None, apiSecret = None):
+		self.apiKey = apiKey
+		self.apiSecret = apiSecret
+		self.nonce = int(time.time())
 		self.tradeUrl = tradeUrl
 		self.baseUrl = baseUrl
 		if baseUrl[-1:] <> '/':
@@ -20,7 +28,7 @@ class Interface:
 			
 		self.baseUrl = baseUrl
 	
-	def __getNonce():
+	def __getNonce(self):
 		self.nonce += 1
 		return self.nonce
 	
@@ -45,6 +53,26 @@ class Interface:
 			url = url[:-1]
 
 		response = urllib2.urlopen(url)
+		self.lastResult = response.getcode()
+		res = json.loads(response.read())
+		if res.has_key('error'):
+			self.lastErrorMessage = res['error']
+			return False
+		
+		return res
+
+	def sendPost(self, params = None):
+		params['nonce'] = self.__getNonce()
+		
+		params = urllib.urlencode(params)
+		H = hmac.new(self.apiSecret, digestmod=hashlib.sha512)
+		H.update(params)
+		sign = H.hexdigest()
+ 		headers = {"Content-type": "application/x-www-form-urlencoded", 'Key': self.apiKey, 'Sign': sign}
+		
+		req = urllib2.Request(self.tradeUrl, params, headers)
+		response = urllib2.urlopen(req)
+		
 		self.lastResult = response.getcode()
 		res = json.loads(response.read())
 		if res.has_key('error'):

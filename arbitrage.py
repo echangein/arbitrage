@@ -44,12 +44,11 @@ if not curSite.generateTradeAmount(config.startAmount):
 	print('Error: ' + Fore.RED + curSite.getLastErrorMessage() + Fore.RESET)
 	quit()
 
-print('Depth ' + Fore.GREEN + 'successfully' + Fore.RESET + ' imported.')
+print('Depth ' + Fore.GREEN + 'successfully' + Fore.RESET + ' imported.\n')
 
-print('')
 variant = 0
 for trades in curSite.seqs:
-	if trades['options']['resultAmount'] > config.startAmount:
+	if not 'error' in trades['options'] and trades['options']['resultAmount'] > config.startAmount:
 		variant += 1
 		print('{0}{1}{2}: {3}->{4}\tprofit: {5}{6}{2}'.format(Fore.YELLOW, variant, Fore.RESET, config.startCurrency, formatTrades(trades['trades']), Fore.GREEN, trades['options']['resultAmount']))
 		
@@ -57,8 +56,7 @@ if not(variant):
 	print('Profitable trading sequence ' + Fore.RED + 'not found' + Fore.RESET + '. Try later please.')
 	quit()
 
-print('')
-print('Press ' + Fore.YELLOW + 'number' + Fore.RESET + ' to select trading sequence to show detail or press ' + Fore.YELLOW + 'ESC' + Fore.RESET + ' to exit.')
+print('\nPress ' + Fore.YELLOW + 'number' + Fore.RESET + ' to select trading sequence to show detail or press ' + Fore.YELLOW + 'ESC' + Fore.RESET + ' to exit.')
 
 key = ord(getch())
 while key != 27:
@@ -71,8 +69,7 @@ while key != 27:
 				if variant == (key - ord('0')):
 					selectedTrades = trades['trades']
 		if selectedTrades <> None:
-			print('')
-			print('Start amount: {0} {1}'.format(config.startAmount, config.startCurrency))
+			print('\nStart amount: {0} {1}'.format(config.startAmount, config.startCurrency))
 			for action in selectedTrades:
 				if action['action'] == 'sell':
 					prefix = Fore.RED
@@ -81,7 +78,6 @@ while key != 27:
 
 				print('{0}: {1}{2}\t{3}{4} @ {5}\t= {6}'.format(action['pair'], prefix, action['action'], Fore.RESET, action['operationAmount'], action['price'], action['resultAmount']))
 			
-			print('')
-			print('Press ' + Fore.YELLOW + 'number' + Fore.RESET + ' to select trading sequence to show detail or press ' + Fore.YELLOW + 'ESC' + Fore.RESET + ' to exit.')
+			print('\nPress ' + Fore.YELLOW + 'number' + Fore.RESET + ' to select trading sequence to show detail or press ' + Fore.YELLOW + 'ESC' + Fore.RESET + ' to exit.')
 
 	key = ord(getch())

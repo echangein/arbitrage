@@ -93,9 +93,11 @@ class Spec:
 					if not actionItem:
 						seq['options']['error'] = 'Can\'t ' + tradeItem['action'] + ' ' + str(actionAmount) + ' in ' + tradeItem['pair']
 						contFlag = False
-					tradeItem.update(actionItem)
-					actionAmount = actionItem['resultAmount']
-			seq['options']['resultAmount'] = actionItem['resultAmount']
+					else:
+						tradeItem.update(actionItem)
+						actionAmount = actionItem['resultAmount']
+			if contFlag:
+				seq['options']['resultAmount'] = actionItem['resultAmount']
 			
 		return True
 	

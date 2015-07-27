@@ -2,7 +2,7 @@
 from colorama import init, Fore
 init()
 
-import os, sys, tty, termios
+import os
 if os.name == 'nt':
 	from msvcrt import getch
 else:
@@ -68,7 +68,9 @@ if not(variant):
 	print('Profitable trading sequence ' + Fore.RED + 'not found' + Fore.RESET + '. Try later please.')
 	quit()
 
-print('\nPress ' + Fore.YELLOW + 'number' + Fore.RESET + ' to select trading sequence to show detail or press ' + Fore.YELLOW + 'ESC' + Fore.RESET + ' to exit.')
+print('\nPress ' + Fore.YELLOW + 'number' + Fore.RESET + ' to select trading sequence')
+print('Press ' + Fore.YELLOW + 'R' + Fore.RESET + ' to reload trade depth.')
+print('Press ' + Fore.YELLOW + 'ESC' + Fore.RESET + ' to exit.')
 
 key = ord(getch())
 while key != 27:
@@ -90,6 +92,30 @@ while key != 27:
 
 				print('{0}: {1}{2}\t{3}{4} @ {5}\t= {6}'.format(action['pair'], prefix, action['action'], Fore.RESET, action['operationAmount'], action['price'], action['resultAmount']))
 			
-			print('\nPress ' + Fore.YELLOW + 'number' + Fore.RESET + ' to select trading sequence to show detail or press ' + Fore.YELLOW + 'ESC' + Fore.RESET + ' to exit.')
+			print('\nPress ' + Fore.YELLOW + 'number' + Fore.RESET + ' to select trading sequence')
+			print('Press ' + Fore.YELLOW + 'R' + Fore.RESET + ' to reload trade depth.')
+			print('Press ' + Fore.YELLOW + 'ESC' + Fore.RESET + ' to exit.')
+	
+	if (key == ord('r')) or (key == ord('r')):
+		if not curSite.generateTradeAmount(config.startAmount):
+			print('Can\'t ' + Fore.RED + 'generate' + Fore.RESET + ' trade amounts.')
+			print('Error: ' + Fore.RED + curSite.getLastErrorMessage() + Fore.RESET)
+			quit()
 
+		print('Depth ' + Fore.GREEN + 'successfully' + Fore.RESET + ' imported.\n')
+
+		variant = 0
+		for trades in curSite.seqs:
+			if not 'error' in trades['options'] and trades['options']['resultAmount'] > config.startAmount:
+				variant += 1
+				print('{0}{1}{2}: {3}->{4}\tprofit: {5}{6}{2}'.format(Fore.YELLOW, variant, Fore.RESET, config.startCurrency, formatTrades(trades['trades']), Fore.GREEN, trades['options']['resultAmount']))
+				
+		if not(variant):
+			print('Profitable trading sequence ' + Fore.RED + 'not found' + Fore.RESET + '. Try later please.')
+			quit()
+
+		print('\nPress ' + Fore.YELLOW + 'number' + Fore.RESET + ' to select trading sequence')
+		print('Press ' + Fore.YELLOW + 'R' + Fore.RESET + ' to reload trade depth.')
+		print('Press ' + Fore.YELLOW + 'ESC' + Fore.RESET + ' to exit.')
+	
 	key = ord(getch())

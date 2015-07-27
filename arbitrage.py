@@ -72,6 +72,7 @@ while key != 27:
 					selectedTrades = trades['trades']
 		if selectedTrades <> None:
 			print('')
+			print('Start amount: {0} {1}'.format(config.startAmount, config.startCurrency))
 			for action in selectedTrades:
 				if action['action'] == 'sell':
 					prefix = Fore.RED

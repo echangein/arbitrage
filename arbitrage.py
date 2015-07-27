@@ -2,12 +2,18 @@
 from colorama import init, Fore
 init()
 
-import os, sys
+import os, sys, tty, termios
 if os.name == 'nt':
 	from msvcrt import getch
 else:
+	import sys, tty, termios
 	def getch():
-		return sys.stdin.read(1)
+		fd = sys.stdin.fileno()
+		oldSettings = termios.tcgetattr(fd)
+		tty.setraw(sys.stdin.fileno())
+		ch = sys.stdin.read(1)
+		termios.tcsetattr(fd, termios.TCSADRAIN, oldSettings)
+		return ch
 
 def formatTrades(trades):
 	res = ''

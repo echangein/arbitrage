@@ -16,12 +16,14 @@ class Spec:
 	def checkConnection(self):
 		res = self.int.sendGet('info')
 		if not res:
+			self.lastErrorMessage = self.int.getLastErrorMessage()
 			return False
 		return True
 	
 	def loadTradeConditions(self):
 		res = self.int.sendGet('info')
 		if not res:
+			self.lastErrorMessage = self.int.getLastErrorMessage()
 			return False
 			
 		self.pairs = res['pairs']

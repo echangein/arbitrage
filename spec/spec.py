@@ -1,5 +1,4 @@
-from int import Int
-import json
+from interface import Interface
 
 class Spec:
 	lastErrorMessage = None
@@ -9,7 +8,7 @@ class Spec:
 	seqs = []
 	
 	def __init__(self, baseUrl):
-		self.int = Int(baseUrl)
+		self.int = Interface(baseUrl)
 	
 	def getLastErrorMessage(self):
 		return self.lastErrorMessage

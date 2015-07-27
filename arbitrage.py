@@ -1,7 +1,13 @@
 #-*-coding:utf-8-*-
-from colorama import init, Fore #, Back, Style
-from msvcrt import getch
+from colorama import init, Fore
 init()
+
+import os, sys
+if os.name == 'nt':
+	from msvcrt import getch
+else:
+	def getch():
+		return sys.stdin.read(1)
 
 def formatTrades(trades):
 	res = ''

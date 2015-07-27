@@ -1,40 +1,27 @@
-import urllib2
+from int import Int
 import json
 
 class Spec:
 	lastErrorMessage = None
-	lastResult = None
-	lastBody = None
-	baseUrl = None
+	int = None
 	pairs = None
 	depth = None
 	seqs = []
 	
 	def __init__(self, baseUrl):
-		self.baseUrl = baseUrl
-		if baseUrl[-1:] <> '/':
-			self.baseUrl = baseUrl + '/'
-			return
-			
-		self.baseUrl = baseUrl
+		self.int = Int(baseUrl)
 	
 	def getLastErrorMessage(self):
 		return self.lastErrorMessage
 
-	def getLastBody(self):
-		return self.lastBody
-		
-	def getLastResult(self):
-		return self.lastResult
-	
 	def checkConnection(self):
-		res = self.__sendGet('info')
+		res = self.int.sendGet('info')
 		if not res:
 			return False
 		return True
 	
 	def loadTradeConditions(self):
-		res = self.__sendGet('info')
+		res = self.int.sendGet('info')
 		if not res:
 			return False
 			
@@ -144,30 +131,10 @@ class Spec:
 		return False
 	
 	def __getDepth(self, pairs = None, tail = {'limit': 10}):
-		res = self.__sendGet('depth', pairs, tail)
+		res = self.int.sendGet('depth', pairs, tail)
 		if not res:
 			return False
 			
 		self.depth = res
 		return True
 		
-	
-	def __sendGet(self, method = None, params = None, tail = None):
-		url = self.baseUrl + method + '/'
-		if hasattr(params, '__contains__'):
-			url = url + '-'.join(params) + '/'
-		
-		if hasattr(tail, '__contains__'):
-			url = url + '?'
-			for key in tail.keys():
-				url = url + key + '=' + str(tail[key]) + '&'
-			url = url[:-1]
-
-		response = urllib2.urlopen(url)
-		self.lastResult = response.getcode()
-		res = json.loads(response.read())
-		if res.has_key('error'):
-			self.lastErrorMessage = res['error']
-			return False
-		
-		return res

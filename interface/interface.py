@@ -9,24 +9,17 @@ class Interface:
 	lastErrorMessage = None
 	lastResult = None
 	lastBody = None
-	baseUrl = None
-	tradeUrl = None
+	baseUrl = 'https://btc-e.com/api/3/'
+	tradeUrl = 'https://btc-e.com/tapi'
 	
 	apiKey = None
 	apiSecret = None
 	nonce = None
 	
-	def __init__(self, baseUrl, tradeUrl = 'https://btc-e.com/tapi', apiKey = None, apiSecret = None):
+	def __init__(self, apiKey = None, apiSecret = None):
 		self.apiKey = apiKey
 		self.apiSecret = apiSecret
 		self.nonce = int(time.time())
-		self.tradeUrl = tradeUrl
-		self.baseUrl = baseUrl
-		if baseUrl[-1:] <> '/':
-			self.baseUrl = baseUrl + '/'
-			return
-			
-		self.baseUrl = baseUrl
 	
 	def __getNonce(self):
 		self.nonce += 1

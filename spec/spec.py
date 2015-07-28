@@ -1,14 +1,18 @@
 from interface import Interface
+from colorama import init, Fore
+import time
 
 class Spec:
 	lastErrorMessage = None
+	checkTimeout = 2
 	int = None
 	pairs = None
 	depth = None
 	seqs = []
 	
-	def __init__(self, baseUrl):
-		self.int = Interface(baseUrl)
+	
+	def __init__(self, key, secret):
+		self.int = Interface(key, secret)
 	
 	def getLastErrorMessage(self):
 		return self.lastErrorMessage
@@ -88,6 +92,92 @@ class Spec:
 				seq['options']['resultAmount'] = actionItem['resultAmount']
 			
 		return True
+	
+	def executeSequence(self, selectedTrades, startAmount, startCurr):
+		print('Checking start amount: {0} {1}'.format(startAmount, startCurr))
+		if not self.checkAmount(startAmount, startCurr):
+			return False
+		else:
+			print('Funds: ' + Fore.GREEN + 'ok' + Fore.RESET + '.')
+			
+		for trade in selectedTrades:
+			print('Create order: ' + self.formatTrade(trade))
+			res = self.createOrder(trade)
+			if res is False:
+				print(Fore.RED + 'Fail' + Fore.RESET + '.')
+				return False
+			elif res is None:
+				print('Already ' + Fore.GREEN + 'executed' + Fore.RESET + '.')
+				trade['order_id'] = 0
+				trade['status_id'] = 1
+			else:
+				print('Wairing for execute.')
+				trade['order_id'] = res
+				trade['status_id'] = 0
+				res = self.waitingOrder(trade['order_id'])
+				if res != 1:
+					self.lastErrorMessage = 'Order {0} was be cancelled'.format(trade['order_id'])
+					return False
+		return True
+	
+	def checkAmount(self, startAmount = 0.0, startCurr = 'usd'):
+		res = self.int.sendPost({'method': 'getInfo'})
+		if not res:
+			self.lastErrorMessage = self.int.getLastErrorMessage()
+			return False
+			
+		if not startCurr in res['return']['funds']:
+			self.lastErrorMessage = 'Not have fund: '+startCurr
+			return False
+		
+		if res['return']['funds'][startCurr] < startAmount:
+			self.lastErrorMessage = 'Start amount large than {0}'.format(res['funds'][startCurr])
+			return False
+			
+		return True
+	
+	def waitingOrder(self, orderId = None):
+		status = 0
+		while status == 0:
+			time.sleep(self.checkTimeout)
+			status = self.getOrderStatus(orderId)
+		
+		return status
+	
+	def getOrderStatus(self, orderId = None):
+		res = self.int.sendPost({'method': 'OrderInfo', 'order_id': orderId})
+		if not res:
+			self.lastErrorMessage = self.int.getLastErrorMessage()
+			return False
+
+		if not str(orderId) in res['return']:
+			self.lastErrorMessage = 'Order {0} not found'.format(orderId)
+			return False
+		
+		return res['return'][str(orderId)]['status']
+
+	
+	def createOrder(self, trade):
+		#TODO check values
+
+		res = self.int.sendPost({'method': 'Trade', 'pair': trade['pair'], 'type': trade['action'], 'rate': trade['price'], 'amount': trade['operationAmount']})
+		if not res:
+			self.lastErrorMessage = self.int.getLastErrorMessage()
+			return False
+		
+		if res['return']['order_id'] == 0:
+			return None
+		else:
+			return res['return']['order_id']
+	
+	def formatTrade(self, trade):
+		if trade['action'] == 'sell':
+			prefix = Fore.RED
+		else:
+			prefix = Fore.GREEN
+
+		return '{0}: {1}{2}\t{3}{4} @ {5}\t= {6}'.format(trade['pair'], prefix, trade['action'], Fore.RESET, trade['operationAmount'], trade['price'], trade['resultAmount'])
+
 	
 	def __getAllCombinations(self, seq = None):
 		if not(hasattr(seq, '__iter__')):

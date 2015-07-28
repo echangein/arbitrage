@@ -42,7 +42,12 @@ def reloadDepths(spec, startAmount, startCurrency):
 import config
 from spec import Spec
 
-curSite = Spec(config.baseUrl)
+f = open('../secrets.txt', 'r')
+key = f.readline().strip()
+secret = f.readline().strip()
+f.close()
+
+curSite = Spec(key, secret)
 
 if not curSite.checkConnection():
 	print(Fore.RED + 'Can\'t connect' + Fore.RESET + ' to ' + curSite.baseUrl)
@@ -80,15 +85,10 @@ while key != 27:
 		if selectedTrades <> None:
 			print('\nStart amount: {0} {1}'.format(config.startAmount, config.startCurrency))
 			for action in selectedTrades:
-				if action['action'] == 'sell':
-					prefix = Fore.RED
-				else:
-					prefix = Fore.GREEN
-
-				print('{0}: {1}{2}\t{3}{4} @ {5}\t= {6}'.format(action['pair'], prefix, action['action'], Fore.RESET, action['operationAmount'], action['price'], action['resultAmount']))
+				print(curSite.formatTrade(action))
 			
-			print('\nPress ' + Fore.YELLOW + 'number' + Fore.RESET + ' to select trading sequence')
-			#print('Press ' + Fore.YELLOW + 'R' + Fore.RESET + ' to reload trade depth.')
+			print('\nPress ' + Fore.YELLOW + 'number' + Fore.RESET + ' to select trading sequence.')
+			print('Press ' + Fore.YELLOW + 'E' + Fore.RESET + ' to execute trading sequence.')
 			print('Press ' + Fore.YELLOW + 'R' + Fore.RESET + ' to reload trade depth.')
 			print('Press ' + Fore.YELLOW + 'ESC' + Fore.RESET + ' to exit.')
 	
@@ -96,5 +96,18 @@ while key != 27:
 		selectedTrades = None
 		print('')
 		reloadDepths(curSite, config.startAmount, config.startCurrency)
+	
+	if (key == ord('e')) or (key == ord('E')):
+		print('')
+		if not selectedTrades is None:
+			if curSite.executeSequence(selectedTrades, config.startAmount, config.startCurrency):
+				print('Trading sequence complete ' + Fore.GREEN + 'successfully' + Fore.RESET + '.')
+				print(selectedTrades)
+				quit()
+			else:
+				print('Trading sequence  ' + Fore.RED + 'failed' + Fore.RESET + '.')
+				print('Error: ' + Fore.RED + curSite.getLastErrorMessage() + Fore.RESET)
+		else:
+			print(Fore.RED + 'Select trading sequence' + Fore.RESET + ' please!')
 	
 	key = ord(getch())

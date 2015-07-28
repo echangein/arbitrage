@@ -13,25 +13,26 @@ res = myInt.sendPost({'method': 'getInfo'})
 
 print res
 """
-
-import os, sys, tty, termios
-if os.name == 'nt':
-	from msvcrt import getch
+s = False
+if s is None:
+	print('s is None')
+elif s is False:
+	print('s is false')
 else:
-	import sys, tty, termios
-	def getch():
-		fd = sys.stdin.fileno()
-		oldSettings = termios.tcgetattr(fd)
-		tty.setraw(sys.stdin.fileno())
-		ch = sys.stdin.read(1)
-		termios.tcsetattr(fd, termios.TCSADRAIN, oldSettings)
-		return ch
+	print('s is another')
 
-while True:
-	key = ord(getch())
-	print(key)
-	
-	if key == 27:
-		break
+s = None
+if s is None:
+	print('s is None')
+elif s is False:
+	print('s is false')
+else:
+	print('s is another')
 
-print('finish')
+s = 0	
+if s is None:
+	print('s is None')
+elif s is False:
+	print('s is false')
+else:
+	print('s is another')

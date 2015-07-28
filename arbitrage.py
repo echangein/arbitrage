@@ -2,18 +2,7 @@
 from colorama import init, Fore
 init()
 
-import os
-if os.name == 'nt':
-	from msvcrt import getch
-else:
-	import sys, tty, termios
-	def getch():
-		fd = sys.stdin.fileno()
-		oldSettings = termios.tcgetattr(fd)
-		tty.setraw(sys.stdin.fileno())
-		ch = sys.stdin.read(1)
-		termios.tcsetattr(fd, termios.TCSADRAIN, oldSettings)
-		return ch
+from kbrd import getch
 
 def formatTrades(trades):
 	res = ''
@@ -25,6 +14,31 @@ def formatTrades(trades):
 			
 	return res[:-2]
 
+def reloadDepths(spec, startAmount, startCurrency):
+	if not spec.generateTradeAmount(startAmount):
+		print('Can\'t ' + Fore.RED + 'generate' + Fore.RESET + ' trade amounts.')
+		print('Error: ' + Fore.RED + spec.getLastErrorMessage() + Fore.RESET)
+		quit()
+
+	print('Depth ' + Fore.GREEN + 'successfully' + Fore.RESET + ' imported.\n')
+
+	variant = 0
+	for trades in spec.seqs:
+		if not 'error' in trades['options'] and trades['options']['resultAmount'] > startAmount:
+			variant += 1
+			print('{0}{1}{2}: {3}->{4}\tprofit: {5}{6}{2}'.format(Fore.YELLOW, variant, Fore.RESET, startCurrency, formatTrades(trades['trades']), Fore.GREEN, trades['options']['resultAmount']))
+	
+	print('\nPress ' + Fore.YELLOW + 'R' + Fore.RESET + ' to reload trade depth.')
+	if variant:
+		print('Press ' + Fore.YELLOW + 'number' + Fore.RESET + ' to select trading sequence.')
+	else:
+		print('Profitable trading sequence ' + Fore.RED + 'not found' + Fore.RESET + '. Try later please.')
+
+	print('Press ' + Fore.YELLOW + 'ESC' + Fore.RESET + ' to exit.')
+	
+	return
+
+	
 import config
 from spec import Spec
 
@@ -51,26 +65,7 @@ if not curSite.generateTradeSequence(config.startCurrency, config.tradeSequence,
 
 print('Trade sequences ' + Fore.GREEN + 'successfully' + Fore.RESET + ' generated.')
 
-if not curSite.generateTradeAmount(config.startAmount):
-	print('Can\'t ' + Fore.RED + 'generate' + Fore.RESET + ' trade amounts.')
-	print('Error: ' + Fore.RED + curSite.getLastErrorMessage() + Fore.RESET)
-	quit()
-
-print('Depth ' + Fore.GREEN + 'successfully' + Fore.RESET + ' imported.\n')
-
-variant = 0
-for trades in curSite.seqs:
-	if not 'error' in trades['options'] and trades['options']['resultAmount'] > config.startAmount:
-		variant += 1
-		print('{0}{1}{2}: {3}->{4}\tprofit: {5}{6}{2}'.format(Fore.YELLOW, variant, Fore.RESET, config.startCurrency, formatTrades(trades['trades']), Fore.GREEN, trades['options']['resultAmount']))
-		
-if not(variant):
-	print('Profitable trading sequence ' + Fore.RED + 'not found' + Fore.RESET + '. Try later please.')
-	quit()
-
-print('\nPress ' + Fore.YELLOW + 'number' + Fore.RESET + ' to select trading sequence')
-print('Press ' + Fore.YELLOW + 'R' + Fore.RESET + ' to reload trade depth.')
-print('Press ' + Fore.YELLOW + 'ESC' + Fore.RESET + ' to exit.')
+reloadDepths(curSite, config.startAmount, config.startCurrency)
 
 key = ord(getch())
 while key != 27:
@@ -93,29 +88,13 @@ while key != 27:
 				print('{0}: {1}{2}\t{3}{4} @ {5}\t= {6}'.format(action['pair'], prefix, action['action'], Fore.RESET, action['operationAmount'], action['price'], action['resultAmount']))
 			
 			print('\nPress ' + Fore.YELLOW + 'number' + Fore.RESET + ' to select trading sequence')
+			#print('Press ' + Fore.YELLOW + 'R' + Fore.RESET + ' to reload trade depth.')
 			print('Press ' + Fore.YELLOW + 'R' + Fore.RESET + ' to reload trade depth.')
 			print('Press ' + Fore.YELLOW + 'ESC' + Fore.RESET + ' to exit.')
 	
-	if (key == ord('r')) or (key == ord('r')):
-		if not curSite.generateTradeAmount(config.startAmount):
-			print('Can\'t ' + Fore.RED + 'generate' + Fore.RESET + ' trade amounts.')
-			print('Error: ' + Fore.RED + curSite.getLastErrorMessage() + Fore.RESET)
-			quit()
-
-		print('Depth ' + Fore.GREEN + 'successfully' + Fore.RESET + ' imported.\n')
-
-		variant = 0
-		for trades in curSite.seqs:
-			if not 'error' in trades['options'] and trades['options']['resultAmount'] > config.startAmount:
-				variant += 1
-				print('{0}{1}{2}: {3}->{4}\tprofit: {5}{6}{2}'.format(Fore.YELLOW, variant, Fore.RESET, config.startCurrency, formatTrades(trades['trades']), Fore.GREEN, trades['options']['resultAmount']))
-				
-		if not(variant):
-			print('Profitable trading sequence ' + Fore.RED + 'not found' + Fore.RESET + '. Try later please.')
-			quit()
-
-		print('\nPress ' + Fore.YELLOW + 'number' + Fore.RESET + ' to select trading sequence')
-		print('Press ' + Fore.YELLOW + 'R' + Fore.RESET + ' to reload trade depth.')
-		print('Press ' + Fore.YELLOW + 'ESC' + Fore.RESET + ' to exit.')
+	if (key == ord('r')) or (key == ord('R')):
+		selectedTrades = None
+		print('')
+		reloadDepths(curSite, config.startAmount, config.startCurrency)
 	
 	key = ord(getch())

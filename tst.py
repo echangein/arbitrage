@@ -9,21 +9,9 @@ f.close()
 
 myInt = Spec(key, secret)
 
-#res = myInt.sendPost({'method': 'getInfo'})
-#print res
 
-trade = {'pair': 'btc_usd', 'action': 'buy', 'price': 10.0, 'operationAmount': 0.33}
-orderId = myInt.createOrder(trade)
-if not orderId:
-	print(myInt.getLastErrorMessage())
-else:
-	print('orderId: {0}'.format(orderId))
-
-orderStatus = myInt.getOrderStatus(orderId)
-if orderStatus is False:
-	print(myInt.getLastErrorMessage())
-else:
-	print('orderStatus: {0}'.format(orderStatus))
+print('hello'),
+print('- cont')
 
 """
 s = False

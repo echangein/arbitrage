@@ -102,7 +102,6 @@ while key != 27:
 		if not selectedTrades is None:
 			if curSite.executeSequence(selectedTrades, config.startAmount, config.startCurrency):
 				print('Trading sequence complete ' + Fore.GREEN + 'successfully' + Fore.RESET + '.')
-				print(selectedTrades)
 				quit()
 			else:
 				print('Trading sequence  ' + Fore.RED + 'failed' + Fore.RESET + '.')

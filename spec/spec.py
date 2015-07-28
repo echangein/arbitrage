@@ -93,31 +93,40 @@ class Spec:
 			
 		return True
 	
-	def executeSequence(self, selectedTrades, startAmount, startCurr):
-		print('Checking start amount: {0} {1}'.format(startAmount, startCurr))
+	def executeSequence(self, selectedTrades, startAmount = None, startCurr = None, cont = False):
+		print('Checking start amount: {0} {1}'.format(startAmount, startCurr)),
 		if not self.checkAmount(startAmount, startCurr):
+			print('')
 			return False
 		else:
-			print('Funds: ' + Fore.GREEN + 'ok' + Fore.RESET + '.')
+			print('- ' + Fore.GREEN + 'ok' + Fore.RESET + '.')
 			
 		for trade in selectedTrades:
-			print('Create order: ' + self.formatTrade(trade))
-			res = self.createOrder(trade)
-			if res is False:
+			if not 'order_id' in trade:
+				print('Create order: ' + self.formatTrade(trade))
+				orderId = self.createOrder(trade)
+			else:
+				print('Exist order: ' + self.formatTrade(trade))
+				orderId = trade['order_id']
+				
+			if orderId is False:
 				print(Fore.RED + 'Fail' + Fore.RESET + '.')
 				return False
-			elif res is None:
+			elif orderId is None:
 				print('Already ' + Fore.GREEN + 'executed' + Fore.RESET + '.')
 				trade['order_id'] = 0
 				trade['status_id'] = 1
 			else:
-				print('Wairing for execute.')
-				trade['order_id'] = res
+				print('Waiting for execute'),
+				trade['order_id'] = orderId
 				trade['status_id'] = 0
 				res = self.waitingOrder(trade['order_id'])
 				if res != 1:
 					self.lastErrorMessage = 'Order {0} was be cancelled'.format(trade['order_id'])
+					print('')
 					return False
+				trade['status_id'] = res
+				print('- ' + Fore.GREEN + 'ok' + Fore.RESET + '.')
 		return True
 	
 	def checkAmount(self, startAmount = 0.0, startCurr = 'usd'):
@@ -158,8 +167,6 @@ class Spec:
 
 	
 	def createOrder(self, trade):
-		#TODO check values
-
 		res = self.int.sendPost({'method': 'Trade', 'pair': trade['pair'], 'type': trade['action'], 'rate': trade['price'], 'amount': trade['operationAmount']})
 		if not res:
 			self.lastErrorMessage = self.int.getLastErrorMessage()

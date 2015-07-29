@@ -1,40 +1,19 @@
 #-*-coding:utf-8-*-
-from spec import Spec
+import os, json
 
-
-f = open('../secrets.txt', 'r')
-key = f.readline().strip()
-secret = f.readline().strip()
-f.close()
-
-myInt = Spec(key, secret)
-
-
-print('hello'),
-print('- cont')
-
-"""
-s = False
-if s is None:
-	print('s is None')
-elif s is False:
-	print('s is false')
+if os.path.isfile('selected_trades'):
+	print('File exists')
+	file = open('selected_trades', 'r+')
+	qq = json.load(file)
+	file.close()
+	print(qq)
 else:
-	print('s is another')
+	print('File NOT exists')
+	
+ss = [{'a': 'trolol'}, {'z': 'hell', 's': 34}]
+	
+file = open('selected_trades', 'w+')
+file.write(json.dumps(ss))
+file.close()
 
-s = None
-if s is None:
-	print('s is None')
-elif s is False:
-	print('s is false')
-else:
-	print('s is another')
-
-s = 0	
-if s is None:
-	print('s is None')
-elif s is False:
-	print('s is false')
-else:
-	print('s is another')
-"""
+os.remove('selected_trades')

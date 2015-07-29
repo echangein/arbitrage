@@ -1,6 +1,6 @@
 from interface import Interface
 from colorama import init, Fore
-import time
+import time, os, json
 
 class Spec:
 	lastErrorMessage = None
@@ -94,12 +94,13 @@ class Spec:
 		return True
 	
 	def executeSequence(self, selectedTrades, startAmount = None, startCurr = None, cont = False):
-		print('Checking start amount: {0} {1}'.format(startAmount, startCurr)),
-		if not self.checkAmount(startAmount, startCurr):
-			print('')
-			return False
-		else:
-			print('- ' + Fore.GREEN + 'ok' + Fore.RESET + '.')
+		if not cont:
+			print('Checking start amount: {0} {1}'.format(startAmount, startCurr)),
+			if not self.checkAmount(startAmount, startCurr):
+				print('')
+				return False
+			else:
+				print('- ' + Fore.GREEN + 'ok' + Fore.RESET + '.')
 			
 		for trade in selectedTrades:
 			if not 'order_id' in trade:
@@ -108,7 +109,7 @@ class Spec:
 			else:
 				print('Exist order: ' + self.formatTrade(trade))
 				orderId = trade['order_id']
-				
+			
 			if orderId is False:
 				print(Fore.RED + 'Fail' + Fore.RESET + '.')
 				return False
@@ -120,6 +121,7 @@ class Spec:
 				print('Waiting for execute'),
 				trade['order_id'] = orderId
 				trade['status_id'] = 0
+				self.saveTrades(selectedTrades)
 				res = self.waitingOrder(trade['order_id'])
 				if res != 1:
 					self.lastErrorMessage = 'Order {0} was be cancelled'.format(trade['order_id'])
@@ -127,7 +129,26 @@ class Spec:
 					return False
 				trade['status_id'] = res
 				print('- ' + Fore.GREEN + 'ok' + Fore.RESET + '.')
+			self.saveTrades(selectedTrades)
 		return True
+	
+	def saveTrades(self, trades):
+		file = open('selected_trades', 'w+')
+		file.write(json.fumps(trades))
+		file.close()
+	
+	def loadTrades(self):
+		file = open('selected_trades', 'r+')
+		trades = json.load(file)
+		file.close()
+		return trades
+		
+	def unlinkTrades(self):
+		if os.path.isfile('selected_trades'):
+			os.remove('selected_trades')
+	
+	def isExistsTrades(self):
+		return os.path.isfile('selected_trades')
 	
 	def checkAmount(self, startAmount = 0.0, startCurr = 'usd'):
 		res = self.int.sendPost({'method': 'getInfo'})

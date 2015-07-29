@@ -41,11 +41,16 @@ def reloadDepths(spec, startAmount, startCurrency):
 	
 import config
 from spec import Spec
+import os.path
 
-f = open('../secrets.txt', 'r')
-key = f.readline().strip()
-secret = f.readline().strip()
-f.close()
+key = None
+secret = None
+
+if os.path.isfile('../secrets.txt'):
+	f = open('../secrets.txt', 'r')
+	key = f.readline().strip()
+	secret = f.readline().strip()
+	f.close()
 
 curSite = Spec(key, secret)
 
@@ -70,9 +75,16 @@ if not curSite.generateTradeSequence(config.startCurrency, config.tradeSequence,
 
 print('Trade sequences ' + Fore.GREEN + 'successfully' + Fore.RESET + ' generated.')
 
-reloadDepths(curSite, config.startAmount, config.startCurrency)
-
-key = ord(getch())
+if curSite.isExistsTrades():
+	prinr('Found uncompleted trading sequence.')
+	selectedTrades = curSite.loadTrades()
+	key = 0
+	cont = True
+else:
+	reloadDepths(curSite, config.startAmount, config.startCurrency)
+	key = ord(getch())
+	cont = False
+	
 while key != 27:
 	if (key >= ord('1')) and (key <= ord('9')):
 		variant = 0
@@ -97,11 +109,12 @@ while key != 27:
 		print('')
 		reloadDepths(curSite, config.startAmount, config.startCurrency)
 	
-	if (key == ord('e')) or (key == ord('E')):
+	if (key == ord('e')) or (key == ord('E') or cont):
 		print('')
 		if not selectedTrades is None:
-			if curSite.executeSequence(selectedTrades, config.startAmount, config.startCurrency):
+			if curSite.executeSequence(selectedTrades, config.startAmount, config.startCurrency, cont):
 				print('Trading sequence complete ' + Fore.GREEN + 'successfully' + Fore.RESET + '.')
+				curSite.unlinkTrades()
 				quit()
 			else:
 				print('Trading sequence  ' + Fore.RED + 'failed' + Fore.RESET + '.')
@@ -109,4 +122,5 @@ while key != 27:
 		else:
 			print(Fore.RED + 'Select trading sequence' + Fore.RESET + ' please!')
 	
+	cont = False
 	key = ord(getch())

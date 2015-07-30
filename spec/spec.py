@@ -134,7 +134,7 @@ class Spec:
 	
 	def saveTrades(self, trades):
 		file = open('selected_trades', 'w+')
-		file.write(json.fumps(trades))
+		file.write(json.dumps(trades))
 		file.close()
 	
 	def loadTrades(self):
@@ -204,7 +204,7 @@ class Spec:
 		else:
 			prefix = Fore.GREEN
 
-		return '{0}: {1}{2}\t{3}{4} @ {5}\t= {6}'.format(trade['pair'], prefix, trade['action'], Fore.RESET, trade['operationAmount'], trade['price'], trade['resultAmount'])
+		return '{0}: {1}{2}\t{3}{4}\t@ {5}\t= {6}'.format(trade['pair'], prefix, trade['action'], Fore.RESET, trade['operationAmount'], trade['price'], trade['resultAmount'])
 
 	
 	def __getAllCombinations(self, seq = None):
@@ -225,7 +225,8 @@ class Spec:
 	
 	
 	def __sell(self, amount = None, depth = None, condition = None):
-		price = round(depth['asks'][0][0]-10**(-condition['decimal_places']), 8)
+		#price = round((depth['bids'][0][0]+depth['asks'][0][0])/2, condition['decimal_places'])
+		price = round(depth['asks'][0][0]-10**(-condition['decimal_places'])*2, 8)
 		operationAmount = amount
 		if operationAmount < condition['min_amount']:
 			return False
@@ -233,7 +234,8 @@ class Spec:
 		return {'operationAmount': operationAmount, 'price': price, 'resultAmount': resultAmount, 'action': 'sell'}
 	
 	def __buy(self, amount = None, depth = None, condition = None):
-		price = round(depth['bids'][0][0]+10**(-condition['decimal_places']), 8)
+		#price = round((depth['bids'][0][0]+depth['asks'][0][0])/2, condition['decimal_places'])
+		price = round(depth['bids'][0][0]+10**(-condition['decimal_places'])*2, 8)
 		operationAmount = round(amount / price, 8)
 		if operationAmount < condition['min_amount']:
 			return False

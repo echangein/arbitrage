@@ -76,8 +76,10 @@ if not curSite.generateTradeSequence(config.startCurrency, config.tradeSequence,
 print('Trade sequences ' + Fore.GREEN + 'successfully' + Fore.RESET + ' generated.')
 
 if curSite.isExistsTrades():
-	prinr('Found uncompleted trading sequence.')
+	print('Found uncompleted trading sequence.')
 	selectedTrades = curSite.loadTrades()
+	for action in selectedTrades:
+		print(curSite.formatTrade(action))
 	key = 0
 	cont = True
 else:

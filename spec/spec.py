@@ -226,7 +226,7 @@ class Spec:
 	
 	def __sell(self, amount = None, depth = None, condition = None):
 		#price = round((depth['bids'][0][0]+depth['asks'][0][0])/2, condition['decimal_places'])
-		price = round(depth['asks'][0][0]-10**(-condition['decimal_places'])*2, 8)
+		price = round(depth['asks'][0][0]-10**(-condition['decimal_places']), 8)
 		operationAmount = amount
 		if operationAmount < condition['min_amount']:
 			return False
@@ -235,7 +235,7 @@ class Spec:
 	
 	def __buy(self, amount = None, depth = None, condition = None):
 		#price = round((depth['bids'][0][0]+depth['asks'][0][0])/2, condition['decimal_places'])
-		price = round(depth['bids'][0][0]+10**(-condition['decimal_places'])*2, 8)
+		price = round(depth['bids'][0][0]+10**(-condition['decimal_places']), 8)
 		operationAmount = round(amount / price, 8)
 		if operationAmount < condition['min_amount']:
 			return False

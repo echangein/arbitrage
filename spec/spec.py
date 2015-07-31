@@ -162,13 +162,19 @@ class Spec:
 		file = open('selected_trades', 'r+')
 		trades = json.load(file)
 		file.close()
+		
+		if not self.silent:
+			print self.dialogs.getLoadTradesMessage()
+			for action in selectedTrades:
+				print(self.dialogs.formatTrade(action))
+		
 		return trades
 		
 	def unlinkTrades(self):
 		if os.path.isfile('selected_trades'):
 			os.remove('selected_trades')
 	
-	def isExistsTrades(self):
+	def hasSavedTrades(self):
 		return os.path.isfile('selected_trades')
 	
 	def checkAmount(self, startAmount = 0.0, startCurr = 'usd'):

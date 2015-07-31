@@ -25,3 +25,17 @@ class Dialogs:
 	def getGenerateTradeSequenceSuccess(self):
 		ret = 'Trade sequences ' + Fore.GREEN + 'successfully' + Fore.RESET + ' generated.'
 		return ret
+		
+	def getLoadTradesMessage(self):
+		ret = 'Found uncompleted trading sequence.'
+		return ret
+		
+	def formatTrades(self, trades):
+		res = ''
+		for trade in trades:
+			if trade['action'] == 'buy':
+				res += trade['pair'][:3] + '->'
+			else:
+				res += trade['pair'][4:] + '->'
+				
+		return res[:-2]

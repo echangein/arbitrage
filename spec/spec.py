@@ -1,10 +1,13 @@
 from interface import Interface
+from dialogs import Dialogs
 from colorama import init, Fore
 import time, os, json
 
 class Spec:
+	dialogs = None
 	lastErrorMessage = None
 	checkTimeout = 2
+	silent = False
 	int = None
 	pairs = None
 	depth = None
@@ -13,6 +16,7 @@ class Spec:
 	
 	def __init__(self, key, secret):
 		self.int = Interface(key, secret)
+		self.dialogs = Dialogs()
 	
 	def getLastErrorMessage(self):
 		return self.lastErrorMessage
@@ -21,25 +25,38 @@ class Spec:
 		res = self.int.sendGet('info')
 		if not res:
 			self.lastErrorMessage = self.int.getLastErrorMessage()
+			if not self.silent:
+				print self.dialogs.getCheckConnectionError(self.lastErrorMessage)
 			return False
+		
+		if not self.silent:
+			print self.dialogs.getCheckConnectionSuccess()
 		return True
 	
 	def loadTradeConditions(self):
 		res = self.int.sendGet('info')
 		if not res:
 			self.lastErrorMessage = self.int.getLastErrorMessage()
+			if not self.silent:
+				print self.dialogs.getLoadTradeConditionsError(self.lastErrorMessage)
 			return False
 			
 		self.pairs = res['pairs']
+		if not self.silent:
+			print self.dialogs.getLoadTradeConditionsSuccess()
 		return True
 	
 	def generateTradeSequence(self, start, seq = None, length = 3):
 		if length < 2:
 			self.lastErrorMessage = 'tradeLength at config.py too small'
+			if not self.silent:
+				print self.dialogs.getGenerateTradeSequenceError(self.lastErrorMessage)
 			return False
 		
 		if len(seq) < length:
 			self.lastErrorMessage = 'Not enough values in tradeSequence at config.py'
+			if not self.silent:
+				print self.dialogs.getGenerateTradeSequenceError(self.lastErrorMessage)
 			return False
 			
 		self.seqs = []
@@ -58,9 +75,13 @@ class Spec:
 				self.seqs.append({'trades': seq})
 		
 		if len(self.seqs)>0:
+			if not self.silent:
+				print self.dialogs.getGenerateTradeSequenceSuccess()
 			return True
 		
 		self.lastErrorMessage = 'Can\'t choose pair for any sequence'
+		if not self.silent:
+			print self.dialogs.getGenerateTradeSequenceError(self.lastErrorMessage)
 		return False
 	
 	def generateTradeAmount(self, startAmount = 0.0):

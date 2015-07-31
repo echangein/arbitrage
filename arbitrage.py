@@ -55,25 +55,13 @@ if os.path.isfile('../secrets.txt'):
 curSite = Spec(key, secret)
 
 if not curSite.checkConnection():
-	print(Fore.RED + 'Can\'t connect' + Fore.RESET + ' to ' + curSite.baseUrl)
-	print('Error: ' + Fore.RED + curSite.getLastErrorMessage() + Fore.RESET)
 	quit()
-
-print('Server answered ' + Fore.GREEN + 'correctly' + Fore.RESET + '.')
 
 if not curSite.loadTradeConditions():
-	print(Fore.RED + 'Can\'t load trade conditions' + Fore.RESET + ' from ' + curSite.baseUrl)
-	print('Error: ' + Fore.RED + curSite.getLastErrorMessage() + Fore.RESET)
 	quit()
-
-print('Trade conditions is ' + Fore.GREEN + 'loading' + Fore.RESET + '.')
 	
 if not curSite.generateTradeSequence(config.startCurrency, config.tradeSequence, config.tradeLength):
-	print('Can\'t ' + Fore.RED + 'generate' + Fore.RESET + ' trade sequence.')
-	print('Error: ' + Fore.RED + curSite.getLastErrorMessage() + Fore.RESET)
 	quit()
-
-print('Trade sequences ' + Fore.GREEN + 'successfully' + Fore.RESET + ' generated.')
 
 if curSite.isExistsTrades():
 	print('Found uncompleted trading sequence.')

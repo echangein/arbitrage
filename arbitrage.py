@@ -3,7 +3,7 @@ from colorama import init, Fore
 init()
 
 from kbrd import getch
-
+"""
 def formatTrades(trades):
 	res = ''
 	for trade in trades:
@@ -37,7 +37,7 @@ def reloadDepths(spec, startAmount, startCurrency):
 	print('Press ' + Fore.YELLOW + 'ESC' + Fore.RESET + ' to exit.')
 	
 	return
-
+"""
 	
 import config
 from spec import Spec
@@ -95,8 +95,9 @@ while key != 27:
 	
 	if (key == ord('r')) or (key == ord('R')):
 		selectedTrades = None
-		print('')
-		reloadDepths(curSite, config.startAmount, config.startCurrency)
+		#print('')
+		if not curSite.waitingDepths(config.startAmount, config.startCurrency):
+			quit()
 	
 	if (key == ord('e')) or (key == ord('E') or cont):
 		print('')

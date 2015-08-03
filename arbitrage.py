@@ -83,6 +83,8 @@ while key != 27:
 				variant += 1
 				if variant == (key - ord('0')):
 					selectedTrades = trades['trades']
+
+		
 		if selectedTrades <> None:
 			print('\nStart amount: {0} {1}'.format(config.startAmount, config.startCurrency))
 			for action in selectedTrades:

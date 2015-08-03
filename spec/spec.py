@@ -230,7 +230,7 @@ class Spec:
 			return res['return']['order_id']
 	
 	
-	def waitingDepths(self, startAmount, startCurrency):
+	def waitingDepths(self, startAmount, startCurrency, minProfit = 0.00):
 		print('Waiting for profitable depths.')
 		execute = True
 		while execute:
@@ -244,7 +244,7 @@ class Spec:
 			
 			variant = 0
 			for trades in self.seqs:
-				if not 'error' in trades['options'] and trades['options']['resultAmount'] > startAmount:
+				if not 'error' in trades['options'] and trades['options']['resultAmount'] > startAmount + minProfit:
 					variant += 1
 					print(self.dialogs.formatSequencyTrades(variant, startCurrency, trades['trades'], trades['options']['resultAmount']))
 			

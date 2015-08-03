@@ -3,6 +3,8 @@ from dialogs import Dialogs
 from colorama import init, Fore
 import time, os, json
 
+
+
 class Spec:
 	dialogs = None
 	lastErrorMessage = None
@@ -17,6 +19,7 @@ class Spec:
 	def __init__(self, key, secret):
 		self.int = Interface(key, secret)
 		self.dialogs = Dialogs()
+		self.formatTrade = self.dialogs.formatTrade
 	
 	def getLastErrorMessage(self):
 		return self.lastErrorMessage
@@ -105,6 +108,7 @@ class Spec:
 						actionItem = self.__buy(actionAmount, self.depth[tradeItem['pair']], self.pairs[tradeItem['pair']])
 					if not actionItem:
 						seq['options']['error'] = 'Can\'t ' + tradeItem['action'] + ' ' + str(actionAmount) + ' in ' + tradeItem['pair']
+						#self.lastErrorMessage = seq['options']['error']
 						contFlag = False
 					else:
 						tradeItem.update(actionItem)
@@ -225,14 +229,31 @@ class Spec:
 		else:
 			return res['return']['order_id']
 	
-	def formatTrade(self, trade):
-		if trade['action'] == 'sell':
-			prefix = Fore.RED
-		else:
-			prefix = Fore.GREEN
-
-		return '{0}: {1}{2}\t{3}{4}\t@ {5}\t= {6}'.format(trade['pair'], prefix, trade['action'], Fore.RESET, trade['operationAmount'], trade['price'], trade['resultAmount'])
-
+	
+	def waitingDepths(self, startAmount, startCurrency):
+		print('Waiting for profitable depths.')
+		execute = True
+		while execute:
+			if not self.generateTradeAmount(startAmount):
+				if not self.silent:
+					print(self.dialogs.getGenerateTradeAmountError(self.lastErrorMessage))
+				return False
+			
+			if not self.silent:
+				print self.dialogs.getGenerateTradeAmountSuccess()
+			
+			variant = 0
+			for trades in self.seqs:
+				if not 'error' in trades['options'] and trades['options']['resultAmount'] > startAmount:
+					variant += 1
+					print(self.dialogs.formatSequencyTrades(variant, startCurrency, trades['trades'], trades['options']['resultAmount']))
+			
+			if variant:
+				execute = False
+			else:
+				time.sleep(self.checkTimeout)
+		
+		return True
 	
 	def __getAllCombinations(self, seq = None):
 		if not(hasattr(seq, '__iter__')):

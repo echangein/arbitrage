@@ -30,6 +30,22 @@ class Dialogs:
 		ret = 'Found uncompleted trading sequence.'
 		return ret
 		
+	def getGenerateTradeAmountError(self, message = None):
+		ret = 'Can\'t ' + Fore.RED + 'generate' + Fore.RESET + ' trade amounts.\nError: ' + Fore.RED + message + Fore.RESET
+		return ret
+	
+	def getGenerateTradeAmountSuccess(self):
+		ret = 'Depth ' + Fore.GREEN + 'successfully' + Fore.RESET + ' imported.'
+		return ret
+	
+	def formatTrade(self, trade):
+		if trade['action'] == 'sell':
+			prefix = Fore.RED
+		else:
+			prefix = Fore.GREEN
+
+		return '{0}: {1}{2}\t{3}{4}\t@ {5}\t= {6}'.format(trade['pair'], prefix, trade['action'], Fore.RESET, trade['operationAmount'], trade['price'], trade['resultAmount'])
+
 	def formatTrades(self, trades):
 		res = ''
 		for trade in trades:
@@ -39,3 +55,7 @@ class Dialogs:
 				res += trade['pair'][4:] + '->'
 				
 		return res[:-2]
+
+	def formatSequencyTrades(self, variant, startCurrency, trades, resultAmount):
+		ret = '{0}{1}{2}: {3}->{4}\tprofit: {5}{6}{2}'.format(Fore.YELLOW, variant, Fore.RESET, startCurrency, self.formatTrades(trades), Fore.GREEN, resultAmount)
+		return ret

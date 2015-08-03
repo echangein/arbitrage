@@ -69,7 +69,8 @@ if curSite.hasSavedTrades():
 	key = 0
 	cont = True
 else:
-	reloadDepths(curSite, config.startAmount, config.startCurrency)
+	if not curSite.waitingDepths(config.startAmount, config.startCurrency):
+		quit()
 	key = ord(getch())
 	cont = False
 	

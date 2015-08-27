@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 #-*-coding:utf-8-*-
 
 from kbrd import getch
@@ -12,6 +13,7 @@ profitPercent = 1
 deepPercent = 10
 totalInvest = 5
 
+"""
 def printCascade(cascade):
 	invested = 0
 	for item in cascade:
@@ -19,9 +21,11 @@ def printCascade(cascade):
 		accepted = round(item['sellOrder']['rate'] * item['sellOrder']['amount'] * (100 - fee) / 100, totalPrecision)
 		profit = round(accepted - invested, profitPrecision)
 		print('{0[stage]:>3} buy {1[amount]:<12}@ {1[rate]:<12}inv: {3:<12}sell: {2[amount]:<12}@ {2[rate]:<12}accp: {4:<14} {5:<2}'.format(item, item['buyOrder'], item['sellOrder'], invested, accepted, profit))
+"""
 
 import config
 from spec import Spec
+from cascade import Cascade
 import os.path
 
 key = None
@@ -34,11 +38,10 @@ if os.path.isfile('../secrets.txt_bot1'):
 	f.close()
 
 curSite = Spec(key, secret)
+engine = Cascade(key, secret)
 
 if not curSite.checkConnection():
 	quit()
-
-
 	
 if not curSite.loadTradeConditions():
 	quit()
@@ -64,7 +67,7 @@ priceStep = round(investQuant * investDensity, pricePrecision)
 if priceStep == 0:
 	priceStep = 10 ** -pricePrecision
 	
-if not os.path.isfile('cascade'):	
+if not os.path.isfile('cascade_trades'):	
 	print('startPrice:\t{0}'.format(startPrice))
 	print('endPrice:\t{0}'.format(endPrice))
 	print('\nPrice lenght:\t{0}'.format(priceLength))
@@ -91,15 +94,15 @@ if not os.path.isfile('cascade'):
 		curInvest -= investQuant
 		curPrice -= priceStep
 
-	file = open('cascade', 'w+')
+	file = open('cascade_trades', 'w+')
 	file.write(json.dumps(cascade))
 	file.close()
 else:
-	file = open('cascade', 'r+')
+	file = open('cascade_trades', 'r+')
 	cascade = json.load(file)
 	file.close()
 
-printCascade(cascade)
+engine.printCascade(cascade)
 
 """
 print(cascade[1]['sell_order']['amount']) #['sell_order']['amount']

@@ -4,10 +4,21 @@ from kbrd import getch
 import time, os, json
 from spec import Spec
 
+totalPrecision = 8
+pair = 'ltc_usd'
+
+profitPercent = 2
+deepPercent = 20
+totalInvest = 5
+
 def printCascade(cascade):
+	invested = 0
 	for item in cascade:
 		#print(item['stage'])
-		print('{0[stage]:>3} buy {1[amount]:<12}@ {1[rate]:<12}sell: {2[amount]:<12}@ {2[rate]:<12}'.format(item, item['buyOrder'], item['sellOrder']))
+		invested += round(item['buyOrder']['rate'] * item['buyOrder']['amount'], totalPrecision)
+		accepted = round(item['sellOrder']['rate'] * item['sellOrder']['amount'] * (100 - fee) / 100, totalPrecision)
+		profit = round(accepted - invested, 3)
+		print('{0[stage]:>3} buy {1[amount]:<12}@ {1[rate]:<12}inv: {3:<12}sell: {2[amount]:<12}@ {2[rate]:<12}accp: {4:<14} {5:<2}'.format(item, item['buyOrder'], item['sellOrder'], invested, accepted, profit))
 		"""
 		print('{stage:>3} buy {1:<12}@ {2:<12}inv: {3:<12}sell: {4:<12}@ {5:<12}accp: {6:<14} {7:<2}'.format(stage, curAmount, curPrice, invested, sellAmount, sellPrice, accepted, profit))
 	
@@ -26,13 +37,6 @@ def printCascade(cascade):
 		curInvest -= investQuant
 		curPrice -= priceStep
 	"""
-
-totalPrecision = 8
-pair = 'ltc_usd'
-
-profitPercent = 2
-deepPercent = 20
-totalInvest = 5
 
 import config
 from spec import Spec

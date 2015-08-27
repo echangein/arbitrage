@@ -2,6 +2,9 @@ from colorama import init, Fore
 
 class Dialogs:
 	
+	def __init__(self):
+		init()
+	
 	def getCheckConnectionError(self, message = None):
 		ret = Fore.RED + 'Can\'t connect' + Fore.RESET + ' to server.\nError: ' + Fore.RED + str(message) + Fore.RESET
 		return ret
@@ -18,6 +21,14 @@ class Dialogs:
 		ret = 'Trade conditions is ' + Fore.GREEN + 'loading' + Fore.RESET + '.'
 		return ret
 	
+	def	getLoadTickersError(self, message = None):
+		ret = Fore.RED + 'Can\'t load tickers' + Fore.RESET + ' from server.\nError: ' + Fore.RED + message + Fore.RESET
+		return ret
+
+	def getLoadTickersSuccess(self):
+		ret = 'Tickers is ' + Fore.GREEN + 'loading' + Fore.RESET + '.'
+		return ret
+		
 	def getGenerateTradeSequenceError(self, message = None):
 		ret = 'Can\'t ' + Fore.RED + 'generate' + Fore.RESET + ' trade sequence.\nError: ' + Fore.RED + message + Fore.RESET
 		return ret

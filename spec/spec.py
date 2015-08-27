@@ -12,11 +12,12 @@ class Spec:
 	silent = False
 	int = None
 	pairs = None
+	tickers = None
 	depth = None
 	seqs = []
 	
 	
-	def __init__(self, key, secret):
+	def __init__(self, key = None, secret = None):
 		self.int = Interface(key, secret)
 		self.dialogs = Dialogs()
 		self.formatTrade = self.dialogs.formatTrade
@@ -47,6 +48,19 @@ class Spec:
 		self.pairs = res['pairs']
 		if not self.silent:
 			print self.dialogs.getLoadTradeConditionsSuccess()
+		return True
+	
+	def loadTickers(self, pairs = ['btc_rur']):
+		res = self.int.sendGet('ticker', pairs)
+		if not res:
+			self.lastErrorMessage = self.int.getLastErrorMessage()
+			if not self.silent:
+				print self.dialogs.getLoadTickersError(self.lastErrorMessage)
+			return False
+			
+		self.tickers = res
+		if not self.silent:
+			print self.dialogs.getLoadTickersSuccess()
 		return True
 	
 	def generateTradeSequence(self, start, seq = None, length = 3):
@@ -229,6 +243,18 @@ class Spec:
 		else:
 			return res['return']['order_id']
 	
+	
+	def cancelOrder(self, orderId = None):
+		res = self.int.sendPost({'method': 'CancelOrder', 'order_id': orderId})
+		if not res:
+			self.lastErrorMessage = self.int.getLastErrorMessage()
+			return False
+
+		if not str(orderId) in res['return']:
+			self.lastErrorMessage = 'Order {0} not found'.format(orderId)
+			return False
+		
+		return True
 	
 	def waitingDepths(self, startAmount, startCurrency, minProfit = 0.00):
 		print('Waiting for profitable depths.')

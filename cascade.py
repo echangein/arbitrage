@@ -5,38 +5,20 @@ import time, os, json
 from spec import Spec
 
 totalPrecision = 8
-pair = 'ltc_usd'
+profitPrecision = 2
+pair = 'btc_usd'
 
-profitPercent = 2
-deepPercent = 20
+profitPercent = 1
+deepPercent = 10
 totalInvest = 5
 
 def printCascade(cascade):
 	invested = 0
 	for item in cascade:
-		#print(item['stage'])
 		invested += round(item['buyOrder']['rate'] * item['buyOrder']['amount'], totalPrecision)
 		accepted = round(item['sellOrder']['rate'] * item['sellOrder']['amount'] * (100 - fee) / 100, totalPrecision)
-		profit = round(accepted - invested, 3)
+		profit = round(accepted - invested, profitPrecision)
 		print('{0[stage]:>3} buy {1[amount]:<12}@ {1[rate]:<12}inv: {3:<12}sell: {2[amount]:<12}@ {2[rate]:<12}accp: {4:<14} {5:<2}'.format(item, item['buyOrder'], item['sellOrder'], invested, accepted, profit))
-		"""
-		print('{stage:>3} buy {1:<12}@ {2:<12}inv: {3:<12}sell: {4:<12}@ {5:<12}accp: {6:<14} {7:<2}'.format(stage, curAmount, curPrice, invested, sellAmount, sellPrice, accepted, profit))
-	
-		curAmount = round(investQuant / curPrice, totalPrecision)
-		if curAmount < minAmount:
-			curAmount = minAmount
-			
-		invested += investQuant
-		sellAmount += round(curAmount * (100 - fee) / 100, totalPrecision)
-		sellPrice = round(invested / sellAmount * (100 + profitPercent) / 100, pricePrecision)
-		accepted = round(sellAmount * sellPrice * (100 - fee) / 100, totalPrecision)
-		profit = round(accepted - invested, 3)
-		print('{0:>3} buy {1:<12}@ {2:<12}inv: {3:<12}sell: {4:<12}@ {5:<12}accp: {6:<14} {7:<2}'.format(stage, curAmount, curPrice, invested, sellAmount, sellPrice, accepted, profit))
-		cascade.append({'stage': stage, 'buy_order': {'pair': pair, 'type': 'buy', 'rate': curPrice, 'amount': curAmount}, 'sell_order': {'pair': pair, 'type': 'sell', 'rate': sellPrice, 'amount': sellAmount}})
-		stage += 1
-		curInvest -= investQuant
-		curPrice -= priceStep
-	"""
 
 import config
 from spec import Spec
@@ -104,9 +86,6 @@ if not os.path.isfile('cascade'):
 		invested += investQuant
 		sellAmount += round(curAmount * (100 - fee) / 100, totalPrecision)
 		sellPrice = round(invested / sellAmount * (100 + profitPercent) / 100, pricePrecision)
-		accepted = round(sellAmount * sellPrice * (100 - fee) / 100, totalPrecision)
-		profit = round(accepted - invested, 3)
-		print('{0:>3} buy {1:<12}@ {2:<12}inv: {3:<12}sell: {4:<12}@ {5:<12}accp: {6:<14} {7:<2}'.format(stage, curAmount, curPrice, invested, sellAmount, sellPrice, accepted, profit))
 		cascade.append({'stage': stage, 'buyOrder': {'pair': pair, 'type': 'buy', 'rate': curPrice, 'amount': curAmount}, 'sellOrder': {'pair': pair, 'type': 'sell', 'rate': sellPrice, 'amount': sellAmount}})
 		stage += 1
 		curInvest -= investQuant
@@ -119,7 +98,8 @@ else:
 	file = open('cascade', 'r+')
 	cascade = json.load(file)
 	file.close()
-	printCascade(cascade)
+
+printCascade(cascade)
 
 """
 print(cascade[1]['sell_order']['amount']) #['sell_order']['amount']

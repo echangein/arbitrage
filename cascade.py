@@ -9,19 +9,9 @@ totalPrecision = 8
 profitPrecision = 2
 pair = 'btc_usd'
 
-profitPercent = 1
-deepPercent = 10
+profitPercent = 2
+deepPercent = 15
 totalInvest = 5
-
-"""
-def printCascade(cascade):
-	invested = 0
-	for item in cascade:
-		invested += round(item['buyOrder']['rate'] * item['buyOrder']['amount'], totalPrecision)
-		accepted = round(item['sellOrder']['rate'] * item['sellOrder']['amount'] * (100 - fee) / 100, totalPrecision)
-		profit = round(accepted - invested, profitPrecision)
-		print('{0[stage]:>3} buy {1[amount]:<12}@ {1[rate]:<12}inv: {3:<12}sell: {2[amount]:<12}@ {2[rate]:<12}accp: {4:<14} {5:<2}'.format(item, item['buyOrder'], item['sellOrder'], invested, accepted, profit))
-"""
 
 import config
 from spec import Spec
@@ -37,78 +27,64 @@ if os.path.isfile('../secrets.txt_bot1'):
 	secret = f.readline().strip()
 	f.close()
 
-curSite = Spec(key, secret)
 engine = Cascade(key, secret)
+engine.setPair(pair)
 
-if not curSite.checkConnection():
-	quit()
+engine.setProfitPercent(profitPercent)
+engine.setDeepPercent(deepPercent)
+engine.setTotalInvest(totalInvest)
+
+print('\ncur Pair:\t{0}'.format(pair))
 	
-if not curSite.loadTradeConditions():
-	quit()
-
-if not curSite.loadTickers([pair]):
-	quit()
-
-lastPrice = curSite.tickers[pair]['last']
-pricePrecision = curSite.pairs[pair]['decimal_places']
-minAmount = curSite.pairs[pair]['min_amount']
-fee = curSite.pairs[pair]['fee']
-
-print('\nSelected pair:\t{0}'.format(pair))
-print('lastPrice:\t{0}\n'.format(lastPrice))
-
-startPrice = round(lastPrice * (100 - profitPercent) / 100, pricePrecision)
-endPrice = round(startPrice * (100 - deepPercent) / 100, pricePrecision)
-priceLength = startPrice - endPrice
-investDensity = round((startPrice - endPrice) / totalInvest, totalPrecision)
-investQuant = round(startPrice * minAmount * (100 + 2 * fee) / 100, pricePrecision)
-
-priceStep = round(investQuant * investDensity, pricePrecision)
-if priceStep == 0:
-	priceStep = 10 ** -pricePrecision
-	
-if not os.path.isfile('cascade_trades'):	
-	print('startPrice:\t{0}'.format(startPrice))
-	print('endPrice:\t{0}'.format(endPrice))
-	print('\nPrice lenght:\t{0}'.format(priceLength))
-	print('investDensity:\t{0}'.format(investDensity))
-	print('investQuant:\t{0}'.format(investQuant))
-	print('priceStep:\t{0}\n'.format(priceStep))
-
-	curInvest = totalInvest
-	curPrice = startPrice
-	invested = 0
-	stage = 0
-	sellAmount = 0
-	cascade = []
-	while curInvest >= investQuant:
-		curAmount = round(investQuant / curPrice, totalPrecision)
-		if curAmount < minAmount:
-			curAmount = minAmount
-			
-		invested += investQuant
-		sellAmount += round(curAmount * (100 - fee) / 100, totalPrecision)
-		sellPrice = round(invested / sellAmount * (100 + profitPercent) / 100, pricePrecision)
-		cascade.append({'stage': stage, 'buyOrder': {'pair': pair, 'type': 'buy', 'rate': curPrice, 'amount': curAmount}, 'sellOrder': {'pair': pair, 'type': 'sell', 'rate': sellPrice, 'amount': sellAmount}})
-		stage += 1
-		curInvest -= investQuant
-		curPrice -= priceStep
-
-	file = open('cascade_trades', 'w+')
-	file.write(json.dumps(cascade))
-	file.close()
-else:
+if os.path.isfile('cascade_trades'): #warning! not chek pair and another params
 	file = open('cascade_trades', 'r+')
 	cascade = json.load(file)
 	file.close()
+	print('Cascade is loading')
+else:
+	cascade = engine.createCascade()
+	print('Cascade is generated')
+
+"""	
+cascade = engine.createOrders(cascade)
+engine.setCascade(cascade)
+engine.checkStatus()
+"""
 
 engine.printCascade(cascade)
+quit()
 
-"""
-print(cascade[1]['sell_order']['amount']) #['sell_order']['amount']
-print(cascade[2]['sell_order']['amount']) #['sell_order']['amount']
-print(cascade[3]['sell_order']['amount']) #['sell_order']['amount']
-"""
+file = open('cascade_trades', 'w+')
+file.write(json.dumps(cascade))
+file.close()
+
+if engine.inWork():
+	print('\nIn work')
+	if engine.checkStatus():
+		engine.cancelOrders()
+		print('\nCascade COMPLETE.')
+		print('Profit: {0}'.format(engine.getProfit()))
+		quit()
+	engine.createOrders()
+	cascade = engine.getCascade()
+	file = open('cascade_trades', 'w+')
+	file.write(json.dumps(cascade))
+	file.close()
+	print('Repeat after few seconds.')
+else:
+	print('\nJust waiting')
+	if engine.checkLastPrice():
+		print('\nPrice change. Generate new cascade')
+		engine.cancelOrders()
+		if os.path.isfile('cascade_trades'):
+			os.remove('cascade_trades')
+		cascade = engine.createCascade()
+		file = open('cascade_trades', 'w+')
+		file.write(json.dumps(cascade))
+		file.close()
+	engine.createOrders()
+	print('Repeat after few seconds.')
+
 
 """	
 orderId = 753455999

@@ -143,9 +143,9 @@ class Cascade:
 			quit()
 		
 		lastPrice = self.spec.tickers[self.pair]['last']
-		cascadeStartPrice = self.cascade[0]['buyOrder']['price']
+		cascadeStartPrice = cascade[0]['buyOrder']['price']
 		
-		print('{0} <> {1}'.format(lastPrice, cascadeStartPrice * (100 + self.profitPercent * 2 ) / 100))
+		#print('{0} <> {1}'.format(lastPrice, cascadeStartPrice * (100 + self.profitPercent * 2 ) / 100))
 		
 		if lastPrice > cascadeStartPrice * (100 + self.profitPercent * 2 ) / 100:
 			return True
@@ -252,7 +252,7 @@ class Cascade:
 		
 		return cascade
 	
-	def getProfit(self, cascade = None): #TODO
+	def getProfit(self, cascade = None):
 		if (cascade is None):
 			cascade = self.cascade
 		if (cascade is None):

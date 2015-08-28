@@ -50,6 +50,8 @@ else:
 
 engine.printCascade(cascade)
 
+cascade = engine.checkOrders(cascade)
+
 if engine.inWork(cascade):
 	print('\nIn work')
 else:
@@ -61,9 +63,9 @@ else:
 		print('Profit: {0}'.format(profit))
 		quit()
 	
-	if not engine.checkLastPrice() is False:
+	if not engine.checkLastPrice(cascade) is False:
 		print('\nPrice change. Generate new cascade')
-		engine.cancelOrders()
+		engine.cancelOrders(cascade)
 		if os.path.isfile('cascade_trades'):
 			os.remove('cascade_trades')
 		cascade = engine.createCascade()
@@ -71,7 +73,6 @@ else:
 		file.write(json.dumps(cascade))
 		file.close()
 
-cascade = engine.checkOrders(cascade)
 cascade = engine.createOrders(cascade)
 
 file = open('cascade_trades', 'w+')
@@ -79,13 +80,3 @@ file.write(json.dumps(cascade))
 file.close()
 	
 print('Repeat after few seconds.')
-
-"""	
-orderId = 753455999
-res = curSite.getOrderStatus(orderId)
-if res is False:
-	print(curSite.getLastErrorMessage())
-	quit()
-
-print('OrderStatus: {0}'.format(res))
-"""

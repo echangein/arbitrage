@@ -61,6 +61,9 @@ else:
 		engine.cancelOrders(cascade)
 		print('\nCascade COMPLETE.')
 		print('Profit: {0}'.format(profit))
+		engine.printCascade(cascade)
+		if os.path.isfile('cascade_trades'):
+			os.remove('cascade_trades')
 		quit()
 	
 	if engine.needRestart(cascade):

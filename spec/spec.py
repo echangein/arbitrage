@@ -250,7 +250,7 @@ class Spec:
 			self.lastErrorMessage = self.int.getLastErrorMessage()
 			return False
 
-		if not str(orderId) in res['return']:
+		if not 'order_id' in res['return']:
 			self.lastErrorMessage = 'Order {0} not found'.format(orderId)
 			return False
 		

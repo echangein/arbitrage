@@ -127,7 +127,7 @@ class Cascade:
 		
 		for element in cascade:
 			if element['stage'] == byedStage:
-				if 'orderId' in element['sellOrder'] and 'status' in element['sellOrder'] and element['sellOrder']['status'] == 1:
+				if self.__isCompleteOrder(element['sellOrder']):
 					return False
 		
 		return True
@@ -188,6 +188,7 @@ class Cascade:
 				if not res:
 					print(self.spec.getLastErrorMessage())
 					quit()
+				element['sellOrder']['status'] = 2
 			
 			if element['stage'] == byedStage and not self.__isCreatedOrder(element['sellOrder']):
 				orderId = self.spec.createOrder(element['sellOrder'])
@@ -202,6 +203,74 @@ class Cascade:
 		
 		return cascade
 	
+	def cancelOrders(self, cascade = None):
+		if (cascade is None):
+			cascade = self.cascade
+		if (cascade is None):
+			print('Cascade element not defined')
+			quit()
+		
+		for element in cascade:
+			if self.__isActiveOrder(element['buyOrder']):
+				res = self.spec.cancelOrder(element['buyOrder']['orderId'])
+				if not res:
+					print(self.spec.getLastErrorMessage())
+					quit()
+				element['buyOrder']['status'] = 2
+			
+			if self.__isActiveOrder(element['sellOrder']):
+				print('CANCEL sell order!')
+				res = self.spec.cancelOrder(element['sellOrder']['orderId'])
+				if not res:
+					print(self.spec.getLastErrorMessage())
+					quit()
+				element['sellOrder']['status'] = 2
+		
+		return cascade
+	
+	def checkOrders(self, cascade = None):
+		if (cascade is None):
+			cascade = self.cascade
+		if (cascade is None):
+			print('Cascade element not defined')
+			quit()
+		
+		for element in cascade:
+			if self.__isActiveOrder(element['buyOrder']):
+				status = self.spec.getOrderStatus(element['buyOrder']['orderId'])
+				if status is False:
+					print(self.spec.getLastErrorMessage())
+					quit()
+				element['buyOrder']['status'] = status
+			
+			if self.__isActiveOrder(element['sellOrder']):
+				status = self.spec.getOrderStatus(element['sellOrder']['orderId'])
+				if status is False:
+					print(self.spec.getLastErrorMessage())
+					quit()
+				element['sellOrder']['status'] = status
+		
+		return cascade
+	
+	def getProfit(self, cascade = None): #TODO
+		if (cascade is None):
+			cascade = self.cascade
+		if (cascade is None):
+			print('Cascade element not defined')
+			quit()
+		
+		profit = False
+		invested = 0
+		for element in cascade:
+			invested += round(element['buyOrder']['price'] * element['buyOrder']['operationAmount'], self.totalPrecision)
+			if self.__isCompleteOrder(element['sellOrder']):
+				accepted = round(element['sellOrder']['price'] * element['sellOrder']['operationAmount'] * (100 - self.fee) / 100, self.totalPrecision)
+				profit = accepted - invested
+				print('Stage: {0}, profit: {1}'.format(element['stage'], profit))
+				profit = round(profit, self.profitPrecision)
+		
+		return profit
+			
 	def __isActiveOrder(self, order):
 		if 'orderId' in order and 'status' in order and order['status'] == 0:
 			return True

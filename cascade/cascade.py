@@ -132,7 +132,7 @@ class Cascade:
 		
 		return True
 	
-	def checkLastPrice(self, cascade = None):
+	def needRestart(self, cascade = None):
 		if (cascade is None):
 			cascade = self.cascade
 		if (cascade is None):
@@ -144,8 +144,6 @@ class Cascade:
 		
 		lastPrice = self.spec.tickers[self.pair]['last']
 		cascadeStartPrice = cascade[0]['buyOrder']['price']
-		
-		#print('{0} <> {1}'.format(lastPrice, cascadeStartPrice * (100 + self.profitPercent * 2 ) / 100))
 		
 		if lastPrice > cascadeStartPrice * (100 + self.profitPercent * 2 ) / 100:
 			return True

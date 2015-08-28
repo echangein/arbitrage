@@ -63,7 +63,7 @@ else:
 		print('Profit: {0}'.format(profit))
 		quit()
 	
-	if not engine.checkLastPrice(cascade) is False:
+	if engine.needRestart(cascade):
 		print('\nPrice change. Generate new cascade')
 		engine.cancelOrders(cascade)
 		if os.path.isfile('cascade_trades'):

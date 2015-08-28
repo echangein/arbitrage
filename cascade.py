@@ -43,20 +43,24 @@ if os.path.isfile('cascade_trades'): #warning! not chek pair and another params
 	print('Cascade is loading')
 else:
 	cascade = engine.createCascade()
+	file = open('cascade_trades', 'w+')
+	file.write(json.dumps(cascade))
+	file.close()
 	print('Cascade is generated')
 
-"""	
+#engine.checkStatus()	
 cascade = engine.createOrders(cascade)
-engine.setCascade(cascade)
-engine.checkStatus()
-"""
+#engine.setCascade(cascade)
+
+
 
 engine.printCascade(cascade)
-quit()
 
 file = open('cascade_trades', 'w+')
 file.write(json.dumps(cascade))
 file.close()
+
+quit() #==========================================
 
 if engine.inWork():
 	print('\nIn work')

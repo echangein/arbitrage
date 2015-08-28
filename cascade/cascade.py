@@ -70,10 +70,10 @@ class Cascade:
 			
 		invested = 0
 		for item in cascade:
-			invested += round(item['buyOrder']['rate'] * item['buyOrder']['amount'], self.totalPrecision)
-			accepted = round(item['sellOrder']['rate'] * item['sellOrder']['amount'] * (100 - self.fee) / 100, self.totalPrecision)
+			invested += round(item['buyOrder']['price'] * item['buyOrder']['operationAmount'], self.totalPrecision)
+			accepted = round(item['sellOrder']['price'] * item['sellOrder']['operationAmount'] * (100 - self.fee) / 100, self.totalPrecision)
 			profit = round(accepted - invested, self.profitPrecision)
-			print('{0[stage]:>3} buy {1[amount]:<12}@ {1[rate]:<12}inv: {3:<12}sell: {2[amount]:<12}@ {2[rate]:<12}accp: {4:<14} {5:<2}'.format(item, item['buyOrder'], item['sellOrder'], invested, accepted, profit))
+			print('{0[stage]:>3} buy {1[operationAmount]:<12}@ {1[price]:<12}inv: {3:<12}sell: {2[operationAmount]:<12}@ {2[price]:<12}accp: {4:<14} {5:<2}'.format(item, item['buyOrder'], item['sellOrder'], invested, accepted, profit))
 		
 	
 	def createCascade(self):
@@ -103,7 +103,7 @@ class Cascade:
 			invested += investQuant
 			sellAmount += round(curAmount * (100 - self.fee) / 100, self.totalPrecision)
 			sellPrice = round(invested / sellAmount * (100 + self.profitPercent) / 100, self.pricePrecision)
-			cascade.append({'stage': stage, 'buyOrder': {'pair': self.pair, 'type': 'buy', 'rate': curPrice, 'amount': curAmount}, 'sellOrder': {'pair': self.pair, 'type': 'sell', 'rate': sellPrice, 'amount': sellAmount}})
+			cascade.append({'stage': stage, 'buyOrder': {'pair': self.pair, 'action': 'buy', 'price': curPrice, 'operationAmount': curAmount}, 'sellOrder': {'pair': self.pair, 'action': 'sell', 'price': sellPrice, 'operationAmount': sellAmount}})
 			stage += 1
 			curInvest -= investQuant
 			curPrice -= priceStep			
@@ -119,7 +119,7 @@ class Cascade:
 		
 		byedStage = None
 		for element in cascade:
-			if 'orderId' in element['buyOrder'] and 'status' in element['buyOrder'] and element['buyOrder']['status'] == 1:
+			if self.__isCompleteOrder(element['buyOrder']):
 				byedStage = element['stage']
 		
 		if byedStage is None:
@@ -143,7 +143,7 @@ class Cascade:
 			quit()
 		
 		lastPrice = self.spec.tickers[self.pair]['last']
-		cascadeStartPrice = self.cascade[0]['buyOrder']['rate']
+		cascadeStartPrice = self.cascade[0]['buyOrder']['price']
 		
 		print('{0} <> {1}'.format(lastPrice, cascadeStartPrice * (100 + self.profitPercent * 2 ) / 100))
 		
@@ -159,21 +159,47 @@ class Cascade:
 			print('Cascade element not defined')
 			quit()
 		
+		byedStage = None
 		createdOrderCount = 0
 		for element in cascade:
 			if self.__isActiveOrder(element['buyOrder']):
 				createdOrderCount += 1
-			if createdOrderCount < activeOrdersCount and not self.__isCreatedOrder(element['buyOrder']):
+			if createdOrderCount < self.activeOrdersCount and not self.__isCreatedOrder(element['buyOrder']):
 				orderId = self.spec.createOrder(element['buyOrder'])
 				if orderId is False:
-					print(self.spec.getLastErrorMessage)
+					print(self.spec.getLastErrorMessage())
 					quit()
 				element['buyOrder']['orderId'] = orderId
 				if orderId is None:
 					element['buyOrder']['status'] = 1
-				else
+				else:
 					element['buyOrder']['status'] = 0
 				createdOrderCount += 1
+			
+			if self.__isCompleteOrder(element['buyOrder']):
+				byedStage = element['stage']
+				
+		for element in cascade:
+			if element['stage'] > byedStage:
+				break
+			
+			if element['stage'] < byedStage and self.__isActiveOrder(element['sellOrder']):
+				res = self.spec.cancelOrder(element['sellOrder']['orderId'])
+				if not res:
+					print(self.spec.getLastErrorMessage())
+					quit()
+			
+			if element['stage'] == byedStage and not self.__isCreatedOrder(element['sellOrder']):
+				orderId = self.spec.createOrder(element['sellOrder'])
+				if orderId is False:
+					print(self.spec.getLastErrorMessage())
+					quit()
+				element['sellOrder']['orderId'] = orderId
+				if orderId is None:
+					element['sellOrder']['status'] = 1
+				else:
+					element['sellOrder']['status'] = 0
+		
 		return cascade
 	
 	def __isActiveOrder(self, order):
@@ -183,5 +209,10 @@ class Cascade:
 		
 	def __isCreatedOrder(self, order):
 		if 'orderId' in order:
+			return True
+		return False
+		
+	def __isCompleteOrder(self, order):
+		if 'orderId' in order and 'status' in order and order['status'] == 1:
 			return True
 		return False

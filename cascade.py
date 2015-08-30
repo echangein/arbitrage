@@ -8,6 +8,7 @@ from spec import Spec
 totalPrecision = 8
 profitPrecision = 2
 pair = 'ltc_usd'
+cascadeFileName = 'cascade_trades'
 
 profitPercent = 1.1
 deepPercent = 15
@@ -36,14 +37,14 @@ engine.setTotalInvest(totalInvest)
 
 print('\ncur Pair:\t{0}'.format(pair))
 	
-if os.path.isfile('cascade_trades'): #warning! not chek pair and another params
-	file = open('cascade_trades', 'r+')
+if os.path.isfile(cascadeFileName): #warning! not chek pair and another params
+	file = open(cascadeFileName, 'r+')
 	cascade = json.load(file)
 	file.close()
 	print('Cascade is loading')
 else:
 	cascade = engine.createCascade()
-	file = open('cascade_trades', 'w+')
+	file = open(cascadeFileName, 'w+')
 	file.write(json.dumps(cascade))
 	file.close()
 	print('Cascade is generated')
@@ -62,23 +63,23 @@ else:
 		print('\nCascade COMPLETE.')
 		print('Profit: {0}'.format(profit))
 		engine.printCascade(cascade)
-		if os.path.isfile('cascade_trades'):
-			os.remove('cascade_trades')
+		if os.path.isfile(cascadeFileName):
+			os.remove(cascadeFileName)
 		quit()
 	
 	if engine.needRestart(cascade):
 		print('\nPrice change. Generate new cascade')
 		engine.cancelOrders(cascade)
-		if os.path.isfile('cascade_trades'):
-			os.remove('cascade_trades')
+		if os.path.isfile(cascadeFileName):
+			os.remove(cascadeFileName)
 		cascade = engine.createCascade()
-		file = open('cascade_trades', 'w+')
+		file = open(cascadeFileName, 'w+')
 		file.write(json.dumps(cascade))
 		file.close()
 
 cascade = engine.createOrders(cascade)
 
-file = open('cascade_trades', 'w+')
+file = open(cascadeFileName, 'w+')
 file.write(json.dumps(cascade))
 file.close()
 	

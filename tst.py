@@ -2,7 +2,7 @@
 #!/usr/bin/env python
 import os, json, sys, time
 
-stateFile = '/home/morro/dev/state';
+stateFile = '/home/m/morro/dev/state';
 
 #print(len(sys.argv))
 #print(sys.argv)
@@ -15,6 +15,7 @@ if len(sys.argv) > 1:
 
 print(key)
 print(int(time.time()))
+print(__file__)
 
 file = open(stateFile, 'w+')
 file.write(json.dumps({'key': key, 'time': int(time.time())}))

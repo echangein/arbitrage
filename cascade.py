@@ -11,12 +11,12 @@ pair = 'ltc_usd'
 silent = False
 
 if len(sys.argv) > 1:
-	if sys.argv[1] == 'crone'
+	if sys.argv[1] == 'crone':
 		silent = True
 
 profitPercent = 1.1
 deepPercent = 15
-totalInvest = 5
+totalInvest = 5.2
 
 import config
 from spec import Spec
@@ -35,6 +35,19 @@ dirname, filename = os.path.split(os.path.abspath(__file__))
 cascadeFileName = dirname + cascadeFile
 keyFileName = dirname + keyFile
 statusFileName = dirname + statusFile
+
+def getPrevStat():
+	ret = 'waiting'
+	if os.path.isfile(statusFileName):
+		f = open(statusFileName, 'r+')
+		ret = f.readline().strip()
+		f.close()
+	return ret
+
+def setPrevStat(val):
+	f = open(statusFileName, 'w+')
+	f.write(val)
+	f.close()
 
 if os.path.isfile(keyFileName):
 	f = open(keyFileName, 'r')
@@ -66,14 +79,20 @@ else:
 	if not silent:
 		print('Cascade is generated')
 
-engine.printCascade(cascade)
+if not silent:
+	engine.printCascade(cascade)
 
 cascade = engine.checkOrders(cascade)
 
 if engine.inWork(cascade):
 	if not silent:
 		print('\nIn work')
+	if getPrevStat() <> 'inWork':
+		print('In work')
+		engine.printCascade(cascade)
+	setPrevStat('inWork')
 else:
+	setPrevStat('waiting')
 	if not silent:
 		print('\nJust waiting')
 	profit = engine.getProfit(cascade)

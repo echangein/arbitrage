@@ -2,7 +2,7 @@
 #!/usr/bin/env python
 import os, json, sys, time
 
-stateFile = '../state';
+stateFile = '/home/morro/dev/state';
 
 #print(len(sys.argv))
 #print(sys.argv)

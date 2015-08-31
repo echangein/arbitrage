@@ -16,7 +16,7 @@ class Cascade:
 	pair = 'btc_usd'
 	
 	profitPercent = 1
-	deepPercent = 10
+	deepPercent = 15
 	totalInvest = 5
 	
 	

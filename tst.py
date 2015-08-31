@@ -6,7 +6,7 @@ dirname, filename = os.path.split(os.path.abspath(__file__))
 stateFileName = 'state';
 stateFile = dirname + '/../' + stateFileName;
 
-statusFile = '/../status'
+statusFile = '/../status1'
 statusFileName = dirname + statusFile
 
 def getPrevStat():
@@ -22,5 +22,5 @@ def setPrevStat(val):
 	f.write(val)
 	f.close()
 
-#setPrevStat('lol')
-print(getPrevStat())
+setPrevStat('low')
+#print(getPrevStat())

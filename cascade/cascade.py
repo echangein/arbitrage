@@ -54,8 +54,8 @@ class Cascade:
 	def setTotalInvest(self, totalInvest):
 		self.totalInvest = totalInvest
 		
-	def __init__(self, key = None, secret = None):
-		self.spec = Spec(key, secret)
+	def __init__(self, key = None, secret = None, silent = False):
+		self.spec = Spec(key, secret, silent)
 	
 	def setCascade(self, cascade):
 		self.cascade = cascade
@@ -65,7 +65,7 @@ class Cascade:
 	
 	def printCascade(self, cascade = None):
 		if (cascade is None):
-			print('Cascade element not defined')
+			print('printCascade. Cascade element not defined')
 			quit()
 			
 		invested = 0
@@ -114,7 +114,7 @@ class Cascade:
 		if (cascade is None):
 			cascade = self.cascade
 		if (cascade is None):
-			print('Cascade element not defined')
+			print('inWork. Cascade element not defined')
 			quit()
 		
 		byedStage = None
@@ -136,7 +136,7 @@ class Cascade:
 		if (cascade is None):
 			cascade = self.cascade
 		if (cascade is None):
-			print('Cascade element not defined')
+			print('needRestart. Cascade element not defined')
 			quit()
 
 		if not self.spec.loadTickers([self.pair]):
@@ -154,7 +154,7 @@ class Cascade:
 		if (cascade is None):
 			cascade = self.cascade
 		if (cascade is None):
-			print('Cascade element not defined')
+			print('createOrders. Cascade element not defined')
 			quit()
 		
 		byedStage = None
@@ -205,7 +205,7 @@ class Cascade:
 		if (cascade is None):
 			cascade = self.cascade
 		if (cascade is None):
-			print('Cascade element not defined')
+			print('cancelOrders. Cascade element not defined')
 			quit()
 		
 		for element in cascade:
@@ -230,7 +230,7 @@ class Cascade:
 		if (cascade is None):
 			cascade = self.cascade
 		if (cascade is None):
-			print('Cascade element not defined')
+			print('checkOrders. Cascade element not defined')
 			quit()
 		
 		for element in cascade:
@@ -254,7 +254,7 @@ class Cascade:
 		if (cascade is None):
 			cascade = self.cascade
 		if (cascade is None):
-			print('Cascade element not defined')
+			print('getProfit. Cascade element not defined')
 			quit()
 		
 		profit = False

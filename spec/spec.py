@@ -17,10 +17,11 @@ class Spec:
 	seqs = []
 	
 	
-	def __init__(self, key = None, secret = None):
+	def __init__(self, key = None, secret = None, silent = False):
 		self.int = Interface(key, secret)
 		self.dialogs = Dialogs()
 		self.formatTrade = self.dialogs.formatTrade
+		self.silent = silent
 	
 	def getLastErrorMessage(self):
 		return self.lastErrorMessage

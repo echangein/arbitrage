@@ -1,7 +1,28 @@
 #-*-coding:utf-8-*-
-import os, json
+#!/usr/bin/env python
+import os, json, sys, time
 
-if os.path.isfile('selected_trades'):
+stateFile = '../state';
+
+#print(len(sys.argv))
+#print(sys.argv)
+#print(int(time.time()))
+
+key = None
+
+if len(sys.argv) > 1:
+	key = sys.argv[1]
+
+print(key)
+print(int(time.time()))
+
+file = open(stateFile, 'w+')
+file.write(json.dumps({'key': key, 'time': int(time.time())}))
+file.close()
+	
+	
+"""
+if os.path.isfile(stateFile):
 	print('File exists')
 	file = open('selected_trades', 'r+')
 	qq = json.load(file)
@@ -12,8 +33,6 @@ else:
 	
 ss = [{'a': 'trolol'}, {'z': 'hell', 's': 34}]
 	
-file = open('selected_trades', 'w+')
-file.write(json.dumps(ss))
-file.close()
 
-os.remove('selected_trades')
+os.remove(stateFile)
+"""

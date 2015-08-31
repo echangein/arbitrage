@@ -2,11 +2,9 @@
 #!/usr/bin/env python
 import os, json, sys, time
 
-stateFile = '/home/m/morro/dev/state';
-
-#print(len(sys.argv))
-#print(sys.argv)
-#print(int(time.time()))
+dirname, filename = os.path.split(os.path.abspath(__file__))
+stateFileName = 'state';
+stateFile = dirname + '/../' + stateFileName;
 
 key = None
 
@@ -15,7 +13,13 @@ if len(sys.argv) > 1:
 
 print(key)
 print(int(time.time()))
-print(__file__)
+print('__file__: {0}'.format(__file__))
+print('repr(__file__): {0}'.format(repr(__file__)))
+print('os.getcwd(): {0}'.format(os.getcwd()))
+
+dirname, filename = os.path.split(os.path.abspath(__file__))
+print "\nrunning from", dirname
+print "file is", filename
 
 file = open(stateFile, 'w+')
 file.write(json.dumps({'key': key, 'time': int(time.time())}))

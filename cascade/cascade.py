@@ -81,10 +81,10 @@ class Cascade:
 		startPrice = round(self.lastPrice * (100 - self.profitPercent) / 100, self.pricePrecision)
 		endPrice = round(startPrice * (100 - self.deepPercent) / 100, self.pricePrecision)
 		priceLength = startPrice - endPrice
-		investDensity = round((startPrice - endPrice) / self.totalInvest, self.totalPrecision)
+		investFreq = round((startPrice - endPrice) / self.totalInvest, self.totalPrecision)
 		investQuant = round(startPrice * self.minAmount * (100 + 2 * self.fee) / 100, self.pricePrecision)
 
-		priceStep = round(investQuant * investDensity, self.pricePrecision)
+		priceStep = round(investQuant * investFreq, self.pricePrecision)
 		
 		if priceStep == 0:
 			priceStep = 10 ** -self.pricePrecision

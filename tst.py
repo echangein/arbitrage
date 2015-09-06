@@ -1,5 +1,6 @@
-#-*-coding:utf-8-*-
 #!/usr/bin/env python
+#-*-coding:utf-8-*-
+
 import os, json, sys, time
 
 dirname, filename = os.path.split(os.path.abspath(__file__))
@@ -22,5 +23,19 @@ def setPrevStat(val):
 	f.write(val)
 	f.close()
 
-setPrevStat('low')
+#setPrevStat('low')
 #print(getPrevStat())
+
+print('Hello')
+#for 
+print(sys.argv[1:])
+
+
+
+for key, val in [s.split('=') for s in sys.argv[1:]]:
+	print(key, val)
+
+print(json.dumps({'hi': True}))
+	
+	
+#print(dict(sys.argv[1:]))

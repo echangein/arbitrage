@@ -10,31 +10,63 @@ profitPrecision = 2
 pair = 'ltc_usd'
 silent = False
 
-if len(sys.argv) > 1:
-	if sys.argv[1] == 'crone':
-		silent = True
-
 profitPercent = 1.1
 deepPercent = 15
 totalInvest = 5.2
+activeOrdersCount = 5
 
 import config
 from spec import Spec
 from cascade import Cascade
 import os.path
 
-keyFile = '/../secrets.txt_bot1'
-cascadeFile = '/../trades_ltc_usd'
-statusFile = '/../status'
+keyFile = 'secrets.txt_bot1'
+#cascadeFile = 'trades_ltc_usd'
+#statusFile = 'status'
+configFile = 'none'
 
-key = None
-secret = None
+for key, val in [s.split('=') for s in sys.argv[1:]]:
+	if key == 'conf':
+		configFile = val
+	if key == 'key':
+		keyFile = val
+
+cascadeFile = 'trades_' + configFile  + '_' + keyFile
+statusFile = 'status_' + configFile  + '_' + keyFile
+
+"""
+if len(sys.argv) > 1:
+	if sys.argv[1] == 'crone':
+		silent = True
+"""
 
 dirname, filename = os.path.split(os.path.abspath(__file__))
 
-cascadeFileName = dirname + cascadeFile
-keyFileName = dirname + keyFile
-statusFileName = dirname + statusFile
+cascadeFileName = dirname + '/../' + cascadeFile
+keyFileName = dirname + '/../' + keyFile
+statusFileName = dirname + '/../' + statusFile
+configFileName = dirname + '/../' + configFile
+
+# set config from file
+
+if os.path.isfile(configFileName):
+	file = open(configFileName, 'r+')
+	config = json.load(file)
+	file.close()
+	if 'profitPercent' in config:
+		profitPercent = config['profitPercent']
+	if 'deepPercent' in config:
+		deepPercent = config['deepPercent']
+	if 'totalInvest' in config:
+		totalInvest = config['totalInvest']
+	if 'pair' in config:
+		pair = config['pair']
+	if 'activeOrdersCount' in config:
+		activeOrdersCount = config['activeOrdersCount']
+	if 'silent' in config:
+		silent = config['silent']
+	
+# set config from file
 
 def getPrevStat():
 	ret = 'waiting'
@@ -49,6 +81,9 @@ def setPrevStat(val):
 	f.write(val)
 	f.close()
 
+key = None
+secret = None
+
 if os.path.isfile(keyFileName):
 	f = open(keyFileName, 'r')
 	key = f.readline().strip()
@@ -61,6 +96,8 @@ engine.setPair(pair)
 engine.setProfitPercent(profitPercent)
 engine.setDeepPercent(deepPercent)
 engine.setTotalInvest(totalInvest)
+
+engine.setActiveOrdersCount(activeOrdersCount)
 
 if not silent:
 	print('\ncur Pair:\t{0}'.format(pair))

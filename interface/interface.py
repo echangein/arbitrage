@@ -44,8 +44,17 @@ class Interface:
 			for key in tail.keys():
 				url = url + key + '=' + str(tail[key]) + '&'
 			url = url[:-1]
-
-		response = urllib2.urlopen(url)
+		
+		try:
+			response = urllib2.urlopen(url)
+		except urllib2.HTTPError, err:
+			self.lastResult = err.code
+			self.lastErrorMessage = err.reason
+			return False
+		except urllib2.URLError, err:
+			self.lastErrorMessage = err.reason
+			return False
+			
 		self.lastResult = response.getcode()
 		res = json.loads(response.read())
 		if res.has_key('error'):
@@ -64,7 +73,17 @@ class Interface:
  		headers = {"Content-type": "application/x-www-form-urlencoded", 'Key': self.apiKey, 'Sign': sign}
 		
 		req = urllib2.Request(self.tradeUrl, params, headers)
-		response = urllib2.urlopen(req)
+		
+		try:		
+			response = urllib2.urlopen(req)
+		except urllib2.HTTPError, err:
+			self.lastResult = err.code
+			self.lastErrorMessage = err.reason
+			return False
+		except urllib2.URLError, err:
+			self.lastResult = err.code
+			self.lastErrorMessage = err.reason
+			return False
 		
 		self.lastResult = response.getcode()
 		res = json.loads(response.read())

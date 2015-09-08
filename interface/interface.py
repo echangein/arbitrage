@@ -49,7 +49,7 @@ class Interface:
 			response = urllib2.urlopen(url)
 		except urllib2.HTTPError, err:
 			self.lastResult = err.code
-			self.lastErrorMessage = err.reason
+			self.lastErrorMessage = 'HTTP Error #{0}'.format(err.code)
 			return False
 		except urllib2.URLError, err:
 			self.lastErrorMessage = err.reason
@@ -78,7 +78,7 @@ class Interface:
 			response = urllib2.urlopen(req)
 		except urllib2.HTTPError, err:
 			self.lastResult = err.code
-			self.lastErrorMessage = err.reason
+			self.lastErrorMessage = 'HTTP Error #{0}'.format(err.code)
 			return False
 		except urllib2.URLError, err:
 			self.lastResult = err.code

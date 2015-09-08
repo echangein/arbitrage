@@ -81,7 +81,7 @@ class Interface:
 			self.lastErrorMessage = 'HTTP Error #{0}'.format(err.code)
 			return False
 		except urllib2.URLError, err:
-			self.lastResult = err.code
+			#self.lastResult = -1 #err.code
 			self.lastErrorMessage = err.reason
 			return False
 		

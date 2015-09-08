@@ -166,7 +166,7 @@ class Cascade:
 				orderId = self.spec.createOrder(element['buyOrder'])
 				if orderId is False:
 					print(self.spec.getLastErrorMessage())
-					return cascade
+					break
 				element['buyOrder']['orderId'] = orderId
 				if orderId is None:
 					element['buyOrder']['status'] = 1
@@ -185,14 +185,14 @@ class Cascade:
 				res = self.spec.cancelOrder(element['sellOrder']['orderId'])
 				if not res:
 					print(self.spec.getLastErrorMessage())
-					return cascade
+					break
 				element['sellOrder']['status'] = 2
 			
 			if element['stage'] == byedStage and not self.__isCreatedOrder(element['sellOrder']):
 				orderId = self.spec.createOrder(element['sellOrder'])
 				if orderId is False:
 					print(self.spec.getLastErrorMessage())
-					return cascade
+					break
 				element['sellOrder']['orderId'] = orderId
 				if orderId is None:
 					element['sellOrder']['status'] = 1
@@ -213,7 +213,7 @@ class Cascade:
 				res = self.spec.cancelOrder(element['buyOrder']['orderId'])
 				if not res:
 					print(self.spec.getLastErrorMessage())
-					return cascade
+					break
 				element['buyOrder']['status'] = 2
 			
 			if self.__isActiveOrder(element['sellOrder']):
@@ -221,7 +221,7 @@ class Cascade:
 				res = self.spec.cancelOrder(element['sellOrder']['orderId'])
 				if not res:
 					print(self.spec.getLastErrorMessage())
-					return cascade
+					break
 				element['sellOrder']['status'] = 2
 		
 		return cascade
@@ -238,14 +238,14 @@ class Cascade:
 				status = self.spec.getOrderStatus(element['buyOrder']['orderId'])
 				if status is False:
 					print(self.spec.getLastErrorMessage())
-					return cascade
+					break
 				element['buyOrder']['status'] = status
 			
 			if self.__isActiveOrder(element['sellOrder']):
 				status = self.spec.getOrderStatus(element['sellOrder']['orderId'])
 				if status is False:
 					print(self.spec.getLastErrorMessage())
-					return cascade
+					break
 				element['sellOrder']['status'] = status
 		
 		return cascade

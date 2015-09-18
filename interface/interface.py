@@ -50,16 +50,18 @@ class Interface:
 		except urllib2.HTTPError, err:
 			self.lastResult = err.code
 			self.lastErrorMessage = 'HTTP Error #{0}'.format(err.code)
-			return False
+			res = False
 		except urllib2.URLError, err:
 			self.lastErrorMessage = err.reason
-			return False
-			
-		self.lastResult = response.getcode()
-		res = json.loads(response.read())
-		if res.has_key('error'):
-			self.lastErrorMessage = res['error']
-			return False
+			res = False
+		else:
+			self.lastResult = response.getcode()
+			res = json.loads(response.read())
+			if res.has_key('error'):
+				self.lastErrorMessage = res['error']
+				res = False
+		
+		response.close()
 		
 		return res
 
@@ -72,23 +74,24 @@ class Interface:
 		sign = H.hexdigest()
  		headers = {"Content-type": "application/x-www-form-urlencoded", 'Key': self.apiKey, 'Sign': sign}
 		
-		req = urllib2.Request(self.tradeUrl, params, headers)
-		
 		try:		
+			req = urllib2.Request(self.tradeUrl, params, headers)
 			response = urllib2.urlopen(req)
 		except urllib2.HTTPError, err:
 			self.lastResult = err.code
 			self.lastErrorMessage = 'HTTP Error #{0}'.format(err.code)
-			return False
+			res = False
 		except urllib2.URLError, err:
 			#self.lastResult = -1 #err.code
 			self.lastErrorMessage = err.reason
-			return False
+			res = False
+		else:
+			self.lastResult = response.getcode()
+			res = json.loads(response.read())
+			if res.has_key('error'):
+				self.lastErrorMessage = res['error']
+				res = False
 		
-		self.lastResult = response.getcode()
-		res = json.loads(response.read())
-		if res.has_key('error'):
-			self.lastErrorMessage = res['error']
-			return False
+		response.close()
 		
 		return res

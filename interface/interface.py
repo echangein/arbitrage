@@ -61,7 +61,7 @@ class Interface:
 				self.lastErrorMessage = res['error']
 				res = False
 		
-		response.close()
+		#response.close()
 		
 		return res
 

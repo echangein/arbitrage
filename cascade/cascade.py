@@ -88,6 +88,7 @@ class Cascade:
 		
 		if priceStep == 0:
 			priceStep = 10 ** -self.pricePrecision
+			investQuant = round(priceStep / investFreq, self.pricePrecision)
 		
 		curInvest = self.totalInvest
 		curPrice = startPrice

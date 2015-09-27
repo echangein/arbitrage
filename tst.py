@@ -1,41 +1,37 @@
 #!/usr/bin/env python
 #-*-coding:utf-8-*-
 
-import os, json, sys, time
+from kbrd import getch
+import time, os, json, sys
+from spec import Spec
 
-dirname, filename = os.path.split(os.path.abspath(__file__))
-stateFileName = 'state';
-stateFile = dirname + '/../' + stateFileName;
+totalPrecision = 8
+profitPrecision = 4
+pair = 'ltc_btc'
+silent = False
 
-statusFile = '/../status1'
-statusFileName = dirname + statusFile
+profitPercent = 1
+deepPercent = 18
+totalInvest = 0.3725
+activeOrdersCount = 5
 
-def getPrevStat():
-	ret = 'waiting'
-	if os.path.isfile(statusFileName):
-		f = open(statusFileName, 'r')
-		ret = f.readline().strip()
-		f.close()
-	return ret
+import config
+from spec import Spec
+from cascade import Cascade
+import os.path
 
-def setPrevStat(val):
-	f = open(statusFileName, 'w+')
-	f.write(val)
-	f.close()
+key = None
+secret = None
 
-#setPrevStat('low')
-#print(getPrevStat())
+engine = Cascade(key, secret, silent)
+engine.setPair(pair)
 
-print('Hello')
-#for 
-print(sys.argv[1:])
+engine.setProfitPercent(profitPercent)
+engine.setDeepPercent(deepPercent)
+engine.setTotalInvest(totalInvest)
 
+engine.setActiveOrdersCount(activeOrdersCount)
 
+cascade = engine.createCascade()
 
-for key, val in [s.split('=') for s in sys.argv[1:]]:
-	print(key, val)
-
-print(json.dumps({'hi': True}))
-	
-	
-#print(dict(sys.argv[1:]))
+engine.printCascade(cascade)

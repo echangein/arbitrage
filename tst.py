@@ -6,13 +6,13 @@ import time, os, json, sys
 from spec import Spec
 
 totalPrecision = 8
-profitPrecision = 4
-pair = 'ltc_btc'
+profitPrecision = 2
+pair = 'btc_usd'
 silent = False
 
 profitPercent = 1
 deepPercent = 18
-totalInvest = 0.3725
+totalInvest = 1000 # 0.3725
 activeOrdersCount = 5
 
 import config

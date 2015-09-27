@@ -86,7 +86,7 @@ class Cascade:
 
 		priceStep = round(investQuant * investFreq, self.pricePrecision)
 		
-		if priceStep == 0:
+		if investQuant * investFreq < 10 ** -self.pricePrecision: #priceStep == 0
 			priceStep = 10 ** -self.pricePrecision
 			investQuant = round(priceStep / investFreq, self.pricePrecision)
 		

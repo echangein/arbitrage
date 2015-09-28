@@ -12,7 +12,7 @@ silent = False
 
 profitPercent = 1
 startPercent = 0.5
-deepPercent = 10
+deepPercent = 18
 totalInvest = 0.3725
 activeOrdersCount = 5
 

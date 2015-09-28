@@ -7,13 +7,13 @@ from spec import Spec
 
 totalPrecision = 8
 profitPrecision = 5
-pair = 'ltc_btc'
+pair = 'btc_usd'
 silent = False
 
 profitPercent = 1
 startPercent = 0.5
-deepPercent = 18
-totalInvest = 0.3725
+deepPercent = 15
+totalInvest = 100
 activeOrdersCount = 5
 
 import config

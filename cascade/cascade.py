@@ -16,6 +16,7 @@ class Cascade:
 	pair = 'btc_usd'
 	
 	profitPercent = 1
+	startPercent = 1
 	deepPercent = 15
 	totalInvest = 5
 	
@@ -48,6 +49,9 @@ class Cascade:
 	def setProfitPercent(self, profitPercent):
 		self.profitPercent = profitPercent
 		
+	def setStartPercent(self, startPercent):
+		self.startPercent = startPercent
+		
 	def setDeepPercent(self, deepPercent):
 		self.deepPercent = deepPercent
 	
@@ -78,7 +82,7 @@ class Cascade:
 	
 	def createCascade(self):
 		self.setPair(self.pair)
-		startPrice = round(self.lastPrice * (100 - self.profitPercent) / 100, self.pricePrecision)
+		startPrice = round(self.lastPrice * (100 - self.startPercent) / 100, self.pricePrecision)
 		endPrice = round(startPrice * (100 - self.deepPercent) / 100, self.pricePrecision)
 		priceLength = startPrice - endPrice
 		investFreq = round((startPrice - endPrice) / self.totalInvest, self.totalPrecision)
@@ -146,7 +150,7 @@ class Cascade:
 		lastPrice = self.spec.tickers[self.pair]['last']
 		cascadeStartPrice = cascade[0]['buyOrder']['price']
 		
-		if lastPrice > cascadeStartPrice * (100 + self.profitPercent * 2 ) / 100:
+		if lastPrice > cascadeStartPrice * (100 + self.startPercent * 2 ) / 100:
 			return True
 		
 		return False

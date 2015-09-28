@@ -11,6 +11,7 @@ pair = 'ltc_usd'
 silent = False
 
 profitPercent = 1.1
+startPercent = 1
 deepPercent = 15
 totalInvest = 5.2
 activeOrdersCount = 5
@@ -55,6 +56,8 @@ if os.path.isfile(configFileName):
 	file.close()
 	if 'profitPercent' in config:
 		profitPercent = config['profitPercent']
+	if 'startPercent' in config:
+		startPercent = config['startPercent']
 	if 'deepPercent' in config:
 		deepPercent = config['deepPercent']
 	if 'totalInvest' in config:
@@ -94,6 +97,7 @@ engine = Cascade(key, secret, silent)
 engine.setPair(pair)
 
 engine.setProfitPercent(profitPercent)
+engine.setStartPercent(startPercent)
 engine.setDeepPercent(deepPercent)
 engine.setTotalInvest(totalInvest)
 

@@ -6,13 +6,14 @@ import time, os, json, sys
 from spec import Spec
 
 totalPrecision = 8
-profitPrecision = 2
-pair = 'btc_usd'
+profitPrecision = 5
+pair = 'ltc_btc'
 silent = False
 
 profitPercent = 1
-deepPercent = 18
-totalInvest = 1000 # 0.3725
+startPercent = 0.5
+deepPercent = 10
+totalInvest = 0.3725
 activeOrdersCount = 5
 
 import config
@@ -27,8 +28,10 @@ engine = Cascade(key, secret, silent)
 engine.setPair(pair)
 
 engine.setProfitPercent(profitPercent)
+engine.setStartPercent(startPercent)
 engine.setDeepPercent(deepPercent)
 engine.setTotalInvest(totalInvest)
+engine.setProfitPrecision(profitPrecision)
 
 engine.setActiveOrdersCount(activeOrdersCount)
 

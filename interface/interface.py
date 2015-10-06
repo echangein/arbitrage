@@ -92,6 +92,7 @@ class Interface:
 				self.lastErrorMessage = res['error']
 				res = False
 		
-		response.close()
+		if response:
+			response.close()
 		
 		return res

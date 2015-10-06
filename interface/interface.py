@@ -74,6 +74,7 @@ class Interface:
 		sign = H.hexdigest()
  		headers = {"Content-type": "application/x-www-form-urlencoded", 'Key': self.apiKey, 'Sign': sign}
 		
+		response = None
 		try:		
 			req = urllib2.Request(self.tradeUrl, params, headers)
 			response = urllib2.urlopen(req)

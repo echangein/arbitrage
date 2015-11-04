@@ -192,6 +192,7 @@ class Cascade:
 			
 			if element['stage'] < byedStage and self.__isCompleteOrder(element['sellOrder']):
 				print('Partial execution in stage {0}'.format(element['stage']))
+				element['sellOrder']['status'] = 2
 				soldAmount = round(element['sellOrder']['operationAmount'], self.totalPrecision)
 			
 			if element['stage'] < byedStage and self.__isActiveOrder(element['sellOrder']):

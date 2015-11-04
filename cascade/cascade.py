@@ -181,10 +181,18 @@ class Cascade:
 			
 			if self.__isCompleteOrder(element['buyOrder']):
 				byedStage = element['stage']
-				
+		
+		soldAmount = None
 		for element in cascade:
 			if element['stage'] > byedStage:
 				break
+			
+			if not soldAmount is None:
+				element['sellOrder']['operationAmount'] -= soldAmount
+			
+			if element['stage'] < byedStage and self.__isCompleteOrder(element['sellOrder']):
+				print('Partial execution in stage {0}'.format(element['stage']))
+				soldAmount = round(element['sellOrder']['operationAmount'], self.totalPrecision)
 			
 			if element['stage'] < byedStage and self.__isActiveOrder(element['sellOrder']):
 				res = self.spec.cancelOrder(element['sellOrder']['orderId'])
@@ -203,6 +211,12 @@ class Cascade:
 					element['sellOrder']['status'] = 1
 				else:
 					element['sellOrder']['status'] = 0
+			
+		# fix rest sell orders in partial execution case
+		if not soldAmount is None:
+			for element in cascade:
+				if element['stage'] > byedStage:
+					element['sellOrder']['operationAmount'] -= soldAmount
 		
 		return cascade
 	

@@ -3,7 +3,7 @@
 
 from kbrd import getch
 import time, os, json, sys
-from spec import Spec
+#from spec import Spec
 
 totalPrecision = 8
 profitPrecision = 2
@@ -17,7 +17,7 @@ totalInvest = 5.2
 activeOrdersCount = 5
 
 import config
-from spec import Spec
+#from spec import Spec
 from cascade import Cascade
 import os.path
 

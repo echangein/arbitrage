@@ -3,21 +3,22 @@
 
 from kbrd import getch
 import time, os, json, sys
-from spec import Spec
+#from spec import Spec
 
-totalPrecision = 8
-profitPrecision = 5
-pair = 'btc_usd'
+
+pair = 'ltc_rur'
 silent = False
 
-profitPercent = 1
-startPercent = 0.5
-deepPercent = 15
-totalInvest = 100
+profitPercent = 1.1
+startPercent = 0.9
+deepPercent = 20
+totalInvest = 5000
 activeOrdersCount = 5
 
+profitPrecision = 2
+
 import config
-from spec import Spec
+#from spec import Spec
 from cascade import Cascade
 import os.path
 
@@ -31,10 +32,10 @@ engine.setProfitPercent(profitPercent)
 engine.setStartPercent(startPercent)
 engine.setDeepPercent(deepPercent)
 engine.setTotalInvest(totalInvest)
-engine.setProfitPrecision(profitPrecision)
-
 engine.setActiveOrdersCount(activeOrdersCount)
 
-cascade = engine.createCascade()
+engine.setProfitPrecision(profitPrecision)
+
+cascade = engine.createCascade(17.99, 666) #
 
 engine.printCascade(cascade)

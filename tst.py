@@ -36,6 +36,11 @@ engine.setActiveOrdersCount(activeOrdersCount)
 
 engine.setProfitPrecision(profitPrecision)
 
-cascade = engine.createCascade(17.99, 666) #
+cascade = engine.createCascade(17.99258339, 666) #
 
+#print(cascade)
+#print(cascade[0]['sellOrder']['operationAmount'])
 engine.printCascade(cascade)
+
+if len(cascade) > 0 and 'options' in cascade[0]:
+	print('cascade is revers')

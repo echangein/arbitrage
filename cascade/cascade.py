@@ -71,13 +71,26 @@ class Cascade:
 		if (cascade is None):
 			print('printCascade. Cascade element not defined')
 			quit()
+		
+		if len(cascade) > 0 and 'options' in cascade[0]:
+			returned = 0
+			accepted = 0
+			profit = 0
+			
+			for item in cascade:
+				accepted += round(item['sellOrder']['price'] * item['sellOrder']['operationAmount'] * (100 - self.fee) / 100, self.pricePrecision)
+				returned = round(item['buyOrder']['operationAmount'] * (100 - self.fee) / 100, self.totalPrecision)
+				profit = round(item['buyOrder']['operationAmount'] * item['sellOrder']['price'] - accepted, self.profitPrecision)
+				print('{0[stage]:>3} sell {1[operationAmount]:<12}@ {1[price]:<12}acc: {3:<12} buy: {2[operationAmount]:<12}@ {2[price]:<12}ret: {4:<14} {5:<2}'.format(item, item['sellOrder'], item['buyOrder'], accepted, returned, profit))
+		
+			return
 			
 		invested = 0
 		for item in cascade:
 			invested += round(item['buyOrder']['price'] * item['buyOrder']['operationAmount'], self.totalPrecision)
 			accepted = round(item['sellOrder']['price'] * item['sellOrder']['operationAmount'] * (100 - self.fee) / 100, self.totalPrecision)
 			profit = round(accepted - invested, self.profitPrecision)
-			print('{0[stage]:>3} buy {1[operationAmount]:<12}@ {1[price]:<12}inv: {3:<12}sell: {2[operationAmount]:<12}@ {2[price]:<12}accp: {4:<14} {5:<2}'.format(item, item['buyOrder'], item['sellOrder'], invested, accepted, profit))
+			print('{0[stage]:>3} buy {1[operationAmount]:<12}@ {1[price]:<12}inv: {3:<12} sell: {2[operationAmount]:<12}@ {2[price]:<12}accp: {4:<14} {5:<2}'.format(item, item['buyOrder'], item['sellOrder'], invested, accepted, profit))
 		
 	
 	def createCascade(self, instrumentVolume = None, orderId = None):
@@ -87,37 +100,45 @@ class Cascade:
 			startPrice = round(self.lastPrice * (100 + self.startPercent) / 100, self.pricePrecision)
 			endPrice = round(startPrice * (100 + self.deepPercent) / 100, self.pricePrecision)
 			priceLength = endPrice - startPrice
-			investFreq = round(instrumentVolume / (endPrice - startPrice), self.totalPrecision)
-			investQuant = round(self.minAmount * (100 + 2 * self.fee) / 100, self.pricePrecision)
-			priceStep = round(investQuant * investFreq, self.pricePrecision)
+			investFreq = round(instrumentVolume / priceLength, self.totalPrecision)
+			investQuant = round(self.minAmount * (100 + 2 * self.fee) / 100, self.totalPrecision)
+			priceStep = round(priceLength * investQuant / instrumentVolume, self.pricePrecision)
 			
-			if investQuant * investFreq < 10 ** -self.pricePrecision: #priceStep == 0
+			if priceStep < 10 ** -self.pricePrecision: #priceStep == 0
 				print('ZERO step')
 				priceStep = 10 ** -self.pricePrecision
-				investQuant = round(priceStep / investFreq, self.pricePrecision)
+				investQuant = round(priceStep * investFreq, self.pricePrecision)
 			
 			
 			print('startPrice: {0}, endPrice: {1}, priceLength: {2}, investQuant: {3}, priceStep: {4}, investFreq: {5}'.format(startPrice, endPrice, priceLength, investQuant, priceStep, investFreq))
 			
-			return []
-			
-			curInvest = instrumentVolume
+			curSelld = instrumentVolume
 			curPrice = startPrice
-			invested = 0
 			stage = 0
-			sellAmount = 0
+			
+			acceptedSumm = 0
+			accepted = 0
 			cascade = []
-			while curInvest >= investQuant:
-				curAmount = round(investQuant / curPrice, self.totalPrecision)
+			while curSelld >= investQuant:
+				
+				"""curAmount = round(investQuant / curPrice, self.totalPrecision)
 				if curAmount < self.minAmount:
-					curAmount = self.minAmount
+					curAmount = self.minAmount"""
 					
-				invested += investQuant
-				sellAmount += round(curAmount * (100 - self.fee) / 100, self.totalPrecision)
-				sellPrice = round(invested / sellAmount * (100 + self.profitPercent) / 100, self.pricePrecision)
-				cascade.append({'stage': stage, 'buyOrder': {'pair': self.pair, 'action': 'buy', 'price': curPrice, 'operationAmount': curAmount}, 'sellOrder': {'pair': self.pair, 'action': 'sell', 'price': sellPrice, 'operationAmount': sellAmount}})
+				accepted += investQuant
+				acceptedSumm += round(investQuant * curPrice * (100 - self.fee) / 100, self.pricePrecision)
+				buyAmount = round(accepted * (100 + self.fee) / 100, self.totalPrecision)
+				buyPrice = round(acceptedSumm / accepted * (100 - self.profitPercent) / 100, self.pricePrecision)
+				#acceptedPrice = round(invested / sellAmount * (100 + self.profitPercent) / 100, self.pricePrecision)
+				#sellAmount += round(curAmount * (100 - self.fee) / 100, self.totalPrecision)
+				#sellPrice = round(invested / sellAmount * (100 + self.profitPercent) / 100, self.pricePrecision)
+				cascade.append({
+					'stage': stage, 
+					'buyOrder': {'pair': self.pair, 'action': 'buy', 'price': buyPrice, 'operationAmount': buyAmount}, 
+					'sellOrder': {'pair': self.pair, 'action': 'sell', 'price': curPrice, 'operationAmount': investQuant}, 
+					'options' : {'order_id': orderId, 'amount': instrumentVolume}})
 				stage += 1
-				curInvest -= investQuant
+				curSelld -= investQuant
 				curPrice += priceStep			
 			return cascade
 

@@ -132,6 +132,13 @@ if engine.inWork(cascade):
 		print('In work')
 		engine.printCascade(cascade)
 	setPrevStat('inWork')
+	"""
+	if engine.needReverse(cascade):
+		volume, orderId = engine.getReverseParams(cascade)
+		engine.saveCascade(cascade, cascadeFileName)
+		cascade = engine.createCascade(volume, orderId)
+		setPrevStat('waiting')
+	"""
 else:
 	setPrevStat('waiting')
 	if not silent:
@@ -142,11 +149,13 @@ else:
 		print('\nCascade COMPLETE.')
 		print('Profit: {0}'.format(profit))
 		engine.printCascade(cascade)
+		#TODO detect revers and restore cascade
 		if os.path.isfile(cascadeFileName):
 			os.remove(cascadeFileName)
 		quit()
 	
 	if engine.needRestart(cascade):
+		#TODO detect revers
 		if not silent:
 			print('\nPrice change. Generate new cascade')
 		engine.cancelOrders(cascade)

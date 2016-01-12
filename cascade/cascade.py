@@ -370,7 +370,6 @@ class Cascade:
 		if self.isRevers(cascade):
 			workAction, profitAction = profitAction, workAction
 
-		
 		for element in cascade:
 			if self.__isActiveOrder(element[workAction]):
 				res = self.spec.cancelOrder(element[workAction]['orderId'])

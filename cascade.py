@@ -151,7 +151,8 @@ else:
 		engine.printCascade(cascade)
 		"""
 		if engine.isRevers(cascade):
-			engine.restoreCascade(cascade, cascadeFileName)
+			cascade = engine.restoreCascade(cascade, cascadeFileName)
+			setPrevStat('inWork')
 		else:"""
 		if os.path.isfile(cascadeFileName): # shift ->
 			os.remove(cascadeFileName) # shift ->

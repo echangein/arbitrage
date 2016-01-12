@@ -174,6 +174,34 @@ class Cascade:
 			curPrice -= priceStep			
 		
 		return cascade
+
+	## 
+	#  @brief Brief
+	#  
+	#  @param [in] self Parameter_Description
+	#  @param [in] cascade Parameter_Description
+	#  @return True if can start reverse cascade, False in other case
+	#  
+	#  @details 0 - active, 1 - complete, 2 - canceled
+	#  		
+	def needReverse(self, cascade = None):
+		if (cascade is None):
+			cascade = self.cascade
+		
+		if (cascade is None):
+			return False
+		if len(cascade) == 0:
+			return False
+		if 'options' in cascade[0]:
+			return False
+		
+		idx = len(cascade) - 1
+		if 'status' in cascade[idx]['buyOrder'] and 'status' in cascade[idx]['sellOrder']:
+			if cascade[idx]['buyOrder']['status'] == 1 and cascade[idx]['sellOrder']['status'] == 0:
+				if round(self.lastPrice * (100 + self.startPercent) / 100, self.pricePrecision) < cascade[idx]['buyOrder']['price']:
+					return True
+		
+		return False
 	
 	def inWork(self, cascade = None):
 		if (cascade is None):

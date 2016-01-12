@@ -80,7 +80,8 @@ class Cascade:
 			for item in cascade:
 				accepted += round(item['sellOrder']['price'] * item['sellOrder']['operationAmount'] * (100 - self.fee) / 100, self.pricePrecision)
 				returned = round(item['buyOrder']['operationAmount'] * (100 - self.fee) / 100, self.totalPrecision)
-				profit = round(item['buyOrder']['operationAmount'] * item['sellOrder']['price'] - accepted, self.profitPrecision)
+				profit = round(accepted - item['buyOrder']['operationAmount'] * item['buyOrder']['price'], self.profitPrecision)
+				
 				print('{0[stage]:>3} sell {1[operationAmount]:<12}@ {1[price]:<12}acc: {3:<12} buy: {2[operationAmount]:<12}@ {2[price]:<12}ret: {4:<14} {5:<2}'.format(item, item['sellOrder'], item['buyOrder'], accepted, returned, profit))
 		
 			return
@@ -127,7 +128,7 @@ class Cascade:
 					
 				accepted += investQuant
 				acceptedSumm += round(investQuant * curPrice * (100 - self.fee) / 100, self.pricePrecision)
-				buyAmount = round(accepted * (100 + self.fee) / 100, self.totalPrecision)
+				buyAmount = round(accepted * 100 / (100 - self.fee), self.totalPrecision)
 				buyPrice = round(acceptedSumm / accepted * (100 - self.profitPercent) / 100, self.pricePrecision)
 				#acceptedPrice = round(invested / sellAmount * (100 + self.profitPercent) / 100, self.pricePrecision)
 				#sellAmount += round(curAmount * (100 - self.fee) / 100, self.totalPrecision)
@@ -420,14 +421,25 @@ class Cascade:
 			quit()
 		
 		profit = False
-		invested = 0
-		for element in cascade:
-			invested += round(element['buyOrder']['price'] * element['buyOrder']['operationAmount'], self.totalPrecision)
-			if self.__isCompleteOrder(element['sellOrder']):
-				accepted = round(element['sellOrder']['price'] * element['sellOrder']['operationAmount'] * (100 - self.fee) / 100, self.totalPrecision)
-				profit = accepted - invested
-				print('Stage: {0}, profit: {1}'.format(element['stage'], profit))
-				profit = round(profit, self.profitPrecision)
+		
+		if self.isRevers(cascade):
+			accepted = 0
+			for element in cascade:
+				accepted += round(element['sellOrder']['price'] * element['sellOrder']['operationAmount'] * (100 - self.fee) / 100, self.pricePrecision)
+				if self.__isCompleteOrder(element['buyOrder']):
+					used = round(element['buyOrder']['price'] * element['buyOrder']['operationAmount'], self.totalPrecision)
+					profit = accepted - used
+					print('Stage: {0}, profit: {1}'.format(element['stage'], profit))
+					profit = round(profit, self.profitPrecision)
+		else:
+			invested = 0
+			for element in cascade:
+				invested += round(element['buyOrder']['price'] * element['buyOrder']['operationAmount'], self.totalPrecision)
+				if self.__isCompleteOrder(element['sellOrder']):
+					accepted = round(element['sellOrder']['price'] * element['sellOrder']['operationAmount'] * (100 - self.fee) / 100, self.totalPrecision)
+					profit = accepted - invested
+					print('Stage: {0}, profit: {1}'.format(element['stage'], profit))
+					profit = round(profit, self.profitPrecision)
 		
 		return profit
 			

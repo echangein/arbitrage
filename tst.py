@@ -12,7 +12,7 @@ silent = False
 profitPercent = 1
 startPercent = 0.8
 deepPercent = 22
-totalInvest = 0,4295
+totalInvest = 0.4295
 activeOrdersCount = 5
 
 profitPrecision = 4
@@ -45,17 +45,20 @@ engine.setActiveOrdersCount(activeOrdersCount)
 
 engine.setProfitPrecision(profitPrecision)
 
-#cascade = engine.createCascade(17.99258339, 666) #
+cascade = engine.createCascade() #43, 666
 
+print(engine.getProfit(cascade))
 #print(cascade)
 #print(cascade[0]['sellOrder']['operationAmount'])
 
+"""
 file = open(cascadeFileName, 'r+')
 cascade = json.load(file)
 file.close()
-
+"""
 
 engine.printCascade(cascade)
+quit()
 
 if engine.needRestart(cascade):
 	print('needRestart')

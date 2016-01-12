@@ -24,7 +24,7 @@ import os.path
 
 cascadeFile = 'trades_btc_rur_btc_rur_key'
 #cascadeFile = 'trades_btc_usd_btc_usd_key'
-cascadeFile = 'trades_ltc_btc_ltc_btc_key'
+#cascadeFile = 'trades_ltc_btc_ltc_btc_key'
 #cascadeFile = 'trades_ltc_rur_rur'
 #cascadeFile = 'trades_ltc_usd_usd'
 
@@ -62,6 +62,8 @@ if engine.needReverse(cascade):
 else:
 	print('still wait')
 
+#engine.needReverse(cascade)	
+	
 if len(cascade) > 0 and 'options' in cascade[0]:
 	print('cascade is revers')
 else:

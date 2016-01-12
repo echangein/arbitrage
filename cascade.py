@@ -149,19 +149,27 @@ else:
 		print('\nCascade COMPLETE.')
 		print('Profit: {0}'.format(profit))
 		engine.printCascade(cascade)
-		#TODO detect revers and restore cascade
-		if os.path.isfile(cascadeFileName):
-			os.remove(cascadeFileName)
+		"""
+		if engine.isRevers(cascade):
+			engine.restoreCascade(cascade, cascadeFileName)
+		else:"""
+		if os.path.isfile(cascadeFileName): # shift ->
+			os.remove(cascadeFileName) # shift ->
 		quit()
 	
 	if engine.needRestart(cascade):
-		#TODO detect revers
 		if not silent:
 			print('\nPrice change. Generate new cascade')
 		engine.cancelOrders(cascade)
 		if os.path.isfile(cascadeFileName):
 			os.remove(cascadeFileName)
-		cascade = engine.createCascade()
+		
+		if engine.isRevers(cascade):
+			volume, orderId = engine.getReverseParams(cascade)
+			cascade = engine.createCascade(volume, orderId)
+		else:
+			cascade = engine.createCascade()
+		
 		file = open(cascadeFileName, 'w+')
 		file.write(json.dumps(cascade))
 		file.close()

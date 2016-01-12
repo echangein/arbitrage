@@ -203,6 +203,42 @@ class Cascade:
 		
 		return False
 	
+	## 
+	#  @brief detect type of cascade True - reverse, False - Normal
+	#  
+	#  @param [in] self Parameter_Description
+	#  @param [in] cascade Parameter_Description
+	#  @return Return_Description
+	#  
+	#  @details what doing with incorrect cascade structure?
+	#  	
+	def isRevers(self, cascade = None):
+		if len(cascade) > 0 and 'options' in cascade[0]:
+			return True
+		
+		return False
+	
+	## 
+	#  @brief Brief
+	#  
+	#  @param [in] self Parameter_Description
+	#  @param [in] cascade Parameter_Description
+	#  @return instrumentVolume, orderId or None, None
+	#  
+	#  @details Details
+	#  	
+	def getReverseParams(self, cascade = None):
+		if len(cascade) > 0 and 'options' in cascade[0]:
+			#case reverse cascade
+			return cascade[0]['options']['amount'], cascade[0]['options']['order_id']
+			
+		idx = len(cascade) - 1
+		if 'orderId' in cascade[idx]['sellOrder'] and cascade[idx]['sellOrder']['status'] == 0:
+			#case direct cascade
+			return cascade[idx]['sellOrder']['amount'], cascade[idx]['sellOrder']['orderId']
+		
+		return None, None
+	
 	def inWork(self, cascade = None):
 		if (cascade is None):
 			cascade = self.cascade

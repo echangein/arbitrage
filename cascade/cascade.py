@@ -246,9 +246,15 @@ class Cascade:
 			print('inWork. Cascade element not defined')
 			quit()
 		
+		workAction = 'buyOrder'
+		profitAction = 'sellOrder'
+		
+		if self.isRevers(cascade):
+			workAction, profitAction = profitAction, workAction
+		
 		byedStage = None
 		for element in cascade:
-			if self.__isCompleteOrder(element['buyOrder']):
+			if self.__isCompleteOrder(element[workAction]):
 				byedStage = element['stage']
 		
 		if byedStage is None:
@@ -256,7 +262,7 @@ class Cascade:
 		
 		for element in cascade:
 			if element['stage'] == byedStage:
-				if self.__isCompleteOrder(element['sellOrder']):
+				if self.__isCompleteOrder(element[profitAction]):
 					return False
 		
 		return True
@@ -272,10 +278,15 @@ class Cascade:
 			quit()
 		
 		lastPrice = self.spec.tickers[self.pair]['last']
-		cascadeStartPrice = cascade[0]['buyOrder']['price']
-		
-		if lastPrice > cascadeStartPrice * (100 + self.startPercent * 2 ) / 100:
-			return True
+		if self.isRevers(cascade):
+			cascadeStartPrice = cascade[0]['sellOrder']['price']
+			if lastPrice < cascadeStartPrice * (100 - self.startPercent * 2 ) / 100:
+				return True
+		else:
+			cascadeStartPrice = cascade[0]['buyOrder']['price']
+			
+			if lastPrice > cascadeStartPrice * (100 + self.startPercent * 2 ) / 100:
+				return True
 		
 		return False
 		
@@ -352,21 +363,28 @@ class Cascade:
 			print('cancelOrders. Cascade element not defined')
 			quit()
 		
+		workAction = 'buyOrder'
+		profitAction = 'sellOrder'
+		
+		if self.isRevers(cascade):
+			workAction, profitAction = profitAction, workAction
+
+		
 		for element in cascade:
-			if self.__isActiveOrder(element['buyOrder']):
-				res = self.spec.cancelOrder(element['buyOrder']['orderId'])
+			if self.__isActiveOrder(element[workAction]):
+				res = self.spec.cancelOrder(element[workAction]['orderId'])
 				if not res:
 					print(self.spec.getLastErrorMessage())
 					break
-				element['buyOrder']['status'] = 2
+				element[workAction]['status'] = 2
 			
-			if self.__isActiveOrder(element['sellOrder']):
-				print('CANCEL sell order!')
-				res = self.spec.cancelOrder(element['sellOrder']['orderId'])
+			if self.__isActiveOrder(element[profitAction]):
+				print('CANCEL profit order!')
+				res = self.spec.cancelOrder(element[profitAction]['orderId'])
 				if not res:
 					print(self.spec.getLastErrorMessage())
 					break
-				element['sellOrder']['status'] = 2
+				element[profitAction]['status'] = 2
 		
 		return cascade
 	

@@ -15,16 +15,16 @@ deepPercent = 22
 totalInvest = 0,4295
 activeOrdersCount = 5
 
-profitPrecision = 2
+profitPrecision = 4
 
 import config
 #from spec import Spec
 from cascade import Cascade
 import os.path
 
-cascadeFile = 'trades_btc_rur_btc_rur_key'
+#cascadeFile = 'trades_btc_rur_btc_rur_key'
 cascadeFile = 'trades_btc_usd_btc_usd_key'
-cascadeFile = 'trades_ltc_btc_ltc_btc_key'
+#cascadeFile = 'trades_ltc_btc_ltc_btc_key'
 #cascadeFile = 'trades_ltc_rur_rur'
 #cascadeFile = 'trades_ltc_usd_usd'
 
@@ -57,16 +57,19 @@ file.close()
 
 engine.printCascade(cascade)
 
-print(engine.getReverseParams(cascade))
+if engine.needRestart(cascade):
+	print('needRestart')
+else:
+	print('NOT needRestart')
+
 
 if engine.needReverse(cascade):
 	print('need Reverse')
 	vol, id = engine.getReverseParams(cascade)
-	#print(vol)
-	print(engine.getReverseParams(engine.createCascade(vol, id)))
+	cascade = engine.createCascade(vol, id)
+	#print(engine.getReverseParams())
 else:
 	print('still wait')
-
 	
 if len(cascade) > 0 and 'options' in cascade[0]:
 	print('cascade is revers')

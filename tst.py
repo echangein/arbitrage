@@ -9,10 +9,10 @@ import time, os, json, sys
 pair = 'ltc_btc'
 silent = False
 
-profitPercent = 1.1
-startPercent = 1
-deepPercent = 18
-totalInvest = 45.5
+profitPercent = 1
+startPercent = 0.8
+deepPercent = 22
+totalInvest = 0,4295
 activeOrdersCount = 5
 
 profitPrecision = 2
@@ -23,8 +23,8 @@ from cascade import Cascade
 import os.path
 
 cascadeFile = 'trades_btc_rur_btc_rur_key'
-#cascadeFile = 'trades_btc_usd_btc_usd_key'
-#cascadeFile = 'trades_ltc_btc_ltc_btc_key'
+cascadeFile = 'trades_btc_usd_btc_usd_key'
+cascadeFile = 'trades_ltc_btc_ltc_btc_key'
 #cascadeFile = 'trades_ltc_rur_rur'
 #cascadeFile = 'trades_ltc_usd_usd'
 
@@ -57,12 +57,16 @@ file.close()
 
 engine.printCascade(cascade)
 
+print(engine.getReverseParams(cascade))
+
 if engine.needReverse(cascade):
 	print('need Reverse')
+	vol, id = engine.getReverseParams(cascade)
+	#print(vol)
+	print(engine.getReverseParams(engine.createCascade(vol, id)))
 else:
 	print('still wait')
 
-#engine.needReverse(cascade)	
 	
 if len(cascade) > 0 and 'options' in cascade[0]:
 	print('cascade is revers')

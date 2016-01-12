@@ -105,12 +105,12 @@ class Cascade:
 			priceStep = round(priceLength * investQuant / instrumentVolume, self.pricePrecision)
 			
 			if priceStep < 10 ** -self.pricePrecision: #priceStep == 0
-				print('ZERO step')
+				#print('ZERO step')
 				priceStep = 10 ** -self.pricePrecision
 				investQuant = round(priceStep * investFreq, self.pricePrecision)
 			
 			
-			print('startPrice: {0}, endPrice: {1}, priceLength: {2}, investQuant: {3}, priceStep: {4}, investFreq: {5}'.format(startPrice, endPrice, priceLength, investQuant, priceStep, investFreq))
+			#print('startPrice: {0}, endPrice: {1}, priceLength: {2}, investQuant: {3}, priceStep: {4}, investFreq: {5}'.format(startPrice, endPrice, priceLength, investQuant, priceStep, investFreq))
 			
 			curSelld = instrumentVolume
 			curPrice = startPrice
@@ -235,7 +235,7 @@ class Cascade:
 		idx = len(cascade) - 1
 		if 'orderId' in cascade[idx]['sellOrder'] and cascade[idx]['sellOrder']['status'] == 0:
 			#case direct cascade
-			return cascade[idx]['sellOrder']['amount'], cascade[idx]['sellOrder']['orderId']
+			return cascade[idx]['sellOrder']['operationAmount'], cascade[idx]['sellOrder']['orderId']
 		
 		return None, None
 	

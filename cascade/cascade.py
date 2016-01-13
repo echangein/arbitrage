@@ -1,4 +1,5 @@
 from spec import Spec
+import os
 
 class Cascade:
 	checkTimeout = 10
@@ -441,7 +442,73 @@ class Cascade:
 					profit = round(profit, self.profitPrecision)
 		
 		return profit
-			
+	
+	## 
+	#  @brief Brief
+	#  
+	#  @param [in] self Parameter_Description
+	#  @param [in] cascade Parameter_Description
+	#  @param [in] cascadeFileName Parameter_Description
+	#  @return true in success case
+	#  
+	#  @details cancel last sell order and save direct cascade
+	#  	
+	def saveCascade(self, cascade = None, cascadeFileName = None):
+		if (cascade is None):
+			cascade = self.cascade
+		if (cascade is None):
+			print('saveCascade. Cascade element not defined')
+			return False
+		if cascadeFileName is None:
+			print('saveCascade. Cascade file name not defined')
+			return False
+		
+		idx = len(cascade) - 1
+		
+		if not self.__isActiveOrder(cascade[idx]['sellOrder']):
+			print('saveCascade. Last save order is not active')
+			return False
+		
+		res = self.spec.cancelOrder(cascade[idx]['sellOrder']['orderId'])
+		if not res:
+			print('saveCascade. Cancel order error ' + self.spec.getLastErrorMessage())
+			return False
+
+		os.rename(cascadeFileName, cascadeFileName + '.bkp')
+		return True
+	
+	## 
+	#  @brief Brief
+	#  
+	#  @param [in] self Parameter_Description
+	#  @param [in] cascade Parameter_Description
+	#  @param [in] cascadeFileName Parameter_Description
+	#  @return Return_Description
+	#  
+	#  @details Details
+	#  	
+	def restoreCascade(self, cascade = None, cascadeFileName = None):
+		if (cascade is None):
+			cascade = self.cascade
+		if (cascade is None):
+			print('saveCascade. Cascade element not defined')
+			return False
+		if cascadeFileName is None:
+			print('saveCascade. Cascade file name not defined')
+			return False
+	
+		os.rename(cascadeFileName + '.bkp', cascadeFileName)
+		
+		orderId = self.spec.createOrder(element['sellOrder'])
+		if orderId is False:
+			print(self.spec.getLastErrorMessage())
+			break
+		element['sellOrder']['orderId'] = orderId
+		if orderId is None:
+			element['sellOrder']['status'] = 1
+		else:
+			element['sellOrder']['status'] = 0
+
 	def __isActiveOrder(self, order):
 		if 'orderId' in order and 'status' in order and order['status'] == 0:
 			return True

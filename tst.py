@@ -22,10 +22,10 @@ import config
 from cascade import Cascade
 import os.path
 
-#cascadeFile = 'trades_btc_rur_btc_rur_key'
-cascadeFile = 'trades_btc_usd_btc_usd_key'
+cascadeFile = 'trades_btc_rur_btc_rur_key'
+#cascadeFile = 'trades_btc_usd_btc_usd_key'
 #cascadeFile = 'trades_ltc_btc_ltc_btc_key'
-#cascadeFile = 'trades_ltc_rur_rur'
+cascadeFile = 'trades_ltc_rur_rur'
 #cascadeFile = 'trades_ltc_usd_usd'
 
 dirname, filename = os.path.split(os.path.abspath(__file__))
@@ -45,27 +45,23 @@ engine.setActiveOrdersCount(activeOrdersCount)
 
 engine.setProfitPrecision(profitPrecision)
 
-cascade = engine.createCascade() #43, 666
+#cascade = engine.createCascade() #43, 666
 
-print(engine.getProfit(cascade))
+#print(engine.getProfit(cascade))
 #print(cascade)
 #print(cascade[0]['sellOrder']['operationAmount'])
 
-"""
+
 file = open(cascadeFileName, 'r+')
 cascade = json.load(file)
 file.close()
-"""
+
 
 engine.printCascade(cascade)
+engine.saveCascade(cascade, cascadeFileName)
 quit()
 
-if engine.needRestart(cascade):
-	print('needRestart')
-else:
-	print('NOT needRestart')
-
-
+"""
 if engine.needReverse(cascade):
 	print('need Reverse')
 	vol, id = engine.getReverseParams(cascade)
@@ -78,3 +74,4 @@ if len(cascade) > 0 and 'options' in cascade[0]:
 	print('cascade is revers')
 else:
 	print('cascade is normal')
+"""

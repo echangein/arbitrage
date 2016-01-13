@@ -132,13 +132,12 @@ if engine.inWork(cascade):
 		print('In work')
 		engine.printCascade(cascade)
 	setPrevStat('inWork')
-	"""
+
 	if engine.needReverse(cascade):
 		volume, orderId = engine.getReverseParams(cascade)
-		engine.saveCascade(cascade, cascadeFileName)
-		cascade = engine.createCascade(volume, orderId)
-		setPrevStat('waiting')
-	"""
+		if engine.saveCascade(cascade, cascadeFileName):
+			cascade = engine.createCascade(volume, orderId)
+			setPrevStat('waiting')
 else:
 	setPrevStat('waiting')
 	if not silent:

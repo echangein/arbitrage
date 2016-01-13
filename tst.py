@@ -6,7 +6,7 @@ import time, os, json, sys
 #from spec import Spec
 
 
-pair = 'ltc_btc'
+pair = 'ltc_usd'
 silent = False
 
 profitPercent = 1
@@ -20,13 +20,13 @@ profitPrecision = 4
 import config
 #from spec import Spec
 from cascade import Cascade
-import os.path
+import os.path, json
 
 cascadeFile = 'trades_btc_rur_btc_rur_key'
-#cascadeFile = 'trades_btc_usd_btc_usd_key'
-#cascadeFile = 'trades_ltc_btc_ltc_btc_key'
+cascadeFile = 'trades_btc_usd_btc_usd_key'
+cascadeFile = 'trades_ltc_btc_ltc_btc_key'
 cascadeFile = 'trades_ltc_rur_rur'
-#cascadeFile = 'trades_ltc_usd_usd'
+cascadeFile = 'trades_ltc_usd_usd'
 
 dirname, filename = os.path.split(os.path.abspath(__file__))
 cascadeFileName = dirname + '/../' + cascadeFile
@@ -56,10 +56,27 @@ file = open(cascadeFileName, 'r+')
 cascade = json.load(file)
 file.close()
 
-
 engine.printCascade(cascade)
-engine.saveCascade(cascade, cascadeFileName)
-quit()
+
+if engine.isRevers(cascade):
+	print('restore cascade')
+	os.remove(cascadeFileName)
+	cascade = engine.restoreCascade(cascade, cascadeFileName)
+else:
+	if engine.needReverse(cascade):
+		print('create revers')
+		volume, orderId = engine.getReverseParams(cascade)
+		if engine.saveCascade(cascade, cascadeFileName):
+			cascade = engine.createCascade(volume, orderId)
+		else:
+			print('save cascade fail')
+
+		
+file = open(cascadeFileName, 'w+')
+file.write(json.dumps(cascade))
+file.close()
+
+
 
 """
 if engine.needReverse(cascade):

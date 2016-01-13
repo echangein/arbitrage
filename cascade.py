@@ -148,13 +148,12 @@ else:
 		print('\nCascade COMPLETE.')
 		print('Profit: {0}'.format(profit))
 		engine.printCascade(cascade)
-		"""
+		
+		if os.path.isfile(cascadeFileName):
+			os.remove(cascadeFileName)
 		if engine.isRevers(cascade):
-			cascade = engine.restoreCascade(cascade, cascadeFileName)
+			engine.restoreCascade(cascade, cascadeFileName)
 			setPrevStat('inWork')
-		else:"""
-		if os.path.isfile(cascadeFileName): # shift ->
-			os.remove(cascadeFileName) # shift ->
 		quit()
 	
 	if engine.needRestart(cascade):

@@ -1,5 +1,5 @@
 from spec import Spec
-import os
+import os, json
 
 class Cascade:
 	checkTimeout = 10
@@ -469,7 +469,7 @@ class Cascade:
 			print('saveCascade. Last save order is not active')
 			return False
 		
-		res = self.spec.cancelOrder(cascade[idx]['sellOrder']['orderId'])
+		res = "self.spec.cancelOrder(cascade[idx]['sellOrder']['orderId'])"
 		if not res:
 			print('saveCascade. Cancel order error ' + self.spec.getLastErrorMessage())
 			return False
@@ -499,15 +499,28 @@ class Cascade:
 	
 		os.rename(cascadeFileName + '.bkp', cascadeFileName)
 		
-		orderId = self.spec.createOrder(element['sellOrder'])
+		file = open(cascadeFileName, 'r+')
+		cascade = json.load(file)
+		file.close()
+		
+		idx = len(cascade) - 1
+		
+		orderId = "self.spec.createOrder(cascade[idx]['sellOrder'])"
 		if orderId is False:
-			print(self.spec.getLastErrorMessage())
-			break
-		element['sellOrder']['orderId'] = orderId
+			print('restoreCascade. Create order error ' + self.spec.getLastErrorMessage())
+			return False
+			
+		cascade[idx]['sellOrder']['orderId'] = orderId
 		if orderId is None:
-			element['sellOrder']['status'] = 1
+			cascade[idx]['sellOrder']['status'] = 1
 		else:
-			element['sellOrder']['status'] = 0
+			cascade[idx]['sellOrder']['status'] = 0
+		
+		file = open(cascadeFileName, 'w+')
+		file.write(json.dumps(cascade))
+		file.close()
+			
+		return True
 
 	def __isActiveOrder(self, order):
 		if 'orderId' in order and 'status' in order and order['status'] == 0:

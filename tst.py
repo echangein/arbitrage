@@ -6,7 +6,7 @@ import time, os, json, sys
 #from spec import Spec
 
 
-pair = 'ltc_usd'
+pair = 'ltc_btc'
 silent = False
 
 profitPercent = 1
@@ -25,8 +25,8 @@ import os.path, json
 cascadeFile = 'trades_btc_rur_btc_rur_key'
 cascadeFile = 'trades_btc_usd_btc_usd_key'
 cascadeFile = 'trades_ltc_btc_ltc_btc_key'
-cascadeFile = 'trades_ltc_rur_rur'
-cascadeFile = 'trades_ltc_usd_usd'
+#cascadeFile = 'trades_ltc_rur_rur'
+#cascadeFile = 'trades_ltc_usd_usd'
 
 dirname, filename = os.path.split(os.path.abspath(__file__))
 cascadeFileName = dirname + '/../' + cascadeFile
@@ -61,7 +61,8 @@ engine.printCascade(cascade)
 if engine.isRevers(cascade):
 	print('restore cascade')
 	os.remove(cascadeFileName)
-	cascade = engine.restoreCascade(cascade, cascadeFileName)
+	engine.restoreCascade(cascade, cascadeFileName)
+	quit()
 else:
 	if engine.needReverse(cascade):
 		print('create revers')
@@ -71,11 +72,9 @@ else:
 		else:
 			print('save cascade fail')
 
-		
 file = open(cascadeFileName, 'w+')
 file.write(json.dumps(cascade))
 file.close()
-
 
 
 """

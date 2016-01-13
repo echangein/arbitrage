@@ -469,7 +469,7 @@ class Cascade:
 			print('saveCascade. Last save order is not active')
 			return False
 		
-		res = "self.spec.cancelOrder(cascade[idx]['sellOrder']['orderId'])"
+		res = self.spec.cancelOrder(cascade[idx]['sellOrder']['orderId'])
 		if not res:
 			print('saveCascade. Cancel order error ' + self.spec.getLastErrorMessage())
 			return False
@@ -505,7 +505,7 @@ class Cascade:
 		
 		idx = len(cascade) - 1
 		
-		orderId = "self.spec.createOrder(cascade[idx]['sellOrder'])"
+		orderId = self.spec.createOrder(cascade[idx]['sellOrder'])
 		if orderId is False:
 			print('restoreCascade. Create order error ' + self.spec.getLastErrorMessage())
 			return False

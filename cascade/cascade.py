@@ -299,24 +299,30 @@ class Cascade:
 			print('createOrders. Cascade element not defined')
 			quit()
 		
+		workAction = 'buyOrder'
+		profitAction = 'sellOrder'
+		
+		if self.isRevers(cascade):
+			workAction, profitAction = profitAction, workAction
+		
 		byedStage = None
 		createdOrderCount = 0
 		for element in cascade:
-			if self.__isActiveOrder(element['buyOrder']):
+			if self.__isActiveOrder(element[workAction]):
 				createdOrderCount += 1
-			if createdOrderCount < self.activeOrdersCount and not self.__isCreatedOrder(element['buyOrder']):
-				orderId = self.spec.createOrder(element['buyOrder'])
+			if createdOrderCount < self.activeOrdersCount and not self.__isCreatedOrder(element[workAction]):
+				orderId = self.spec.createOrder(element[workAction])
 				if orderId is False:
 					print(self.spec.getLastErrorMessage())
 					break
-				element['buyOrder']['orderId'] = orderId
+				element[workAction]['orderId'] = orderId
 				if orderId is None:
-					element['buyOrder']['status'] = 1
+					element[workAction]['status'] = 1
 				else:
-					element['buyOrder']['status'] = 0
+					element[workAction]['status'] = 0
 				createdOrderCount += 1
 			
-			if self.__isCompleteOrder(element['buyOrder']):
+			if self.__isCompleteOrder(element[workAction]):
 				byedStage = element['stage']
 		
 		soldAmount = None
@@ -325,36 +331,36 @@ class Cascade:
 				break
 			
 			if not soldAmount is None:
-				element['sellOrder']['operationAmount'] -= soldAmount
+				element[profitAction]['operationAmount'] -= soldAmount
 			
-			if element['stage'] < byedStage and self.__isCompleteOrder(element['sellOrder']):
+			if element['stage'] < byedStage and self.__isCompleteOrder(element[profitAction]):
 				print('Partial execution in stage {0}'.format(element['stage']))
-				element['sellOrder']['status'] = 2
-				soldAmount = round(element['sellOrder']['operationAmount'], self.totalPrecision)
+				element[profitAction]['status'] = 2
+				soldAmount = round(element[profitAction]['operationAmount'], self.totalPrecision)
 			
-			if element['stage'] < byedStage and self.__isActiveOrder(element['sellOrder']):
-				res = self.spec.cancelOrder(element['sellOrder']['orderId'])
+			if element['stage'] < byedStage and self.__isActiveOrder(element[profitAction]):
+				res = self.spec.cancelOrder(element[profitAction]['orderId'])
 				if not res:
 					print(self.spec.getLastErrorMessage())
 					break
-				element['sellOrder']['status'] = 2
+				element[profitAction]['status'] = 2
 			
-			if element['stage'] == byedStage and not self.__isCreatedOrder(element['sellOrder']):
-				orderId = self.spec.createOrder(element['sellOrder'])
+			if element['stage'] == byedStage and not self.__isCreatedOrder(element[profitAction]):
+				orderId = self.spec.createOrder(element[profitAction])
 				if orderId is False:
 					print(self.spec.getLastErrorMessage())
 					break
-				element['sellOrder']['orderId'] = orderId
+				element[profitAction]['orderId'] = orderId
 				if orderId is None:
-					element['sellOrder']['status'] = 1
+					element[profitAction]['status'] = 1
 				else:
-					element['sellOrder']['status'] = 0
+					element[profitAction]['status'] = 0
 			
-		# fix rest sell orders in partial execution case
+		# fix rest profit orders in partial execution case
 		if not soldAmount is None:
 			for element in cascade:
 				if element['stage'] > byedStage:
-					element['sellOrder']['operationAmount'] -= soldAmount
+					element[profitAction]['operationAmount'] -= soldAmount
 		
 		return cascade
 	
@@ -491,10 +497,10 @@ class Cascade:
 		if (cascade is None):
 			cascade = self.cascade
 		if (cascade is None):
-			print('saveCascade. Cascade element not defined')
+			print('saveCascade. Cascade element is not defined')
 			return False
 		if cascadeFileName is None:
-			print('saveCascade. Cascade file name not defined')
+			print('saveCascade. Cascade file name is not defined')
 			return False
 	
 		os.rename(cascadeFileName + '.bkp', cascadeFileName)

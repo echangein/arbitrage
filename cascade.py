@@ -66,6 +66,8 @@ if os.path.isfile(configFileName):
 		pair = config['pair']
 	if 'activeOrdersCount' in config:
 		activeOrdersCount = config['activeOrdersCount']
+	if 'profitPrecision' in config:
+		profitPrecision = config['profitPrecision']
 	if 'silent' in config:
 		silent = config['silent']
 	
@@ -101,6 +103,7 @@ engine.setStartPercent(startPercent)
 engine.setDeepPercent(deepPercent)
 engine.setTotalInvest(totalInvest)
 
+engine.setProfitPrecision(profitPrecision)
 engine.setActiveOrdersCount(activeOrdersCount)
 
 if not silent:

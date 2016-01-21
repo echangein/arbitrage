@@ -15,6 +15,7 @@ startPercent = 1
 deepPercent = 15
 totalInvest = 5.2
 activeOrdersCount = 5
+allowRevers = False
 
 import config
 #from spec import Spec

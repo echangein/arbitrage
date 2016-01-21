@@ -70,6 +70,8 @@ if os.path.isfile(configFileName):
 		profitPrecision = config['profitPrecision']
 	if 'silent' in config:
 		silent = config['silent']
+	if 'allowRevers' in config:
+		allowRevers = config['allowRevers']
 	
 # set config from file
 
@@ -105,6 +107,7 @@ engine.setTotalInvest(totalInvest)
 
 engine.setProfitPrecision(profitPrecision)
 engine.setActiveOrdersCount(activeOrdersCount)
+engine.setAllowRevers(allowRevers)
 
 if not silent:
 	print('\ncur Pair:\t{0}'.format(pair))

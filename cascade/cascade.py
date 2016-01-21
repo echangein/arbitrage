@@ -21,6 +21,8 @@ class Cascade:
 	deepPercent = 15
 	totalInvest = 5
 	
+	allowRevers = False
+	
 	
 	def setActiveOrdersCount(self, activeOrdersCount):
 		self.activeOrdersCount = activeOrdersCount
@@ -58,6 +60,9 @@ class Cascade:
 	
 	def setTotalInvest(self, totalInvest):
 		self.totalInvest = totalInvest
+	
+	def setAllowRevers(self, allowRevers):
+		self.allowRevers = allowRevers
 		
 	def __init__(self, key = None, secret = None, silent = False):
 		self.spec = Spec(key, secret, silent)
@@ -195,6 +200,8 @@ class Cascade:
 		if len(cascade) == 0:
 			return False
 		if 'options' in cascade[0]:
+			return False
+		if not self.allowRevers:
 			return False
 		
 		idx = len(cascade) - 1

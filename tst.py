@@ -30,6 +30,7 @@ cascadeFile = 'trades_ltc_btc_ltc_btc_key'
 
 dirname, filename = os.path.split(os.path.abspath(__file__))
 cascadeFileName = dirname + '/../' + cascadeFile
+cascadeFileName = dirname + '/../bool'
 
 key = None
 secret = None
@@ -51,7 +52,7 @@ engine.setProfitPrecision(profitPrecision)
 #print(cascade)
 #print(cascade[0]['sellOrder']['operationAmount'])
 
-
+"""
 file = open(cascadeFileName, 'r+')
 cascade = json.load(file)
 file.close()
@@ -74,6 +75,11 @@ else:
 
 file = open(cascadeFileName, 'w+')
 file.write(json.dumps(cascade))
+file.close()
+"""
+
+file = open(cascadeFileName, 'w+')
+file.write(json.dumps(True))
 file.close()
 
 

@@ -12,6 +12,8 @@ class Interface:
 	baseUrl = 'https://btc-e.com/api/3/'
 	tradeUrl = 'https://btc-e.com/tapi'
 	
+	#opener = None
+	
 	apiKey = None
 	apiSecret = None
 	nonce = None
@@ -20,6 +22,9 @@ class Interface:
 		self.apiKey = apiKey
 		self.apiSecret = apiSecret
 		self.nonce = int(time.time())
+		
+		#proxy = urllib2.ProxyHandler({'http': '94.42.140.10:8080'})
+		#self.opener = urllib2.build_opener(proxy)
 	
 	def __getNonce(self):
 		self.nonce += 1
@@ -44,6 +49,8 @@ class Interface:
 			for key in tail.keys():
 				url = url + key + '=' + str(tail[key]) + '&'
 			url = url[:-1]
+		
+		#urllib2.install_opener(self.opener)
 		
 		try:
 			response = urllib2.urlopen(url)

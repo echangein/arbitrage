@@ -9,8 +9,8 @@ class Interface:
 	lastErrorMessage = None
 	lastResult = None
 	lastBody = None
-	baseUrl = 'https://btc-e.com/api/3/'
-	tradeUrl = 'https://btc-e.com/tapi'
+	baseUrl = 'https://btc-e.nz/api/3/'
+	tradeUrl = 'https://btc-e.nz/tapi'
 	
 	#opener = None
 	

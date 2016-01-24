@@ -3,6 +3,21 @@
 
 from kbrd import getch
 import time, os, json, sys
+
+# new test connection
+import httplib
+
+headers = {"Content-type": "application/x-www-form-urlencoded"}
+conn = httplib.HTTPSConnection("btc-e.nz")
+conn.request("GET", "/api/3/info", {}, headers)
+response = conn.getresponse()
+
+
+print response.status, response.reason
+print json.load(response)
+
+quit()
+
 #from spec import Spec
 
 
@@ -36,8 +51,9 @@ key = None
 secret = None
 
 engine = Cascade(key, secret, silent)
-engine.setPair(pair)
 
+engine.setPair(pair)
+quit()
 engine.setProfitPercent(profitPercent)
 engine.setStartPercent(startPercent)
 engine.setDeepPercent(deepPercent)

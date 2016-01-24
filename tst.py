@@ -4,11 +4,25 @@
 from kbrd import getch
 import time, os, json, sys
 
+from interface import Interface
+
+key = '2ZBRTHMR-VCMKM1BA-W1IX3TL8-4UVRYGJQ-ZIC6T51Y'
+secret = 'bf0c5be346ea2678e1b8642be0de22faf60569493cdab4dc6eb3d0574d262b64'
+
+inter = Interface(key, secret)
+res = inter.sendPost({'method': 'getInfo'})
+print(res)
+print(inter.lastErrorMessage, inter.lastResult)
+#if not res:
+#			self.lastErrorMessage = self.int.getLastErrorMessage()
+#			return False
+#quit()
+"""
 # new test connection
 import httplib
 
 headers = {"Content-type": "application/x-www-form-urlencoded"}
-conn = httplib.HTTPSConnection("btc-e.nz")
+conn = httplib.HTTPSConnection("btc-e.com")
 conn.request("GET", "/api/3/info", {}, headers)
 response = conn.getresponse()
 
@@ -17,6 +31,7 @@ print response.status, response.reason
 print json.load(response)
 
 quit()
+"""
 
 #from spec import Spec
 
@@ -47,12 +62,15 @@ dirname, filename = os.path.split(os.path.abspath(__file__))
 cascadeFileName = dirname + '/../' + cascadeFile
 cascadeFileName = dirname + '/../bool'
 
-key = None
-secret = None
+key = 'VG4PRAAN-12QORIZE-KZCLUQY8-M1EQUY0Y-QH756KNR'
+secret = '75a758d5b16835c92fdda55deb19ff0e1f256c15f27df7fa2be9d8de62524a9e'
 
 engine = Cascade(key, secret, silent)
 
 engine.setPair(pair)
+#cancel_order(968200187, 17)
+print(engine.spec.checkAmount(100, 'usd'))
+
 quit()
 engine.setProfitPercent(profitPercent)
 engine.setStartPercent(startPercent)
@@ -93,11 +111,11 @@ file = open(cascadeFileName, 'w+')
 file.write(json.dumps(cascade))
 file.close()
 """
-
+"""
 file = open(cascadeFileName, 'w+')
 file.write(json.dumps(True))
 file.close()
-
+"""
 
 """
 if engine.needReverse(cascade):

@@ -207,7 +207,7 @@ class Spec:
 			return False
 		
 		if res['return']['funds'][startCurr] < startAmount:
-			self.lastErrorMessage = 'Start amount large than {0}'.format(res['funds'][startCurr])
+			self.lastErrorMessage = 'Start amount large than {0}'.format(res['return']['funds'][startCurr])
 			return False
 			
 		return True

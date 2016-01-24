@@ -5,12 +5,17 @@ import hashlib
 import json
 import time
 
+import httplib
+
 class Interface:
 	lastErrorMessage = None
 	lastResult = None
 	lastBody = None
 	baseUrl = 'https://btc-e.nz/api/3/'
+	hostName = 'btc-e.nz'
+	apiLink = '/api/3/'
 	tradeUrl = 'https://btc-e.nz/tapi'
+	tradeLink = '/tapi'
 	
 	apiKey = None
 	apiSecret = None
@@ -35,6 +40,35 @@ class Interface:
 		return self.lastResult
 	
 	def sendGet(self, method = None, params = None, tail = None):
+		url = self.apiLink + method + '/'
+		if hasattr(params, '__contains__'):
+			url = url + '-'.join(params) + '/'
+		
+		if hasattr(tail, '__contains__'):
+			url = url + '?'
+			for key in tail.keys():
+				url = url + key + '=' + str(tail[key]) + '&'
+			url = url[:-1]
+		
+		headers = {'Content-type': 'application/x-www-form-urlencoded'}
+		conn = httplib.HTTPSConnection(self.hostName)
+		conn.request('GET', url, {}, headers)
+		response = conn.getresponse()
+		
+		self.lastResult = response.status
+		self.lastErrorMessage = 'HTTP Error #{0}: {1}'.format(response.status, response.reason)
+		
+		res = False
+		
+		if self.lastResult == 200:
+			res = json.load(response)
+			if res.has_key('error'):
+				self.lastErrorMessage = res['error']
+				res = False
+		
+		return res
+		
+		# ========= will remove =========
 		url = self.baseUrl + method + '/'
 		if hasattr(params, '__contains__'):
 			url = url + '-'.join(params) + '/'
@@ -67,13 +101,31 @@ class Interface:
 
 	def sendPost(self, params = None):
 		params['nonce'] = self.__getNonce()
-		
 		params = urllib.urlencode(params)
+		
 		H = hmac.new(self.apiSecret, digestmod=hashlib.sha512)
 		H.update(params)
 		sign = H.hexdigest()
  		headers = {"Content-type": "application/x-www-form-urlencoded", 'Key': self.apiKey, 'Sign': sign}
 		
+		conn = httplib.HTTPSConnection(self.hostName)
+		conn.request('POST', self.tradeLink, params, headers)
+		response = conn.getresponse()
+
+		self.lastResult = response.status
+		self.lastErrorMessage = 'HTTP Error #{0}: {1}'.format(response.status, response.reason)
+		
+		res = False
+		
+		if self.lastResult == 200:
+			res = json.load(response)
+			if res.has_key('error'):
+				self.lastErrorMessage = res['error']
+				res = False
+		
+		return res
+		
+		# ========= will remove =========
 		response = None
 		try:		
 			req = urllib2.Request(self.tradeUrl, params, headers)

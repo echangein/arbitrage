@@ -100,9 +100,11 @@ class Cascade:
 			print('{0[stage]:>3} buy {1[operationAmount]:<12}@ {1[price]:<12}inv: {3:<12} sell: {2[operationAmount]:<12}@ {2[price]:<12}accp: {4:<14} {5:<2}'.format(item, item['buyOrder'], item['sellOrder'], invested, accepted, profit))
 		
 	
-	def createCascade(self, instrumentVolume = None, orderId = None, maxStages = 10):
+	def createCascade(self, instrumentVolume = None, orderId = None, maxStages = 150):
 		self.setPair(self.pair)
 		
+		if not instrumentVolume is None:
+			instrumentVolume = float(instrumentVolume)
 		self.totalInvest = float(self.totalInvest)
 		
 		if orderId:
@@ -111,27 +113,28 @@ class Cascade:
 			priceLength = endPrice - startPrice
 			investFreq = round(instrumentVolume / priceLength, self.totalPrecision)
 			investQuant = round(self.minAmount * (100 + 2 * self.fee) / 100, self.totalPrecision)
-			priceStep = round(priceLength * investQuant / instrumentVolume, self.pricePrecision)
+			priceStep = priceLength * investQuant / instrumentVolume
+			#priceStep = round(priceLength * investQuant / instrumentVolume, self.pricePrecision)
 			
 			if priceStep < 10 ** -self.pricePrecision:
 				priceStep = 10 ** -self.pricePrecision
 				investQuant = round(priceStep * investFreq, self.pricePrecision)
 			
-			
-			curSelld = instrumentVolume
-			curPrice = startPrice
-			stage = 0
+			if instrumentVolume // investQuant > maxStages:
+				investQuant = round(instrumentVolume / maxStages, self.totalPrecision)
+				priceStep = priceLength / maxStages
+				#priceStep = round(priceLength / maxStages, self.pricePrecision)
+			else:
+				maxStages = int(instrumentVolume // investQuant)
+				investQuant = round(instrumentVolume / (instrumentVolume // investQuant), self.totalPrecision)
+				priceStep = priceLength / (instrumentVolume // investQuant)
+				#priceStep = round(priceLength / (instrumentVolume // investQuant), self.pricePrecision)
 			
 			acceptedSumm = 0
-			accepted = 0
 			cascade = []
-			while curSelld >= investQuant:
-				
-				"""curAmount = round(investQuant / curPrice, self.totalPrecision)
-				if curAmount < self.minAmount:
-					curAmount = self.minAmount"""
-					
-				accepted += investQuant
+			for stage in range(0, maxStages):
+				curPrice = round(startPrice + priceStep * stage, self.pricePrecision)
+				accepted = investQuant * (stage + 1)
 				acceptedSumm += round(investQuant * curPrice * (100 - self.fee) / 100, self.pricePrecision)
 				buyAmount = round(accepted * 100 / (100 - self.fee), self.totalPrecision)
 				buyPrice = round(acceptedSumm / accepted * (100 - self.profitPercent) / 100, self.pricePrecision)
@@ -140,54 +143,35 @@ class Cascade:
 					'buyOrder': {'pair': self.pair, 'action': 'buy', 'price': buyPrice, 'operationAmount': buyAmount}, 
 					'sellOrder': {'pair': self.pair, 'action': 'sell', 'price': curPrice, 'operationAmount': investQuant}, 
 					'options' : {'order_id': orderId, 'amount': instrumentVolume}})
-				stage += 1
-				curSelld -= investQuant
-				curPrice += priceStep			
 			return cascade
+			
 
 		startPrice = round(self.lastPrice * (100 - self.startPercent) / 100, self.pricePrecision)
 		endPrice = round(startPrice * (100 - self.deepPercent) / 100, self.pricePrecision)
 		priceLength = startPrice - endPrice
 		investFreq = round((startPrice - endPrice) / self.totalInvest, self.totalPrecision)
 		investQuant = round(startPrice * self.minAmount * (100 + 2 * self.fee) / 100, self.totalPrecision)
-
-		# ========= debug =========
-		print('lastPrice: {0}\r\nstartPrice-endPrice: {1}-{2}'.format(self.lastPrice, startPrice, endPrice))
-		print('first investQuant: {0}'.format(investQuant))
-		print('pricePrecision: {0}'.format(self.pricePrecision))
-		# ========= debug =========
+		priceStep = investQuant * investFreq
+		#priceStep = round(investQuant * investFreq, self.pricePrecision)
 		
-		priceStep = round(investQuant * investFreq, self.pricePrecision)
-		
-		if investQuant * investFreq < 10 ** -self.pricePrecision: #priceStep == 0
-			print('too small')
+		if investQuant * investFreq < 10 ** -self.pricePrecision:
 			priceStep = 10 ** -self.pricePrecision
 			investQuant = round(priceStep / investFreq, self.totalPrecision)
 		
-		# ========= debug =========
-		print('resume investQuant: {0}'.format(investQuant))
-		print('cascade stages: {0}'.format(self.totalInvest // investQuant))
-		# ========= debug =========
-		
 		if self.totalInvest // investQuant > maxStages:
-			print('too many stages')
 			investQuant = round(self.totalInvest / maxStages, self.totalPrecision)
-			priceStep = round(priceLength / maxStages, self.pricePrecision)
+			priceStep = priceLength / maxStages
+			#priceStep = round(priceLength / maxStages, self.pricePrecision)
 		else:
 			maxStages = int(self.totalInvest // investQuant)
 			investQuant = round(self.totalInvest / (self.totalInvest // investQuant), self.totalPrecision)
-			priceStep = round(priceLength / (self.totalInvest // investQuant), self.pricePrecision)
+			priceStep = priceLength / (self.totalInvest // investQuant)
+			#priceStep = round(priceLength / (self.totalInvest // investQuant), self.pricePrecision)
 			
-		
-		# ========= debug =========
-		print('finaly investQuant: {0}'.format(investQuant))
-		print('finaly stages: {0} or {1}'.format(maxStages, self.totalInvest // investQuant))
-		# ========= debug =========
-		
 		sellAmount = 0
 		cascade = []
 		for stage in range(0, maxStages):
-			curPrice = startPrice - priceStep * stage
+			curPrice = round(startPrice - priceStep * stage, self.pricePrecision)
 			curAmount = round(investQuant / curPrice, self.totalPrecision)
 			if curAmount < self.minAmount:
 				curAmount = self.minAmount
@@ -198,27 +182,6 @@ class Cascade:
 
 		return cascade
 		
-		curInvest = self.totalInvest
-		#curPrice = startPrice
-		invested = 0
-		stage = 0
-		sellAmount = 0
-		cascade = []
-		while curInvest >= investQuant:
-			curPrice = startPrice - priceStep * stage
-			curAmount = round(investQuant / curPrice, self.totalPrecision)
-			if curAmount < self.minAmount:
-				curAmount = self.minAmount
-				
-			invested += investQuant
-			sellAmount += round(curAmount * (100 - self.fee) / 100, self.totalPrecision)
-			sellPrice = round(invested / sellAmount * (100 + self.profitPercent) / 100, self.pricePrecision)
-			cascade.append({'stage': stage, 'buyOrder': {'pair': self.pair, 'action': 'buy', 'price': curPrice, 'operationAmount': curAmount}, 'sellOrder': {'pair': self.pair, 'action': 'sell', 'price': sellPrice, 'operationAmount': sellAmount}})
-			stage += 1
-			curInvest -= investQuant
-			#curPrice -= priceStep			
-		
-		return cascade
 
 	## 
 	#  @brief Brief

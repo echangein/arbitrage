@@ -4,13 +4,13 @@
 from kbrd import getch
 import time, os, json, sys
 
-pair = 'btc_usd'
+pair = 'ltc_rur'
 silent = False
 
-profitPercent = 1
-startPercent = 0.8
-deepPercent = 18
-totalInvest = 100
+profitPercent = 1.2
+startPercent = 0.9
+deepPercent = 19
+totalInvest = 5000
 activeOrdersCount = 5
 
 profitPrecision = 4
@@ -41,5 +41,5 @@ engine.setActiveOrdersCount(activeOrdersCount)
 
 engine.setProfitPrecision(profitPrecision)
 
-cascade = engine.createCascade() #43, 666
+cascade = engine.createCascade(17.99, 666) #43.93, 666
 engine.printCascade(cascade)

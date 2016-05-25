@@ -25,7 +25,7 @@ if hasProfit(cascadeStruct): #sell order complete
 	quit()
 	
 if not waitingProfit(cascadeStruct): #sell order is partial executed
-	cascadeStruct, error = createOrder(cascadeStruct)
+	cascadeStruct, error = createOrders(cascadeStruct)
 	if error:
 		reportCreateOrdersError()
 	cascadeStruct = shiftOrders(cascadeStruct)

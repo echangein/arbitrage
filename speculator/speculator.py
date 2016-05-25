@@ -24,9 +24,17 @@ class Speculator:
 	#  @param [in] self Parameter_Description
 	#  @param [in] pair Parameter_Description
 	#  @param [in] depth Parameter_Description
-	#  @return Return_Description
+	#  @return sigma, avg or False, errorMessage
 	#  
 	#  @details Details
 	#  		
 	def getSigmaAndAvg(self, pair = None, depth = None):
-		return 0, 0
+		req = {'pair': pair}
+		if depth.isdigit():
+			req['depth'] = depth
+		
+		res = self.int.sendGet('stat', None, req)
+		if (not res):
+			return False, self.int.getLastErrorMessage()
+			
+		return res['res']['sigma'], res['res']['avg']

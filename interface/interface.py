@@ -1,4 +1,3 @@
-import urllib2
 import urllib
 import hmac
 import hashlib
@@ -74,7 +73,13 @@ class Interface:
 		
 		headers = {'Content-type': 'application/x-www-form-urlencoded'}
 		conn = httplib.HTTPSConnection(self.hostName)
-		conn.request('GET', url, {}, headers)
+		try:
+			conn.request('GET', url, {}, headers)
+		except:
+			self.lastResult = 0
+			self.lastErrorMessage = 'connection to {0} error'.format(self.hostName+url)
+			return False
+			
 		response = conn.getresponse()
 		
 		self.lastResult = response.status
@@ -83,7 +88,13 @@ class Interface:
 		res = False
 		
 		if self.lastResult == 200:
-			res = json.load(response)
+			try:
+				res = json.load(response)
+			except:
+				self.lastResult = 0
+				self.lastErrorMessage = 'recognize error'
+				return False
+				
 			if res.has_key('error'):
 				self.lastErrorMessage = res['error']
 				res = False

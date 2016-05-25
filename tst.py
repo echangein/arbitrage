@@ -4,9 +4,13 @@
 from kbrd import getch
 import time, os, json, sys
 
-hi = raw_input()
-print(hi)
-print('alles gemacht')
+from speculator import Speculator
+
+spec = Speculator()
+print('enter depth');
+depth = raw_input()
+print(spec.getSigmaAndAvg('ltc_rur', depth))
+
 quit()
 
 pair = 'ltc_rur'

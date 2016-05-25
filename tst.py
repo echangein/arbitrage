@@ -4,6 +4,11 @@
 from kbrd import getch
 import time, os, json, sys
 
+hi = raw_input()
+print(hi)
+print('alles gemacht')
+quit()
+
 pair = 'ltc_rur'
 silent = False
 

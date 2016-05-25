@@ -28,6 +28,30 @@ class Interface:
 		self.nonce += 1
 		return self.nonce
 	
+	## 
+	#  @brief will be using in speculator class
+	#  
+	#  @param [in] self Parameter_Description
+	#  @param [in] hostName Parameter_Description
+	#  @return Return_Description
+	#  
+	#  @details Details
+	#  	
+	def setHost(self, hostName = None):
+		self.hostName = hostName
+	
+	## 
+	#  @brief will be using in speculator class
+	#  
+	#  @param [in] self Parameter_Description
+	#  @param [in] apiLink Parameter_Description
+	#  @return Return_Description
+	#  
+	#  @details Details
+	#  	
+	def setApiLink(self, apiLink = None):
+		self.apiLink = apiLink
+	
 	def getLastErrorMessage(self):
 		return self.lastErrorMessage
 

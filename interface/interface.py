@@ -11,10 +11,8 @@ class Interface:
 	lastErrorMessage = None
 	lastResult = None
 	lastBody = None
-	baseUrl = 'https://btc-e.nz/api/3/'
 	hostName = 'btc-e.nz'
 	apiLink = '/api/3/'
-	tradeUrl = 'https://btc-e.nz/tapi'
 	tradeLink = '/tapi'
 	
 	apiKey = None
@@ -67,37 +65,6 @@ class Interface:
 				res = False
 		
 		return res
-		
-		# ========= will remove =========
-		url = self.baseUrl + method + '/'
-		if hasattr(params, '__contains__'):
-			url = url + '-'.join(params) + '/'
-		
-		if hasattr(tail, '__contains__'):
-			url = url + '?'
-			for key in tail.keys():
-				url = url + key + '=' + str(tail[key]) + '&'
-			url = url[:-1]
-		
-		try:
-			response = urllib2.urlopen(url)
-		except urllib2.HTTPError, err:
-			self.lastResult = err.code
-			self.lastErrorMessage = 'HTTP Error #{0}'.format(err.code)
-			res = False
-		except urllib2.URLError, err:
-			self.lastErrorMessage = err.reason
-			res = False
-		else:
-			self.lastResult = response.getcode()
-			res = json.loads(response.read())
-			if res.has_key('error'):
-				self.lastErrorMessage = res['error']
-				res = False
-		
-		#response.close()
-		
-		return res
 
 	def sendPost(self, params = None):
 		params['nonce'] = self.__getNonce()
@@ -122,30 +89,5 @@ class Interface:
 			if res.has_key('error'):
 				self.lastErrorMessage = res['error']
 				res = False
-		
-		return res
-		
-		# ========= will remove =========
-		response = None
-		try:		
-			req = urllib2.Request(self.tradeUrl, params, headers)
-			response = urllib2.urlopen(req)
-		except urllib2.HTTPError, err:
-			self.lastResult = err.code
-			self.lastErrorMessage = 'HTTP Error #{0}'.format(err.code)
-			res = False
-		except urllib2.URLError, err:
-			#self.lastResult = -1 #err.code
-			self.lastErrorMessage = err.reason
-			res = False
-		else:
-			self.lastResult = response.getcode()
-			res = json.loads(response.read())
-			if res.has_key('error'):
-				self.lastErrorMessage = res['error']
-				res = False
-		
-		if response:
-			response.close()
 		
 		return res

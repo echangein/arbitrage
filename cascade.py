@@ -16,6 +16,7 @@ deepPercent = 15
 totalInvest = 5.2
 activeOrdersCount = 5
 allowRevers = False
+allowStop = False
 
 import config
 #from spec import Spec
@@ -73,6 +74,8 @@ if os.path.isfile(configFileName):
 		silent = config['silent']
 	if 'allowRevers' in config:
 		allowRevers = config['allowRevers']
+	if 'allowStop' in config:
+		allowStop = config['allowStop']
 	
 # set config from file
 
@@ -89,6 +92,9 @@ def setPrevStat(val):
 	f.write(val)
 	f.close()
 
+if getPrevStat() == 'stopped':
+	quit()
+	
 key = None
 secret = None
 
@@ -161,6 +167,8 @@ else:
 		if engine.isRevers(cascade):
 			engine.restoreCascade(cascade, cascadeFileName)
 			setPrevStat('inWork')
+		elif allowStop:
+			setPrevStat('stopped')
 		quit()
 	
 	if engine.needRestart(cascade):

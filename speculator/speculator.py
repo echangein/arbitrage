@@ -34,7 +34,7 @@ class Speculator:
 			req['depth'] = depth
 		
 		res = self.int.sendGet('stat', None, req)
-		if (not res):
+		if not res:
 			return False, self.int.getLastErrorMessage()
 			
 		return res['res']['sigma'], res['res']['avg']

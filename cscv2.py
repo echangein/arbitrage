@@ -1,3 +1,5 @@
+
+
 cascadeFileName = 'usd_rur.csc'
 
 if isExistsCascadeFile(cascadeFileName):

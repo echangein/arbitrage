@@ -4,12 +4,11 @@
 from kbrd import getch
 import time, os, json, sys
 
-from speculator import Speculator
+from btce import Btce
 
-spec = Speculator()
-print('enter depth');
-depth = raw_input()
-print(spec.getSigmaAndAvg('ltc_rur', depth))
+exchange = Btce()
+
+print(exchange.getTicker(['btc_usd', 'ltc_rurs']))
 
 quit()
 

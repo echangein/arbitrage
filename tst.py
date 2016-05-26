@@ -6,9 +6,19 @@ import time, os, json, sys
 
 from btce import Btce
 
-exchange = Btce()
+keyFile = 'secret.key'
+dirname, filename = os.path.split(os.path.abspath(__file__))
+keyFileName = dirname + '/../' + keyFile
+f = open(keyFileName, 'r')
+key = f.readline().strip()
+secret = f.readline().strip()
+f.close()
 
-print(exchange.getActiveOrders('btc_rur'))
+exchange = Btce(key, secret)
+
+#print(exchange.createOrder('btc_rur', 'buy', 28501, 0.02))
+
+print(exchange.cancelOrder(1085667368))
 
 quit()
 

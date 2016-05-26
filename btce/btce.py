@@ -63,22 +63,59 @@ class Btce:
 	#  
 	#  @details Details
 	#  		
-	def trade(self, pair = None, type = None, rate = None, amount = None):
-		return False, 'function trade is not realized'
+	def createOrder(self, pair = None, type = None, rate = None, amount = None):
+		res = self.int.sendPost({'method': 'Trade', 'pair': pair, 'type': type, 'rate': rate, 'amount': amount})
+		if not res:
+			return False, self.int.getLastErrorMessage()
+		return res['return'], 'ok'
 	
 	## 
 	#  @brief Brief
 	#  
 	#  @param [in] self Parameter_Description
-	#  @param [in] pair Parameter_Description
+	#  @param [in] pair only one pair
 	#  @return Return_Description
 	#  
 	#  @details Details
 	#  		
 	def getActiveOrders(self, pair = None):
-		res = self.int.sendPost({'method': 'ActiveOrders', 'pair': pair})
+		params = {'method': 'ActiveOrders'}
+		if isinstance(pair, str) or isinstance(pair, unicode):
+			params['pair'] = pair
+		
+		res = self.int.sendPost(params)
 		if not res:
 			return False, self.int.getLastErrorMessage()
 			
-		return res, 'ok'
-		
+		return res['return'], 'ok'
+	
+	## 
+	#  @brief Brief
+	#  
+	#  @param [in] self Parameter_Description
+	#  @param [in] orderId Parameter_Description
+	#  @return Return_Description
+	#  
+	#  @details 0 - active, 1 - excuted, 2 - canceled, 3 - canceled but partial executed
+	#  		
+	def getOrderInfo(self, orderId = None):
+		res = self.int.sendPost({'method': 'OrderInfo', 'order_id': orderId})
+		if not res:
+			return False, self.int.getLastErrorMessage()
+		return res['return'], 'ok'
+	
+	## 
+	#  @brief Brief
+	#  
+	#  @param [in] self Parameter_Description
+	#  @param [in] orderId Parameter_Description
+	#  @return Return_Description
+	#  
+	#  @details Details
+	#  	
+	def cancelOrder(self, orderId = None):
+		res = self.int.sendPost({'method': 'CancelOrder', 'order_id': orderId})
+		if not res:
+			return False, self.int.getLastErrorMessage()
+			
+		return res['return'], 'ok'

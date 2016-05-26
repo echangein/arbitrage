@@ -8,7 +8,7 @@ from btce import Btce
 
 exchange = Btce()
 
-print(exchange.getTicker(['btc_usd', 'ltc_rurs']))
+print(exchange.getActiveOrders('btc_rur'))
 
 quit()
 

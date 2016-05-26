@@ -42,10 +42,41 @@ class Btce:
 	#  @details Details
 	#  	
 	def getTicker(self, pairs = None):
-		if not pair:
-			return False, 'undefined pair'
+		if not hasattr(pairs, '__contains__'):
+			return False, 'pairs must be array'
 			
-		res = self.int.sendGet('ticker', pair)
+		res = self.int.sendGet('ticker', pairs)
+		if not res:
+			return False, self.int.getLastErrorMessage()
+			
+		return res, 'ok'
+		
+	## 
+	#  @brief Brief
+	#  
+	#  @param [in] self Parameter_Description
+	#  @param [in] pair Parameter_Description
+	#  @param [in] type Parameter_Description
+	#  @param [in] rate Parameter_Description
+	#  @param [in] amount Parameter_Description
+	#  @return Return_Description
+	#  
+	#  @details Details
+	#  		
+	def trade(self, pair = None, type = None, rate = None, amount = None):
+		return False, 'function trade is not realized'
+	
+	## 
+	#  @brief Brief
+	#  
+	#  @param [in] self Parameter_Description
+	#  @param [in] pair Parameter_Description
+	#  @return Return_Description
+	#  
+	#  @details Details
+	#  		
+	def getActiveOrders(self, pair = None):
+		res = self.int.sendPost({'method': 'ActiveOrders', 'pair': pair})
 		if not res:
 			return False, self.int.getLastErrorMessage()
 			

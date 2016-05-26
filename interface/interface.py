@@ -105,7 +105,13 @@ class Interface:
 		params['nonce'] = self.__getNonce()
 		params = urllib.urlencode(params)
 		
-		H = hmac.new(self.apiSecret, digestmod=hashlib.sha512)
+		try:
+			H = hmac.new(self.apiSecret, digestmod=hashlib.sha512)
+		except:
+			self.lastResult = 0
+			self.lastErrorMessage = 'sendPost: undefined secret key'
+			return False
+			
 		H.update(params)
 		sign = H.hexdigest()
  		headers = {"Content-type": "application/x-www-form-urlencoded", 'Key': self.apiKey, 'Sign': sign}

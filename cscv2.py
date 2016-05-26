@@ -1,65 +1,88 @@
+#!/usr/bin/env python
+#-*-coding:utf-8-*-
 
+import time, os, json, sys
 
-cascadeFileName = 'usd_rur.csc'
+dirName, ownFileName = os.path.split(os.path.abspath(__file__))
+
+def isExistsCascadeFile(fileName = None):
+	return os.path.isfile(dirName + '/../' + fileName)
+
+def loadCascadeFile(fileName = None):
+	file = open(dirName + '/../' + fileName, 'r+')
+	ret = json.load(file)
+	file.close()
+	return ret
+	
+def saveCascadeFile(fileName = None, cascadeStruct = None):
+	file = open(dirName + '/../' + fileName, 'w+')
+	file.write(json.dumps(cascadeStruct))
+	file.close()
+
+def removeCascadeFile(fileName = None):
+	os.remove(dirName + '/../' + fileName)
+
+# ================== define cascade params ================== #
+cascadeFileName = 'ltc_rur.csc'
+# ================== define cascade params ================== #
 
 if isExistsCascadeFile(cascadeFileName):
 	cascadeStruct = loadCascadeFile(cascadeFileName)
 else
-	cascadeStruct = createCascadeStruct()
+	cascadeStruct = sigma.createCascade()
 	
-cascadeStruct, error = checkOrdersStatus(cascadeStruct)#can be errors
+cascadeStruct, error = sigma.checkOrders(cascadeStruct) #checkOrdersStatus
 if error:
-	reportCheckOrdersStatusError()
+	print('error with checkOrders in init: {0}'.format(error)) #reportCheckOrdersStatusError()
 	saveCascadeFile(cascadeFileName, cascadeStruct)
 	quit()
 
 # ================== restart cascade ================== #
-if not inWork(cascadeStruct) and needRestart(cascadeStruct):
-	cascadeStruct, error = cancelOrders(cascadeStruct)
+if not sigma.inWork(cascadeStruct) and sigma.needRestart(cascadeStruct):
+	cascadeStruct, error = sigma.cancelOrders(cascadeStruct)
 	if error:
-		reportCancelOrdersError()
+		print('error with cancelOrders in restart cascade: {0}'.format(error)) #reportCancelOrdersError()
 		saveCascadeFile(cascadeFileName, cascadeStruct)
 		quit()
 		
-	cascadeStruct = createCascadeStruct()
-	cascadeStruct, error = checkOrdersStatus(cascadeStruct)#can be errors
+	cascadeStruct = sigma.createCascadeStruct()
+	cascadeStruct, error = sigma.checkOrders(cascadeStruct) #checkOrdersStatus
 	if error:
-		reportCheckOrdersStatusError()
+		print('error with checkOrders in restart: {0}'.format(error)) #reportCheckOrdersStatusError()
 		saveCascadeFile(cascadeFileName, cascadeStruct)
 		quit()
 # ================== restart cascade ================== #
 
 # ================== cascade get profit ================== #
-if hasProfit(cascadeStruct): #sell order complete
-	reportProfit(cascadeStruct)
-	if hasPartialExecution(cascadeStruct): # need check executed next buy order
-		cascadeStruct = resizeAfterProfit(cascadeStruct)
+if sigma.hasProfit(cascadeStruct): #sell order complete
+	sigma.reportProfit(cascadeStruct)
+	if sigma.hasPartialExecution(cascadeStruct): # need check executed next buy order
+		cascadeStruct = sigma.resizeAfterProfit(cascadeStruct)
 	else:
-		cascadeStruct, error = cancelOrders(cascadeStruct)
+		cascadeStruct, error = sigma.cancelOrders(cascadeStruct)
 		if error:
-			reportCancelOrdersError()
+			print('error with cancelOrders in cascade get profit: {0}'.format(error)) #reportCancelOrdersError()
 			saveCascadeFile(cascadeFileName, cascadeStruct)
 			quit()
-		if hasParnet(cascadeStruct): # for reverse
-			restoreParent(cascadeStruct)
-			quit()
-		else:
-			removeCascadeFile(cascadeFileName)
-			quit()
+		removeCascadeFile(cascadeFileName)
+		quit()
+#		if hasParnet(cascadeStruct): # for reverse
+#			restoreParent(cascadeStruct)
+#			quit()
 # ================== cascade get profit ================== #
 
 # ================== create revers cascade ================== #
 # ================== create revers cascade ================== #
 
 # ================== create order sequence ================== #
-cascadeStruct, error = createOrders(cascadeStruct)
+cascadeStruct, error = sigma.createOrders(cascadeStruct)
 if error:
-	reportCreateOrdersError()
-cascadeStruct = shiftOrders(cascadeStruct)
+	print('error with createOrders in create order sequence: {0}'.format(error))
+cascadeStruct = sigma.shiftOrders(cascadeStruct)
 
-cascadeStruct, error = moveProfitOrder(cascadeStruct)
+cascadeStruct, error = sigma.moveProfitOrder(cascadeStruct)
 if error:
-	reportMoveProfitOrderError()
+	print('error with moveProfitOrder in create order sequence: {0}'.format(error)) #reportMoveProfitOrderError()
 # ================== create order sequence ================== #
 
 saveCascadeFile(cascadeFileName, cascadeStruct)

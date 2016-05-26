@@ -111,7 +111,13 @@ class Interface:
  		headers = {"Content-type": "application/x-www-form-urlencoded", 'Key': self.apiKey, 'Sign': sign}
 		
 		conn = httplib.HTTPSConnection(self.hostName)
-		conn.request('POST', self.tradeLink, params, headers)
+		try:
+			conn.request('POST', self.tradeLink, params, headers)
+		except:
+			self.lastResult = 0
+			self.lastErrorMessage = 'send POST to {0} error'.format(self.hostName+self.tradeLink)
+			return False
+			
 		response = conn.getresponse()
 
 		self.lastResult = response.status
@@ -120,7 +126,13 @@ class Interface:
 		res = False
 		
 		if self.lastResult == 200:
-			res = json.load(response)
+			try:
+				res = json.load(response)
+			except:
+				self.lastResult = 0
+				self.lastErrorMessage = 'recognize error'
+				return False
+		
 			if res.has_key('error'):
 				self.lastErrorMessage = res['error']
 				res = False

@@ -2,10 +2,11 @@
 #-*-coding:utf-8-*-
 
 from kbrd import getch
-import time, os, json, sys
+import time, os, json, sys, datetime
 
 from btce import Btce
 from speculator import Speculator
+from sigma import Sigma
 
 keyFile = 'secret.key'
 dirname, filename = os.path.split(os.path.abspath(__file__))
@@ -15,10 +16,26 @@ key = f.readline().strip()
 secret = f.readline().strip()
 f.close()
 
+pair = 'ltc_rur'
+
+sigma = Sigma(key, secret, pair)
+sigma.invest = 4050
+sigma.minProfitPercent = 1.2
+
+cascade = sigma.createCascade()
+sigma.printCascade(cascade)
+quit()
+
+
 stat = Speculator()
 exchange = Btce(key, secret)
 
 #print(exchange.getConditions())
+
+dt = int(time.time())
+print(dt, datetime.datetime.fromtimestamp(dt).strftime('%Y.%m.%d %H:%M:%S'))
+
+#time.gmtime(), time.strftime('%Y.%m.%d %H:%M:%S', time.gmtime())
 
 pair = raw_input('enter pair: ')
 sigma, avg = stat.getSigmaAndAvg(pair)

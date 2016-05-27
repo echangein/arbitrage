@@ -110,7 +110,6 @@ class Sigma:
 			'createTS': int(time.time()),
 			'createLastPrice': self.lastPrice,
 			'createSigma': self.sigma,
-			'invest': self.invest,
 			'version': '0.1'
 		}
 		

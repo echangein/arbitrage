@@ -37,6 +37,7 @@ statusFileName = configFile  + '_' + keyFile + '.sts'
 
 if isExistsCascadeFile(cascadeFileName):
 	cascadeStruct = loadCascadeFile(cascadeFileName)
+	sigma.setParams(cascadeStruct)
 else
 	cascadeStruct = sigma.createCascade()
 	
@@ -54,7 +55,7 @@ if not sigma.inWork(cascadeStruct) and sigma.needRestart(cascadeStruct):
 		saveCascadeFile(cascadeFileName, cascadeStruct)
 		quit()
 		
-	cascadeStruct = sigma.createCascadeStruct()
+	cascadeStruct = sigma.createCascade()
 	cascadeStruct, error = sigma.checkOrders(cascadeStruct) #checkOrdersStatus
 	if error:
 		print('error with checkOrders in restart: {0}'.format(error)) #reportCheckOrdersStatusError()
@@ -67,6 +68,7 @@ if sigma.hasProfit(cascadeStruct): #sell order complete
 	sigma.reportProfit(cascadeStruct)
 	if sigma.hasPartialExecution(cascadeStruct): # need check executed next buy order
 		cascadeStruct = sigma.resizeAfterProfit(cascadeStruct)
+		sigma.setParams(cascadeStruct)
 	else:
 		cascadeStruct, error = sigma.cancelOrders(cascadeStruct)
 		if error:

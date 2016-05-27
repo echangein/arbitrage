@@ -16,6 +16,7 @@ class Sigma:
 	totalIndent = 3.0
 	minProfitPercent = 1.0
 	maxStages = 150
+	activeOrders = 3
 	
 	## 
 	#  @brief load lastPrise, sigma and trade conditions for specified pair
@@ -68,11 +69,24 @@ class Sigma:
 		quit()
 		
 	## 
+	#  @brief set class params from cascade options
+	#  
+	#  @param [in] self Parameter_Description
+	#  @param [in] cascadeStruct Parameter_Description
+	#  @return Return_Description
+	#  
+	#  @details Details
+	#  	
+	def setParams(self, cascadeStruct):
+		print('setParams is not implement')
+		quit()
+		
+	## 
 	#  @brief only update order status
 	#  
 	#  @param [in] self Parameter_Description
 	#  @param [in] cascadeStruct Parameter_Description
-	#  @return cascadeStruct, False or False, errorMessage
+	#  @return cascadeStruct, False or cascadeStruct, errorMessage
 	#  
 	#  @details Details
 	#  
@@ -104,4 +118,108 @@ class Sigma:
 	#  
 	def needRestart(self, cascadeStruct):
 		print('needRestart is not implement')
+		quit()
+	
+	## 
+	#  @brief True if exists executed profit order
+	#  
+	#  @param [in] self Parameter_Description
+	#  @param [in] cascadeStruct Parameter_Description
+	#  @return True or False
+	#  
+	#  @details Details
+	#  
+	def hasProfit(self, cascadeStruct):
+		print('hasProfit is not implement')
+		quit()
+
+	## 
+	#  @brief just print options and cascade
+	#  
+	#  @param [in] self Parameter_Description
+	#  @param [in] cascadeStruct Parameter_Description
+	#  @return Return_Description
+	#  
+	#  @details Details
+	#  		
+	def reportProfit(self, cascadeStruct):
+		print('reportProfit is not implement')
+		quit()
+	
+	## 
+	#  @brief True if exists executed invest order after executed profit order
+	#  
+	#  @param [in] self Parameter_Description
+	#  @param [in] cascadeStruct Parameter_Description
+	#  @return True or Falase
+	#  
+	#  @details Details
+	#  
+	def hasPartialExecution(self, cascadeStruct):
+		print('hasPartialExecution is not implement')
+		quit()
+	
+	## 
+	#  @brief cut executed parts with profit and recalc profit order
+	#  
+	#  @param [in] self Parameter_Description
+	#  @param [in] cascadeStruct Parameter_Description
+	#  @return cascade struct
+	#  
+	#  @details Details
+	#  	
+	def resizeAfterProfit(self, cascadeStruct):
+		print('resizeAfterProfit is not implement')
+		quit()
+		
+	## 
+	#  @brief cancel all orders
+	#  
+	#  @param [in] self Parameter_Description
+	#  @param [in] cascadeStruct Parameter_Description
+	#  @return cascadeStruct, False or cascadeStruct, errorMessage
+	#  
+	#  @details Details
+	#  	
+	def cancelOrders(self, cascadeStruct):
+		print('cancelOrders is not implement')
+		quit()
+
+	## 
+	#  @brief create invest orders to self.activeOrders counts
+	#  
+	#  @param [in] self Parameter_Description
+	#  @param [in] cascadeStruct Parameter_Description
+	#  @return cascadeStruct, False or cascadeStruct, errorMessage
+	#  
+	#  @details Details
+	#  		
+	def createOrders(self, cascadeStruct):
+		print('createOrders is not implement')
+		quit()
+	
+	## 
+	#  @brief recalc not active invest and profitorder
+	#  
+	#  @param [in] self Parameter_Description
+	#  @param [in] cascadeStruct Parameter_Description
+	#  @return cascadeStruct
+	#  
+	#  @details Details
+	#  
+	def shiftOrders(self, cascadeStruct):
+		print('shiftOrders is not implement')
+		quit()
+	
+	## 
+	#  @brief move profit order to last executed invest order
+	#  
+	#  @param [in] self Parameter_Description
+	#  @param [in] cascadeStruct Parameter_Description
+	#  @return cascadeStruct, False or cascadeStruct, errorMessage
+	#  
+	#  @details Details
+	#  
+	def moveProfitOrder(self, cascadeStruct):
+		print('moveProfitOrder is not implement')
 		quit()

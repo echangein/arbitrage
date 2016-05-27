@@ -30,7 +30,7 @@ class Speculator:
 	#  		
 	def getSigmaAndAvg(self, pair = None, depth = None):
 		req = {'pair': pair}
-		if depth.isdigit():
+		if not depth is None and depth.isdigit():
 			req['depth'] = depth
 		
 		res = self.int.sendGet('stat', None, req)

@@ -208,7 +208,7 @@ class Cascade:
 		idx = len(cascade) - 1
 		if 'status' in cascade[idx]['buyOrder'] and 'status' in cascade[idx]['sellOrder']:
 			if cascade[idx]['buyOrder']['status'] == 1 and cascade[idx]['sellOrder']['status'] == 0:
-				if round(self.lastPrice * (100 + self.startPercent) / 100, self.pricePrecision) < cascade[idx]['buyOrder']['price']:
+				if round(self.lastPrice * (100 + self.startPercent) / 100, self.pricePrecision) < cascade[idx]['sellOrder']['price']:
 					return True
 		
 		return False

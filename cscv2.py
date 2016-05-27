@@ -23,7 +23,16 @@ def removeCascadeFile(fileName = None):
 	os.remove(dirName + '/../' + fileName)
 
 # ================== define cascade params ================== #
-cascadeFileName = 'ltc_rur.csc'
+configFile = 'ltc_rur.cfg'
+keyFile = 'ltc_rur.key'
+for key, val in [s.split('=') for s in sys.argv[1:]]:
+	if key == 'conf':
+		configFile = val
+	if key == 'key':
+		keyFile = val
+
+cascadeFileName = configFile  + '_' + keyFile + '.csc'
+statusFileName = configFile  + '_' + keyFile + '.sts'
 # ================== define cascade params ================== #
 
 if isExistsCascadeFile(cascadeFileName):

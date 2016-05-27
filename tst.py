@@ -5,6 +5,7 @@ from kbrd import getch
 import time, os, json, sys
 
 from btce import Btce
+from speculator import Speculator
 
 keyFile = 'secret.key'
 dirname, filename = os.path.split(os.path.abspath(__file__))
@@ -14,11 +15,22 @@ key = f.readline().strip()
 secret = f.readline().strip()
 f.close()
 
+stat = Speculator()
 exchange = Btce(key, secret)
 
-#print(exchange.createOrder('btc_rur', 'buy', 28501, 0.02))
+pair = 'ltc_rur'
+sigma, avg = stat.getSigmaAndAvg(pair)
+if not sigma:
+	print(avg)
+	quit()
 
-print(exchange.cancelOrder(1085667368))
+
+res, error = exchange.getTicker([pair])
+if not res:
+	print(error)
+	quit()
+	
+print('{2} from {0} to {1}'.format(res[pair]['last'] - 3 * sigma, res[pair]['last'] + 3 * sigma, pair))
 
 quit()
 

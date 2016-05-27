@@ -110,6 +110,7 @@ class Sigma:
 			'createTS': int(time.time()),
 			'createLastPrice': self.lastPrice,
 			'createSigma': self.sigma,
+			'invest': self.invest,
 			'version': '0.1'
 		}
 		
@@ -120,11 +121,11 @@ class Sigma:
 		
 		investQuant = self.invest / float(steps)
 		options['investQuant'] = investQuant
-		investOrders = self.__getInvestOrders(startPrice, endPrice, steps, investQuant)
+		investOrders = self.__getInvestOrders(startPrice, endPrice, steps, investQuant, profitType)
 		return {
 			'options': options,
 			'investOrders': investOrders,
-			'profitOrders': self.__getProfitOrders(investOrders, profitType)
+			'profitOrders': self.__getProfitOrders(investOrders, [], profitType)
 		}
 	
 	## 
@@ -164,34 +165,31 @@ class Sigma:
 	#  
 	#  @param [in] self Parameter_Description
 	#  @param [in] investOrders Parameter_Description
+	#  @param [in] profitOrders begin of exists profit orders sequence
+	#  @param [in] profitType Parameter_Description
 	#  @return Return_Description
 	#  
 	#  @details Details
 	#  		
-	def __getProfitOrders(self, investOrders = None, profitType = 'buy'):
+	def __getProfitOrders(self, investOrders = None, profitOrders = [], profitType = 'buy'):
 		#TODO revers cascade
 		investAction = 'sell'
 		profitAction = 'buy'
 		if profitType == 'buy':
 			investAction, profitAction = profitAction, investAction
 	
-		profitOrders = []
 		invested = 0
 		accepted = 0
 		for order in investOrders:
 			accepted += order['amount'] * (100 - self.conditions['fee']) / 100
 			invested += order['amount'] * order['price']
 			price = invested / accepted * (100 + self.minProfitPercent) / 100
-			#if profitType <> 'buy':
-			#	accepted += order['amount'] * order['price'] * (100 - self.conditions['fee']) / 100
-			#	invested += order['amount']
-			#	price = 
-			
-			profitOrders.append({
-				'type': profitAction,
-				'amount': round(accepted, self.totalPrecision),
-				'price': round(price, self.conditions['decimal_places'])
-			})
+			if profitOrders == [] or (len(profitOrders) and profitOrders[-1]['amount'] < accepted):
+				profitOrders.append({
+					'type': profitAction,
+					'amount': round(accepted, self.totalPrecision),
+					'price': round(price, self.conditions['decimal_places'])
+				})
 		return profitOrders
 	
 	## 

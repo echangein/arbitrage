@@ -18,7 +18,9 @@ f.close()
 stat = Speculator()
 exchange = Btce(key, secret)
 
-pair = 'ltc_rur'
+#print(exchange.getConditions())
+
+pair = raw_input('enter pair: ')
 sigma, avg = stat.getSigmaAndAvg(pair)
 if not sigma:
 	print(avg)
@@ -31,6 +33,7 @@ if not res:
 	quit()
 	
 print('{2} from {0} to {1}'.format(res[pair]['last'] - 3 * sigma, res[pair]['last'] + 3 * sigma, pair))
+print('deep 3 sigma percent: {0}'.format(3 * sigma / res[pair]['last'] * 100))
 
 quit()
 

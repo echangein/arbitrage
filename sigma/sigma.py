@@ -315,7 +315,11 @@ class Sigma:
 		cou = 0
 		invested = 0
 		for order in cascadeStruct['profitOrders']:
+			invested += cascadeStruct['investOrders'][cou]['price'] * cascadeStruct['investOrders'][cou]['amount']
+			if self.__isCompleteOrder(order):
+				print()
 			cou += 1
+			
 		
 		print('reportProfit is not implement')
 		quit()

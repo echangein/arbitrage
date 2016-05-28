@@ -1,4 +1,4 @@
-import time, os, json
+import time, os, json, datetime
 
 from btce import Btce
 from speculator import Speculator
@@ -71,6 +71,15 @@ class Sigma:
 	#  	
 	def printCascade(self, cascadeStruct):
 		#TODO revers cascade
+		
+		print('created: {1} pair: {0[pair]} profit type: {0[profitType]} start price: {0[createLastPrice]} start sigma: {0[createSigma]}'.format(
+			cascadeStruct['options'],
+			datetime.datetime.fromtimestamp(cascadeStruct['options']['createTS']).strftime('%Y.%m.%d %H:%M:%S')
+		))
+		print('start indent: {0[startIndent]}, total indent: {0[totalIndent]} used: {0[invest]}'.format(
+			cascadeStruct['options']
+		))
+		
 		invested = 0
 		accepted = 0
 		for stage in range(0, len(cascadeStruct['investOrders'])):
@@ -106,17 +115,22 @@ class Sigma:
 			investDiv = minInvest * self.lastPrice
 		
 		options = {
+			'version': '0.1',
 			'pair': self.pair,
 			'createTS': int(time.time()),
 			'createLastPrice': self.lastPrice,
 			'createSigma': self.sigma,
-			'version': '0.1'
+			'invest': self.invest, #will need for reverse
+			'profitType': profitType, 
+			'startIndent': self.startIndent,
+			'totalIndent': self.totalIndent,
+			'minProfitPercent': self.minProfitPercent
 		}
 		
 		startPrice = self.lastPrice - self.startIndent * self.sigma * direction
 		endPrice = self.lastPrice - self.totalIndent * self.sigma * direction
 		steps = min(int(self.invest / investDiv), self.maxStages)
-		options['stages'] = steps
+		options['totalStages'] = steps
 		
 		investQuant = self.invest / float(steps)
 		options['investQuant'] = investQuant
@@ -201,8 +215,15 @@ class Sigma:
 	#  @details Details
 	#  	
 	def setParams(self, cascadeStruct):
-		print('setParams is not implement')
-		quit()
+		if not 'options' in cascadeStruct:
+			print('options param not set in cascade struct')
+			quit()
+		
+		self.pair = cascadeStruct['options']['pair']
+		self.invest = cascadeStruct['options']['invest']
+		self.startIndent = cascadeStruct['options']['startIndent']
+		self.totalIndent = cascadeStruct['options']['totalIndent']
+		self.minProfitPercent = cascadeStruct['options']['minProfitPercent']
 		
 	## 
 	#  @brief only update order status
@@ -214,8 +235,9 @@ class Sigma:
 	#  @details Details
 	#  
 	def checkOrders(self, cascadeStruct):
-		print('checkOrders is not implement')
-		quit()
+		print(self.exchange.getActiveOrders(self.pair))
+		#print('checkOrders is not implement')
+		#quit()
 	
 	## 
 	#  @brief True if exist active or executed profit order

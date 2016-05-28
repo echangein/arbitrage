@@ -16,15 +16,18 @@ key = f.readline().strip()
 secret = f.readline().strip()
 f.close()
 
-pair = 'ltc_btc'
+pair = 'btc_rur'
 
 sigma = Sigma(key, secret, pair)
-sigma.invest = 0.44
-sigma.totalIndent = 3
-sigma.minProfitPercent = 1
+sigma.invest = 9000.0
+sigma.totalIndent = 3.0
+sigma.minProfitPercent = 1.0
 
 cascade = sigma.createCascade()
 sigma.printCascade(cascade)
+
+sigma.setParams(cascade)
+sigma.checkOrders(cascade)
 quit()
 
 

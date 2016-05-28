@@ -254,7 +254,7 @@ class Sigma:
 		return cascadeStruct, False
 	
 	## 
-	#  @brief True if exist active or executed profit order
+	#  @brief True if exist executed invest order
 	#  
 	#  @param [in] self Parameter_Description
 	#  @param [in] cascadeStruct Parameter_Description
@@ -263,8 +263,11 @@ class Sigma:
 	#  @details Details
 	#  
 	def inWork(self, cascadeStruct):
-		print('inWork is not implement')
-		quit()
+		for order in cascadeStruct['investOrders']:
+			if self.__isCompleteOrder(order):
+				return True
+		
+		return False
 
 	## 
 	#  @brief compare lastPrice and first invest order by start indent
@@ -276,8 +279,11 @@ class Sigma:
 	#  @details Details
 	#  
 	def needRestart(self, cascadeStruct):
-		print('needRestart is not implement')
-		quit()
+		#TODO modify for sell profit type
+		if self.lastPrice > cascadeStruct['investOrders'][0]['price'] + self.sigma * self.startIndent:
+			return True
+		
+		return False
 	
 	## 
 	#  @brief True if exists executed profit order
@@ -289,8 +295,11 @@ class Sigma:
 	#  @details Details
 	#  
 	def hasProfit(self, cascadeStruct):
-		print('hasProfit is not implement')
-		quit()
+		for order in cascadeStruct['profitOrders']:
+			if self.__isCompleteOrder(order):
+				return True
+		
+		return False
 
 	## 
 	#  @brief just print options and cascade
@@ -302,6 +311,12 @@ class Sigma:
 	#  @details Details
 	#  		
 	def reportProfit(self, cascadeStruct):
+		#TODO modify for sell profit type
+		cou = 0
+		invested = 0
+		for order in cascadeStruct['profitOrders']:
+			cou += 1
+		
 		print('reportProfit is not implement')
 		quit()
 	
@@ -412,7 +427,7 @@ class Sigma:
 		return False
 		
 	## 
-	#  @brief order is completed
+	#  @brief order is executed
 	#  
 	#  @param [in] self Parameter_Description
 	#  @param [in] order Parameter_Description

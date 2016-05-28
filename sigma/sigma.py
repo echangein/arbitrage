@@ -232,12 +232,26 @@ class Sigma:
 	#  @param [in] cascadeStruct Parameter_Description
 	#  @return cascadeStruct, False or cascadeStruct, errorMessage
 	#  
-	#  @details Details
+	#  @details 0 - active, 1 - excuted, 2 - canceled, 3 - canceled but partial executed
 	#  
 	def checkOrders(self, cascadeStruct):
-		print(self.exchange.getActiveOrders(self.pair))
-		#print('checkOrders is not implement')
-		#quit()
+		res, error = self.exchange.getActiveOrders(self.pair) #self.pair
+		if not res and error <> 'no orders':
+			return cascadeStruct, error
+		
+		orderIds = []
+		if not isinstance(res, bool):
+			orderIds = res.keys()
+		
+		for order in cascadeStruct['investOrders']:
+			if self.__isActiveOrder(order) and not order['orderId'] in orderIds:
+				order['status'] = 1
+		
+		for order in cascadeStruct['profitOrders']:
+			if self.__isActiveOrder(order) and not order['orderId'] in orderIds:
+				order['status'] = 1
+		
+		return cascadeStruct, False
 	
 	## 
 	#  @brief True if exist active or executed profit order
@@ -368,3 +382,45 @@ class Sigma:
 	def moveProfitOrder(self, cascadeStruct):
 		print('moveProfitOrder is not implement')
 		quit()
+	
+	## 
+	#  @brief order is created but not compete
+	#  
+	#  @param [in] self Parameter_Description
+	#  @param [in] order Parameter_Description
+	#  @return Return_Description
+	#  
+	#  @details Details
+	#  		
+	def __isActiveOrder(self, order):
+		if 'orderId' in order and 'status' in order and order['status'] == 0:
+			return True
+		return False
+		
+	## 
+	#  @brief order was be created
+	#  
+	#  @param [in] self Parameter_Description
+	#  @param [in] order Parameter_Description
+	#  @return Return_Description
+	#  
+	#  @details Details
+	#  		
+	def __isCreatedOrder(self, order):
+		if 'orderId' in order:
+			return True
+		return False
+		
+	## 
+	#  @brief order is completed
+	#  
+	#  @param [in] self Parameter_Description
+	#  @param [in] order Parameter_Description
+	#  @return Return_Description
+	#  
+	#  @details Details
+	#  		
+	def __isCompleteOrder(self, order):
+		if 'orderId' in order and 'status' in order and order['status'] == 1:
+			return True
+		return False

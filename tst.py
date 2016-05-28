@@ -27,7 +27,10 @@ cascade = sigma.createCascade()
 sigma.printCascade(cascade)
 
 sigma.setParams(cascade)
-sigma.checkOrders(cascade)
+cascade, error = sigma.checkOrders(cascade)
+
+print(cascade, error)
+
 quit()
 
 

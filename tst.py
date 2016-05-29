@@ -4,6 +4,13 @@
 from kbrd import getch
 import time, os, json, sys, datetime
 
+import requests
+
+url = 'http://speculator.in/ax/stat/?pair=btc_rur'
+print(requests.get(url))
+
+quit()
+
 from btce import Btce
 from speculator import Speculator
 from sigma import Sigma

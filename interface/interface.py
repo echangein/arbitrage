@@ -1,4 +1,5 @@
 import urllib
+import urllib2
 import hmac
 import hashlib
 import json
@@ -81,6 +82,7 @@ class Interface:
 			return False
 			
 		response = conn.getresponse()
+		#response = self.sendGetOld('https://' + self.hostName + url)
 		
 		self.lastResult = response.status
 		self.lastErrorMessage = 'HTTP Error #{0}: {1}'.format(response.status, response.reason)
@@ -100,6 +102,9 @@ class Interface:
 				res = False
 		
 		return res
+
+	def sendGetOld(self, url = None, headers = None):
+		return urllib2.urlopen(url)
 
 	def sendPost(self, params = None):
 		params['nonce'] = self.__getNonce()

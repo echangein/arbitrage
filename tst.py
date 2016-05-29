@@ -5,8 +5,20 @@ from kbrd import getch
 import time, os, json, sys, datetime
 
 import requests
+def fileno(self):
+    return self.socket.fileno()
 
-url = 'http://speculator.in/ax/stat/?pair=btc_rur'
+
+def close(self):
+    return self.connection.shutdown()
+
+
+requests.pyopenssl.WrappedSocket.close = close
+requests.pyopenssl.WrappedSocket.fileno = fileno
+
+# look here http://stackoverflow.com/questions/33972671/downloading-https-pages-with-urllib-error14077438ssl-routinesssl23-get-serve
+
+url = 'https://speculator.in/ax/stat/?pair=btc_rur'
 print(requests.get(url))
 
 quit()

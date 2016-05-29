@@ -4,19 +4,18 @@
 from kbrd import getch
 import time, os, json, sys, datetime
 
-import urllib
-
-url = 'https://btc-e.nz/api/3/ticker/btc_usd'
+import httplib
 
 url = 'http://speculator.in/ax/stat/?pair=btc_rur'
+urll = '/ax/stat/?pair=btc_rur'
 
-#print(urllib.urlopen(url, '/ax/stat/?pair=btc_rur').read())
+headers = {'Content-type': 'application/x-www-form-urlencoded'}
 
-import requests
-resp = requests.get(url)
-print resp.status_code
-print resp.headers
-print resp.text
+conn = httplib.HTTPConnection('speculator.in')
+conn.request('GET', urll) #, {}, headers
+response = conn.getresponse()
+
+print(json.load(response))
 
 quit()
 

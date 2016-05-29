@@ -4,14 +4,19 @@
 from kbrd import getch
 import time, os, json, sys, datetime
 
-from btce import Btce
-from speculator import Speculator
+import urllib
 
-exchange = Btce()
-stat = Speculator()
+url = 'https://btc-e.nz/api/3/ticker/btc_usd'
 
-print(exchange.getTicker(['btc_rur']))
-print(stat.getSigmaAndAvg('btc_rur'))
+url = 'http://speculator.in/ax/stat/?pair=btc_rur'
+
+#print(urllib.urlopen(url, '/ax/stat/?pair=btc_rur').read())
+
+import requests
+resp = requests.get(url)
+print resp.status_code
+print resp.headers
+print resp.text
 
 quit()
 

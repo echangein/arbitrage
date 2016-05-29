@@ -314,15 +314,15 @@ class Sigma:
 		#TODO modify for sell profit type
 		cou = 0
 		invested = 0
-		for order in cascadeStruct['profitOrders']:
+		for profitOrder in cascadeStruct['profitOrders']:
 			invested += cascadeStruct['investOrders'][cou]['price'] * cascadeStruct['investOrders'][cou]['amount']
-			if self.__isCompleteOrder(order):
-				print()
+			if self.__isCompleteOrder(profitOrder):
+				print('Stage {0} of {1}. Profit: {2}'.format(
+					cou,
+					len(cascadeStruct['investOrders']) - 1, 
+					profitOrder['amount'] * profitOrder['price'] * (100 - self.conditions['fee']) / 100 - invested
+				))
 			cou += 1
-			
-		
-		print('reportProfit is not implement')
-		quit()
 	
 	## 
 	#  @brief True if exists executed invest order after executed profit order

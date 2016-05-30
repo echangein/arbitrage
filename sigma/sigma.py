@@ -429,9 +429,6 @@ class Sigma:
 		if lastIdx >= len(cascadeStruct['investOrders']): # all invest orders complete
 			return cascadeStruct, False
 		
-		print('active ordersCount {0} lastIdx {1}'.format(ordersCount, lastIdx))
-		print(range(lastIdx, lastIdx + self.activeOrdersCount - ordersCount))
-		
 		for idx in range(lastIdx, lastIdx + self.activeOrdersCount - ordersCount):
 			if idx < len(cascadeStruct['investOrders']):
 				orderId, error = self.__createOrder(cascadeStruct['investOrders'][idx])
@@ -473,8 +470,30 @@ class Sigma:
 	#  @details Details
 	#  
 	def shiftOrders(self, cascadeStruct):
-		print('shiftOrders is not implement')
-		quit()
+		#TODO sell profit type
+		idx = 0
+		for order in cascadeStruct['investOrders']:
+			if not self.__isCreatedOrder(order):
+				break;
+			idx += 1
+		
+		if idx >= len(cascadeStruct['investOrders']): # all invest is created nothing to shift
+			return cascadeStruct
+	
+		startPrice = cascadeStruct['investOrders'][idx]['price']
+		endPrice = self.lastPrice - self.totalIndent * self.sigma
+		
+		if endPrice > startPrice:
+			return cascadeStruct
+		
+		steps = len(cascadeStruct['investOrders']) - idx + 1
+		investQuant = cascadeStruct['options']['investQuant']
+		
+		cascadeStruct['investOrders'] = cascadeStruct['investOrders'][:idx] + self.__getInvestOrders(startPrice, endPrice, steps, investQuant)[1:]
+	
+		cascadeStruct['profitOrders'] = self.__getProfitOrders(cascadeStruct['investOrders'], cascadeStruct['profitOrders'][:idx])
+	
+		return cascadeStruct
 	
 	## 
 	#  @brief move profit order to last executed invest order
@@ -486,6 +505,17 @@ class Sigma:
 	#  @details Details
 	#  
 	def moveProfitOrder(self, cascadeStruct):
+		idx = 0
+		for order in cascadeStruct['investOrders']:
+			if not self.__isCompleteOrder(order):
+				break;
+			idx += 1
+		
+		if idx >= len(cascadeStruct['investOrders']):
+			return cascadeStruct, False
+		
+		for order in cascadeStruct['profitOrders']:
+	
 		print('moveProfitOrder is not implement')
 		quit()
 	

@@ -29,53 +29,23 @@ cascade, error = sigma.checkOrders(cascade)
 
 # 0 - active, 1 - excuted, 2 - canceled, 3 - canceled but partial executed
 
-profitIdx = len(cascade['profitOrders']) / 2
+#profitIdx = len(cascade['profitOrders']) / 2
 
-print('profitIdx: {0}'.format(profitIdx))
+#print('profitIdx: {0}'.format(profitIdx))
 
 # set in work
-cascade['investOrders'][0]['orderId'] = 666
-cascade['investOrders'][0]['status'] = 0
+for order in cascade['investOrders']:
+	order['orderId'] = 666
+	order['status'] = 0
 # set in work
 
-"""
-#set partial execution
-cascade['profitOrders'][profitIdx]['orderId'] = 666
-cascade['profitOrders'][profitIdx]['status'] = 1
-cascade['investOrders'][profitIdx]['orderId'] = 666
-cascade['investOrders'][profitIdx]['status'] = 1
-cascade['investOrders'][profitIdx+1]['orderId'] = 666
-cascade['investOrders'][profitIdx+1]['status'] = 1
-#set partial execution
-"""
+print('inv: {0} prof: {1}'.format(len(cascade['investOrders']), len(cascade['profitOrders'])))
 
-if sigma.inWork(cascade):
-	print('inWork')
-
-if sigma.hasProfit(cascade):
-	print('hasProfit is True')
-	sigma.reportProfit(cascade)
-else:
-	print('hasProfit is False')
-
-if sigma.hasPartialExecution(cascade):
-	print('hasPartialExecution is True')
-	cascade = sigma.resizeAfterProfit(cascade)
-	print('resaze after partial execution')
-
+cascade = sigma.shiftOrders(cascade)
+#print(cascade)
 sigma.printCascade(cascade)
+print('inv: {0} prof: {1}'.format(len(cascade['investOrders']), len(cascade['profitOrders'])))
 
-if sigma.inWork(cascade):
-	print('inWork')
-
-if sigma.hasProfit(cascade):
-	print('hasProfit is True')
-	sigma.reportProfit(cascade)
-else:
-	print('hasProfit is False')
-
-sigma.createOrders(cascade)
-	
 quit()
 
 from btce import Btce

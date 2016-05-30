@@ -33,7 +33,7 @@ class Speculator:
 		if not depth is None and depth.isdigit():
 			req['depth'] = depth
 		
-		res = self.int.sendGet('stat', None, req)
+		res = self.int.sendGet('stat', None, req, False)
 		if not res:
 			return False, self.int.getLastErrorMessage()
 			

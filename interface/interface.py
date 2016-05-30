@@ -1,5 +1,4 @@
 import urllib
-import urllib2
 import hmac
 import hashlib
 import json
@@ -61,7 +60,7 @@ class Interface:
 	def getLastResult(self):
 		return self.lastResult
 	
-	def sendGet(self, method = None, params = None, tail = None):
+	def sendGet(self, method = None, params = None, tail = None, ssh = True):
 		url = self.apiLink + method + '/'
 		if hasattr(params, '__contains__'):
 			url = url + '-'.join(params) + '/'
@@ -73,16 +72,22 @@ class Interface:
 			url = url[:-1]
 		
 		headers = {'Content-type': 'application/x-www-form-urlencoded'}
-		conn = httplib.HTTPSConnection(self.hostName)
+		if ssh:
+			conn = httplib.HTTPSConnection(self.hostName)
+		else:
+			conn = httplib.HTTPConnection(self.hostName)
+			
 		try:
-			conn.request('GET', url, {}, headers)
+			if ssh:
+				conn.request('GET', url, {}, headers)
+			else:
+				conn.request('GET', url)
 		except:
 			self.lastResult = 0
 			self.lastErrorMessage = 'connection to {0} error'.format(self.hostName+url)
 			return False
 			
 		response = conn.getresponse()
-		#response = self.sendGetOld('https://' + self.hostName + url)
 		
 		self.lastResult = response.status
 		self.lastErrorMessage = 'HTTP Error #{0}: {1}'.format(response.status, response.reason)
@@ -102,9 +107,6 @@ class Interface:
 				res = False
 		
 		return res
-
-	def sendGetOld(self, url = None, headers = None):
-		return urllib2.urlopen(url)
 
 	def sendPost(self, params = None):
 		params['nonce'] = self.__getNonce()

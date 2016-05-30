@@ -4,19 +4,16 @@
 from kbrd import getch
 import time, os, json, sys, datetime
 
-import httplib
+from btce import Btce
+from speculator import Speculator
 
-url = 'http://speculator.in/ax/stat/?pair=btc_rur'
-urll = '/ax/stat/?pair=btc_rur'
+stat = Speculator()
+exchange = Btce()
 
-headers = {'Content-type': 'application/x-www-form-urlencoded'}
+pair = 'btc_usd'
 
-conn = httplib.HTTPConnection('speculator.in')
-conn.request('GET', urll) #, {}, headers
-response = conn.getresponse()
-
-print(json.load(response))
-
+print(exchange.getTicker([pair]))
+print(stat.getSigmaAndAvg(pair))
 quit()
 
 from btce import Btce

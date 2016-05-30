@@ -505,16 +505,27 @@ class Sigma:
 	#  @details Details
 	#  
 	def moveProfitOrder(self, cascadeStruct):
-		idx = 0
+		investIdx = 0
 		for order in cascadeStruct['investOrders']:
-			if not self.__isCompleteOrder(order):
+			if not self.__isCompleteOrder(order): # WTF?
 				break;
-			idx += 1
+			investIdx += 1
 		
-		if idx >= len(cascadeStruct['investOrders']):
-			return cascadeStruct, False
-		
+		if investIdx = len(cascadeStruct['investOrders']):
+			investIdx = len(cascadeStruct['investOrders']) - 1
+
+		idx = 0
 		for order in cascadeStruct['profitOrders']:
+			if self.__isActiveOrder(order) and idx < investIdx:
+				res, error = self.exchange.cancelOrder(order['orderId'])
+				if res:
+					order['status'] = 2
+				else:
+					return cascadeStruct, error
+			idx += 1
+	
+		if self.__isCompleteOrder(cascadeStruct['profitOrders'][investIdx]):
+			
 	
 		print('moveProfitOrder is not implement')
 		quit()

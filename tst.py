@@ -34,17 +34,23 @@ cascade, error = sigma.checkOrders(cascade)
 #print('profitIdx: {0}'.format(profitIdx))
 
 # set in work
+"""
 for order in cascade['investOrders']:
 	order['orderId'] = 666
-	order['status'] = 0
+	order['status'] = 1
+"""
+cascade['investOrders'][0]['orderId'] = 666
+cascade['investOrders'][0]['status'] = 1
+#cascade['investOrders'][1]['orderId'] = 666
+#cascade['investOrders'][1]['status'] = 1
 # set in work
 
 print('inv: {0} prof: {1}'.format(len(cascade['investOrders']), len(cascade['profitOrders'])))
 
-cascade = sigma.shiftOrders(cascade)
+#cascade, error = sigma.moveProfitOrder(cascade)
 #print(cascade)
-sigma.printCascade(cascade)
-print('inv: {0} prof: {1}'.format(len(cascade['investOrders']), len(cascade['profitOrders'])))
+#sigma.printCascade(cascade)
+#print('inv: {0} prof: {1}'.format(len(cascade['investOrders']), len(cascade['profitOrders'])))
 
 quit()
 

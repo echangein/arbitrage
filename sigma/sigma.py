@@ -436,7 +436,7 @@ class Sigma:
 					return cascadeStruct, error
 				else:
 					cascadeStruct['investOrders'][idx]['orderId'] = orderId
-					if orderId == 0:
+					if orderId is 0:
 						cascadeStruct['investOrders'][idx]['status'] = 1
 					else:
 						cascadeStruct['investOrders'][idx]['status'] = 0
@@ -505,18 +505,19 @@ class Sigma:
 	#  @details Details
 	#  
 	def moveProfitOrder(self, cascadeStruct):
-		investIdx = 0
-		for order in cascadeStruct['investOrders']:
-			if not self.__isCompleteOrder(order): # WTF?
-				break;
-			investIdx += 1
+		if not self.__isCompleteOrder(cascadeStruct['investOrders'][0]): # no complete - no move
+			print('no complete - no move')
+			return cascadeStruct, False
 		
-		if investIdx = len(cascadeStruct['investOrders']):
-			investIdx = len(cascadeStruct['investOrders']) - 1
-
+		completeIdx = -1
+		for order in cascadeStruct['investOrders']:
+			if not self.__isCompleteOrder(order):
+				break;
+			completeIdx += 1
+		
 		idx = 0
-		for order in cascadeStruct['profitOrders']:
-			if self.__isActiveOrder(order) and idx < investIdx:
+		for order in cascadeStruct['profitOrders']: # cancel prev profit order
+			if self.__isActiveOrder(order) and idx < completeIdx:
 				res, error = self.exchange.cancelOrder(order['orderId'])
 				if res:
 					order['status'] = 2
@@ -524,11 +525,20 @@ class Sigma:
 					return cascadeStruct, error
 			idx += 1
 	
-		if self.__isCompleteOrder(cascadeStruct['profitOrders'][investIdx]):
+		if self.__isCreatedOrder(cascadeStruct['profitOrders'][completeIdx]): # profit order already exists
+			return cascadeStruct, False
 			
-	
-		print('moveProfitOrder is not implement')
-		quit()
+		orderId, error = self.__createOrder(cascadeStruct['profitOrders'][completeIdx])
+		if orderId is False:
+			return cascadeStruct, error
+		else:
+			cascadeStruct['profitOrders'][completeIdx]['orderId'] = orderId
+			if orderId is 0:
+				cascadeStruct['profitOrders'][completeIdx]['status'] = 1
+			else:
+				cascadeStruct['profitOrders'][completeIdx]['status'] = 0
+		
+		return cascadeStruct, False
 	
 	## 
 	#  @brief order is created but not compete

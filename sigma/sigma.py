@@ -19,7 +19,7 @@ class Sigma:
 	minProfitPercent = 1.0
 	
 	maxStages = 150
-	activeOrders = 3
+	activeOrdersCount = 3
 	
 	
 	## 
@@ -329,8 +329,8 @@ class Sigma:
 					cascadeStruct['options']['invest'],
 					cascadeStruct['options']['minProfitPercent']
 				))
+				break
 			cou += 1
-		
 	
 	## 
 	#  @brief True if exists executed invest order after executed profit order
@@ -367,6 +367,7 @@ class Sigma:
 	#  @details Details
 	#  	
 	def resizeAfterProfit(self, cascadeStruct):
+		#TODO mb need modify for sell profit type
 		cou = 0
 		for profitOrder in cascadeStruct['profitOrders']:
 			if self.__isCompleteOrder(profitOrder):
@@ -378,9 +379,6 @@ class Sigma:
 		
 		return cascadeStruct
 		
-		print('resizeAfterProfit is not implement')
-		quit()
-		
 	## 
 	#  @brief cancel all orders
 	#  
@@ -388,24 +386,82 @@ class Sigma:
 	#  @param [in] cascadeStruct Parameter_Description
 	#  @return cascadeStruct, False or cascadeStruct, errorMessage
 	#  
-	#  @details Details
+	#  @details 0 - active, 1 - excuted, 2 - canceled, 3 - canceled but partial executed
 	#  	
 	def cancelOrders(self, cascadeStruct):
-		print('cancelOrders is not implement')
-		quit()
+		for order in cascadeStruct['investOrders']:
+			if self.__isActiveOrder(order):
+				res, error = self.exchange.cancelOrder(order['orderId'])
+				if res:
+					order['status'] = 2
+				else:
+					return cascadeStruct, error
+		
+		for order in cascadeStruct['profitOrders']:
+			if self.__isActiveOrder(order):
+				res, error = self.exchange.cancelOrder(order['orderId'])
+				if res:
+					order['status'] = 2
+				else:
+					return cascadeStruct, error
+		
+		return cascadeStruct, False
 
 	## 
-	#  @brief create invest orders to self.activeOrders counts
+	#  @brief create invest orders to self.activeOrdersCount counts
 	#  
 	#  @param [in] self Parameter_Description
 	#  @param [in] cascadeStruct Parameter_Description
 	#  @return cascadeStruct, False or cascadeStruct, errorMessage
 	#  
-	#  @details Details
+	#  @details 0 - active, 1 - excuted, 2 - canceled, 3 - canceled but partial executed
 	#  		
 	def createOrders(self, cascadeStruct):
-		print('createOrders is not implement')
-		quit()
+		ordersCount = 0
+		lastIdx = 0
+		for order in cascadeStruct['investOrders']:
+			if self.__isActiveOrder(order):
+				ordersCount += 1
+			if not self.__isCreatedOrder(order):
+				break;
+			lastIdx += 1
+		
+		if lastIdx >= len(cascadeStruct['investOrders']): # all invest orders complete
+			return cascadeStruct, False
+		
+		print('active ordersCount {0} lastIdx {1}'.format(ordersCount, lastIdx))
+		print(range(lastIdx, lastIdx + self.activeOrdersCount - ordersCount))
+		
+		for idx in range(lastIdx, lastIdx + self.activeOrdersCount - ordersCount):
+			if idx < len(cascadeStruct['investOrders']):
+				orderId, error = self.__createOrder(cascadeStruct['investOrders'][idx])
+				if orderId is False:
+					return cascadeStruct, error
+				else:
+					cascadeStruct['investOrders'][idx]['orderId'] = orderId
+					if orderId == 0:
+						cascadeStruct['investOrders'][idx]['status'] = 1
+					else:
+						cascadeStruct['investOrders'][idx]['status'] = 0
+		
+		return cascadeStruct, False
+	
+	## 
+	#  @brief Brief
+	#  
+	#  @param [in] self Parameter_Description
+	#  @param [in] order Parameter_Description
+	#  @return orderId, False or 0, False or False, error
+	#  
+	#  @details Details
+	#  	
+	def __createOrder(self, order):
+		res, error = self.exchange.createOrder(self.pair, order['type'], order['price'], order['amount'])
+		if res:
+			return int(res['order_id']), False
+		else:
+			return False, error
+		
 	
 	## 
 	#  @brief recalc not active invest and profitorder

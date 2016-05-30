@@ -67,6 +67,7 @@ if not sigma.inWork(cascadeStruct) and sigma.needRestart(cascadeStruct):
 if sigma.hasProfit(cascadeStruct): #sell order complete
 	sigma.reportProfit(cascadeStruct)
 	if sigma.hasPartialExecution(cascadeStruct): # need check executed next buy order
+		print('partial execution')
 		cascadeStruct = sigma.resizeAfterProfit(cascadeStruct)
 		sigma.setParams(cascadeStruct)
 	else:

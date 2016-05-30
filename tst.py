@@ -35,9 +35,10 @@ print('profitIdx: {0}'.format(profitIdx))
 
 # set in work
 cascade['investOrders'][0]['orderId'] = 666
-cascade['investOrders'][0]['status'] = 1
+cascade['investOrders'][0]['status'] = 0
 # set in work
 
+"""
 #set partial execution
 cascade['profitOrders'][profitIdx]['orderId'] = 666
 cascade['profitOrders'][profitIdx]['status'] = 1
@@ -46,6 +47,7 @@ cascade['investOrders'][profitIdx]['status'] = 1
 cascade['investOrders'][profitIdx+1]['orderId'] = 666
 cascade['investOrders'][profitIdx+1]['status'] = 1
 #set partial execution
+"""
 
 if sigma.inWork(cascade):
 	print('inWork')
@@ -58,9 +60,9 @@ else:
 
 if sigma.hasPartialExecution(cascade):
 	print('hasPartialExecution is True')
-	
-cascade = sigma.resizeAfterProfit(cascade)
-print('resaze after partial execution')
+	cascade = sigma.resizeAfterProfit(cascade)
+	print('resaze after partial execution')
+
 sigma.printCascade(cascade)
 
 if sigma.inWork(cascade):
@@ -72,6 +74,8 @@ if sigma.hasProfit(cascade):
 else:
 	print('hasProfit is False')
 
+sigma.createOrders(cascade)
+	
 quit()
 
 from btce import Btce

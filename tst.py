@@ -4,20 +4,6 @@
 from kbrd import getch
 import time, os, json, sys, datetime
 
-from btce import Btce
-from speculator import Speculator
-
-stat = Speculator()
-exchange = Btce()
-
-pair = 'btc_usd'
-
-print(exchange.getTicker([pair]))
-print(stat.getSigmaAndAvg(pair))
-quit()
-
-from btce import Btce
-from speculator import Speculator
 from sigma import Sigma
 
 keyFile = 'secret.key'
@@ -33,6 +19,7 @@ pair = 'btc_rur'
 sigma = Sigma(key, secret, pair)
 sigma.invest = 9000.0
 sigma.totalIndent = 3.0
+sigma.startIndent = 0.5
 sigma.minProfitPercent = 1.0
 
 cascade = sigma.createCascade()
@@ -41,10 +28,12 @@ sigma.printCascade(cascade)
 sigma.setParams(cascade)
 cascade, error = sigma.checkOrders(cascade)
 
-print(cascade, error)
+#print(cascade, error)
 
 quit()
 
+from btce import Btce
+from speculator import Speculator
 
 stat = Speculator()
 exchange = Btce(key, secret)

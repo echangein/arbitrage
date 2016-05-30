@@ -80,6 +80,10 @@ class Sigma:
 			cascadeStruct['options']
 		))
 		
+		# =============== debug =============== #
+		print('invest orders: {0}, profit orders: {1}'.format(len(cascadeStruct['investOrders']), len(cascadeStruct['profitOrders'])))
+		# =============== debug =============== #
+		
 		invested = 0
 		accepted = 0
 		for stage in range(0, len(cascadeStruct['investOrders'])):
@@ -317,12 +321,16 @@ class Sigma:
 		for profitOrder in cascadeStruct['profitOrders']:
 			invested += cascadeStruct['investOrders'][cou]['price'] * cascadeStruct['investOrders'][cou]['amount']
 			if self.__isCompleteOrder(profitOrder):
-				print('Stage {0} of {1}. Profit: {2}'.format(
+				print('Stage {0} of {1}. Invested {3} of {4}. Profit percent: {5}. Profit: {2}'.format(
 					cou,
 					len(cascadeStruct['investOrders']) - 1, 
-					profitOrder['amount'] * profitOrder['price'] * (100 - self.conditions['fee']) / 100 - invested
+					profitOrder['amount'] * profitOrder['price'] * (100 - self.conditions['fee']) / 100 - invested,
+					invested,
+					cascadeStruct['options']['invest'],
+					cascadeStruct['options']['minProfitPercent']
 				))
 			cou += 1
+		
 	
 	## 
 	#  @brief True if exists executed invest order after executed profit order
@@ -334,8 +342,20 @@ class Sigma:
 	#  @details Details
 	#  
 	def hasPartialExecution(self, cascadeStruct):
-		print('hasPartialExecution is not implement')
-		quit()
+		cou = 0
+		for profitOrder in cascadeStruct['profitOrders']:
+			if self.__isCompleteOrder(profitOrder):
+				break
+			cou += 1
+		
+		if cou == len(cascadeStruct['profitOrders']) - 1:
+			return False
+		
+		for investOrder in cascadeStruct['investOrders'][cou + 1:]:
+			if self.__isCompleteOrder(investOrder):
+				return True
+		
+		return False
 	
 	## 
 	#  @brief cut executed parts with profit and recalc profit order
@@ -347,6 +367,17 @@ class Sigma:
 	#  @details Details
 	#  	
 	def resizeAfterProfit(self, cascadeStruct):
+		cou = 0
+		for profitOrder in cascadeStruct['profitOrders']:
+			if self.__isCompleteOrder(profitOrder):
+				break
+			cou += 1
+		
+		cascadeStruct['investOrders'] = cascadeStruct['investOrders'][cou + 1:]
+		cascadeStruct['profitOrders'] = self.__getProfitOrders(cascadeStruct['investOrders'])
+		
+		return cascadeStruct
+		
 		print('resizeAfterProfit is not implement')
 		quit()
 		
@@ -409,7 +440,7 @@ class Sigma:
 	#  @param [in] order Parameter_Description
 	#  @return Return_Description
 	#  
-	#  @details Details
+	#  @details 0 - active, 1 - excuted, 2 - canceled, 3 - canceled but partial executed
 	#  		
 	def __isActiveOrder(self, order):
 		if 'orderId' in order and 'status' in order and order['status'] == 0:
@@ -423,7 +454,7 @@ class Sigma:
 	#  @param [in] order Parameter_Description
 	#  @return Return_Description
 	#  
-	#  @details Details
+	#  @details 0 - active, 1 - excuted, 2 - canceled, 3 - canceled but partial executed
 	#  		
 	def __isCreatedOrder(self, order):
 		if 'orderId' in order:
@@ -437,7 +468,7 @@ class Sigma:
 	#  @param [in] order Parameter_Description
 	#  @return Return_Description
 	#  
-	#  @details Details
+	#  @details 0 - active, 1 - excuted, 2 - canceled, 3 - canceled but partial executed
 	#  		
 	def __isCompleteOrder(self, order):
 		if 'orderId' in order and 'status' in order and order['status'] == 1:

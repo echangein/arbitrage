@@ -25,10 +25,52 @@ sigma.minProfitPercent = 1.0
 cascade = sigma.createCascade()
 sigma.printCascade(cascade)
 
-sigma.setParams(cascade)
 cascade, error = sigma.checkOrders(cascade)
 
-#print(cascade, error)
+# 0 - active, 1 - excuted, 2 - canceled, 3 - canceled but partial executed
+
+profitIdx = len(cascade['profitOrders']) / 2
+
+print('profitIdx: {0}'.format(profitIdx))
+
+# set in work
+cascade['investOrders'][0]['orderId'] = 666
+cascade['investOrders'][0]['status'] = 1
+# set in work
+
+#set partial execution
+cascade['profitOrders'][profitIdx]['orderId'] = 666
+cascade['profitOrders'][profitIdx]['status'] = 1
+cascade['investOrders'][profitIdx]['orderId'] = 666
+cascade['investOrders'][profitIdx]['status'] = 1
+cascade['investOrders'][profitIdx+1]['orderId'] = 666
+cascade['investOrders'][profitIdx+1]['status'] = 1
+#set partial execution
+
+if sigma.inWork(cascade):
+	print('inWork')
+
+if sigma.hasProfit(cascade):
+	print('hasProfit is True')
+	sigma.reportProfit(cascade)
+else:
+	print('hasProfit is False')
+
+if sigma.hasPartialExecution(cascade):
+	print('hasPartialExecution is True')
+	
+cascade = sigma.resizeAfterProfit(cascade)
+print('resaze after partial execution')
+sigma.printCascade(cascade)
+
+if sigma.inWork(cascade):
+	print('inWork')
+
+if sigma.hasProfit(cascade):
+	print('hasProfit is True')
+	sigma.reportProfit(cascade)
+else:
+	print('hasProfit is False')
 
 quit()
 

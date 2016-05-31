@@ -31,7 +31,7 @@ def getStat(fileName = None):
 		f.close()
 	return ret
 
-def setStat(fileName = None, val):
+def setStat(fileName = None, val = 'waiting'):
 	statusFileName = dirName + '/../' + fileName
 	f = open(statusFileName, 'w+')
 	f.write(val)
@@ -51,8 +51,8 @@ for key, val in [s.split('=') for s in sys.argv[1:]]:
 cascadeFileName = configFile + '_' + keyFile + '.csc'
 statusFileName = configFile + '_' + keyFile + '.sts'
 
-keyFileName = dirname + '/../' + keyFile
-configFileName = dirname + '/../' + configFile
+keyFileName = dirName + '/../' + keyFile
+configFileName = dirName + '/../' + configFile
 
 if os.path.isfile(configFileName):
 	file = open(configFileName, 'r+')
@@ -89,7 +89,7 @@ sigma.minProfitPercent = minProfitPercent
 if isExistsCascadeFile(cascadeFileName):
 	cascadeStruct = loadCascadeFile(cascadeFileName)
 	sigma.setParams(cascadeStruct)
-else
+else:
 	cascadeStruct = sigma.createCascade()
 	setStat(statusFileName, 'waiting')
 	

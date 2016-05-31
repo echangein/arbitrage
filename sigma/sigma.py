@@ -134,8 +134,6 @@ class Sigma:
 		startPrice = self.lastPrice - self.startIndent * self.sigma * direction
 		endPrice = self.lastPrice - self.totalIndent * self.sigma * direction
 		
-		print('createCascade endPrice: {0}'.format(endPrice))
-		
 		steps = min(int(self.invest / investDiv), self.maxStages)
 		options['totalStages'] = steps
 		
@@ -253,11 +251,11 @@ class Sigma:
 			orderIds = res.keys()
 		
 		for order in cascadeStruct['investOrders']:
-			if self.__isActiveOrder(order) and not order['orderId'] in orderIds:
+			if self.__isActiveOrder(order) and not str(order['orderId']) in orderIds:
 				order['status'] = 1
 		
 		for order in cascadeStruct['profitOrders']:
-			if self.__isActiveOrder(order) and not order['orderId'] in orderIds:
+			if self.__isActiveOrder(order) and not str(order['orderId']) in orderIds:
 				order['status'] = 1
 		
 		return cascadeStruct, False
@@ -513,7 +511,6 @@ class Sigma:
 	#  
 	def moveProfitOrder(self, cascadeStruct):
 		if not self.__isCompleteOrder(cascadeStruct['investOrders'][0]): # no complete - no move
-			print('no complete - no move')
 			return cascadeStruct, False
 		
 		completeIdx = -1

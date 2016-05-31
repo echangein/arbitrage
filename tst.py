@@ -25,9 +25,24 @@ sigma.minProfitPercent = 1.0
 cascade = sigma.createCascade()
 sigma.printCascade(cascade)
 
-cascade, error = sigma.checkOrders(cascade)
-
 # 0 - active, 1 - excuted, 2 - canceled, 3 - canceled but partial executed
+
+cou = 0
+for order in cascade['investOrders']:
+	if cou < 5:
+		order['orderId'] = 666
+		order['status'] = 0
+	cou += 1
+#cascade['investOrders'][0]['orderId'] = 666
+#cascade['investOrders'][0]['status'] = 0
+
+key = 0
+while key != 27:
+	cascade = sigma.shiftOrders(cascade)
+	sigma.printCascade(cascade)
+	key = ord(getch())
+	
+quit()
 
 #profitIdx = len(cascade['profitOrders']) / 2
 

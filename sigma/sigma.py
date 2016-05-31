@@ -133,6 +133,9 @@ class Sigma:
 		
 		startPrice = self.lastPrice - self.startIndent * self.sigma * direction
 		endPrice = self.lastPrice - self.totalIndent * self.sigma * direction
+		
+		print('createCascade endPrice: {0}'.format(endPrice))
+		
 		steps = min(int(self.invest / investDiv), self.maxStages)
 		options['totalStages'] = steps
 		
@@ -197,11 +200,13 @@ class Sigma:
 	
 		invested = 0
 		accepted = 0
+		idx = 0
 		for order in investOrders:
 			accepted += order['amount'] * (100 - self.conditions['fee']) / 100
 			invested += order['amount'] * order['price']
 			price = invested / accepted * (100 + self.minProfitPercent) / 100
-			if profitOrders == [] or (len(profitOrders) and profitOrders[-1]['amount'] < accepted):
+			idx += 1
+			if idx > len(profitOrders):
 				profitOrders.append({
 					'type': profitAction,
 					'amount': round(accepted, self.totalPrecision),
@@ -471,13 +476,15 @@ class Sigma:
 	#  
 	def shiftOrders(self, cascadeStruct):
 		#TODO sell profit type
-		idx = 0
+		idx = -1
 		for order in cascadeStruct['investOrders']:
 			if not self.__isCreatedOrder(order):
 				break;
 			idx += 1
 		
-		if idx >= len(cascadeStruct['investOrders']): # all invest is created nothing to shift
+		idx = max(idx, 0)
+		
+		if idx >= len(cascadeStruct['investOrders']) - 1: # all invest is created nothing to shift
 			return cascadeStruct
 	
 		startPrice = cascadeStruct['investOrders'][idx]['price']
@@ -485,13 +492,13 @@ class Sigma:
 		
 		if endPrice > startPrice:
 			return cascadeStruct
-		
-		steps = len(cascadeStruct['investOrders']) - idx + 1
+
+		steps = len(cascadeStruct['investOrders']) - idx
 		investQuant = cascadeStruct['options']['investQuant']
 		
-		cascadeStruct['investOrders'] = cascadeStruct['investOrders'][:idx] + self.__getInvestOrders(startPrice, endPrice, steps, investQuant)[1:]
-	
-		cascadeStruct['profitOrders'] = self.__getProfitOrders(cascadeStruct['investOrders'], cascadeStruct['profitOrders'][:idx])
+		cascadeStruct['investOrders'] = cascadeStruct['investOrders'][:idx + 1] + self.__getInvestOrders(startPrice, endPrice, steps, investQuant)[1:]
+		
+		cascadeStruct['profitOrders'] = self.__getProfitOrders(cascadeStruct['investOrders'], cascadeStruct['profitOrders'][:idx + 1])
 	
 		return cascadeStruct
 	

@@ -14,10 +14,10 @@ key = f.readline().strip()
 secret = f.readline().strip()
 f.close()
 
-pair = 'btc_rur'
+pair = 'ltc_rur'
 
 sigma = Sigma(key, secret, pair)
-sigma.invest = 5000.0
+sigma.invest = 4050.0
 sigma.totalIndent = 3.0
 sigma.startIndent = 0.5
 sigma.minProfitPercent = 1.2
@@ -31,16 +31,16 @@ cou = 0
 for order in cascade['investOrders']:
 	if cou < 5:
 		order['orderId'] = 666
-		order['status'] = 0
+		order['status'] = 1
 	cou += 1
-#cascade['investOrders'][0]['orderId'] = 666
-#cascade['investOrders'][0]['status'] = 0
+cascade['investOrders'][5]['orderId'] = 666
+cascade['investOrders'][5]['status'] = 0
+cascade['profitOrders'][4]['orderId'] = 666
+cascade['profitOrders'][4]['status'] = 0
 
-key = 0
-while key != 27:
-	cascade = sigma.shiftOrders(cascade)
-	sigma.printCascade(cascade)
-	key = ord(getch())
+file = open('../ltc_rur.csc', 'w+')
+file.write(json.dumps(cascade))
+file.close()
 	
 quit()
 

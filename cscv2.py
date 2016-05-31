@@ -37,6 +37,8 @@ def setStat(fileName = None, val):
 	f.write(val)
 	f.close()
 
+from sigma import Sigma
+	
 # ================== define cascade params ================== #
 configFile = 'ltc_rur.cfg'
 keyFile = 'ltc_rur.key'
@@ -48,7 +50,41 @@ for key, val in [s.split('=') for s in sys.argv[1:]]:
 
 cascadeFileName = configFile + '_' + keyFile + '.csc'
 statusFileName = configFile + '_' + keyFile + '.sts'
+
+keyFileName = dirname + '/../' + keyFile
+configFileName = dirname + '/../' + configFile
+
+if os.path.isfile(configFileName):
+	file = open(configFileName, 'r+')
+	config = json.load(file)
+	file.close()
+	if 'pair' in config:
+		pair = config['pair']
+	if 'invest' in config:
+		invest = config['invest']
+	if 'startIndent' in config:
+		startIndent = config['startIndent']
+	if 'totalIndent' in config:
+		totalIndent = config['totalIndent']
+	if 'minProfitPercent' in config:
+		minProfitPercent = config['minProfitPercent']
 # ================== define cascade params ================== #
+
+key = None
+secret = None
+
+if os.path.isfile(keyFileName):
+	f = open(keyFileName, 'r')
+	key = f.readline().strip()
+	secret = f.readline().strip()
+	f.close()
+
+sigma = Sigma(key, secret, pair)
+
+sigma.invest = invest
+sigma.startIndent = startIndent
+sigma.totalIndent = totalIndent
+sigma.minProfitPercent = minProfitPercent
 
 if isExistsCascadeFile(cascadeFileName):
 	cascadeStruct = loadCascadeFile(cascadeFileName)

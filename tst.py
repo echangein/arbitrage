@@ -17,10 +17,10 @@ f.close()
 pair = 'btc_rur'
 
 sigma = Sigma(key, secret, pair)
-sigma.invest = 9000.0
+sigma.invest = 5000.0
 sigma.totalIndent = 3.0
 sigma.startIndent = 0.5
-sigma.minProfitPercent = 1.0
+sigma.minProfitPercent = 1.2
 
 cascade = sigma.createCascade()
 sigma.printCascade(cascade)

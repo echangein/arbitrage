@@ -22,6 +22,21 @@ def saveCascadeFile(fileName = None, cascadeStruct = None):
 def removeCascadeFile(fileName = None):
 	os.remove(dirName + '/../' + fileName)
 
+def getStat(fileName = None):
+	statusFileName = dirName + '/../' + fileName
+	ret = 'waiting'
+	if os.path.isfile(statusFileName):
+		f = open(statusFileName, 'r+')
+		ret = f.readline().strip()
+		f.close()
+	return ret
+
+def setStat(fileName = None, val):
+	statusFileName = dirName + '/../' + fileName
+	f = open(statusFileName, 'w+')
+	f.write(val)
+	f.close()
+
 # ================== define cascade params ================== #
 configFile = 'ltc_rur.cfg'
 keyFile = 'ltc_rur.key'
@@ -31,8 +46,8 @@ for key, val in [s.split('=') for s in sys.argv[1:]]:
 	if key == 'key':
 		keyFile = val
 
-cascadeFileName = configFile  + '_' + keyFile + '.csc'
-statusFileName = configFile  + '_' + keyFile + '.sts'
+cascadeFileName = configFile + '_' + keyFile + '.csc'
+statusFileName = configFile + '_' + keyFile + '.sts'
 # ================== define cascade params ================== #
 
 if isExistsCascadeFile(cascadeFileName):
@@ -40,12 +55,20 @@ if isExistsCascadeFile(cascadeFileName):
 	sigma.setParams(cascadeStruct)
 else
 	cascadeStruct = sigma.createCascade()
+	setStat(statusFileName, 'waiting')
 	
 cascadeStruct, error = sigma.checkOrders(cascadeStruct) #checkOrdersStatus
 if error:
 	print('error with checkOrders in init: {0}'.format(error)) #reportCheckOrdersStatusError()
 	saveCascadeFile(cascadeFileName, cascadeStruct)
 	quit()
+
+# ================== check inWork status ================== #
+if sigma.inWork(cascadeStruct):
+	if getStat(statusFileName) <> 'inWork':
+		sigma.printCascade(cascadeStruct)
+		setStat(statusFileName, 'inWork')
+# ================== check inWork status ================== #
 
 # ================== restart cascade ================== #
 if not sigma.inWork(cascadeStruct) and sigma.needRestart(cascadeStruct):
@@ -66,6 +89,7 @@ if not sigma.inWork(cascadeStruct) and sigma.needRestart(cascadeStruct):
 # ================== cascade get profit ================== #
 if sigma.hasProfit(cascadeStruct): #sell order complete
 	sigma.reportProfit(cascadeStruct)
+	sigma.printCascade(cascadeStruct)
 	if sigma.hasPartialExecution(cascadeStruct): # need check executed next buy order
 		print('partial execution')
 		cascadeStruct = sigma.resizeAfterProfit(cascadeStruct)

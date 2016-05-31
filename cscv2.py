@@ -108,6 +108,7 @@ if sigma.inWork(cascadeStruct):
 
 # ================== restart cascade ================== #
 if not sigma.inWork(cascadeStruct) and sigma.needRestart(cascadeStruct):
+	print('restart')
 	cascadeStruct, error = sigma.cancelOrders(cascadeStruct)
 	if error:
 		print('error with cancelOrders in restart cascade: {0}'.format(error)) #reportCancelOrdersError()

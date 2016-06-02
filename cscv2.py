@@ -148,10 +148,10 @@ if sigma.hasProfit(cascadeStruct): #sell order complete
 # ================== create revers cascade ================== #
 
 # ================== create order sequence ================== #
+cascadeStruct = sigma.shiftOrders(cascadeStruct)
 cascadeStruct, error = sigma.createOrders(cascadeStruct)
 if error:
 	print('error with createOrders in create order sequence: {0}'.format(error))
-cascadeStruct = sigma.shiftOrders(cascadeStruct)
 
 cascadeStruct, error = sigma.moveProfitOrder(cascadeStruct)
 if error:

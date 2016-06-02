@@ -4,83 +4,14 @@
 from kbrd import getch
 import time, os, json, sys, datetime
 
-from sigma import Sigma
-
-keyFile = 'secret.key'
-dirname, filename = os.path.split(os.path.abspath(__file__))
-keyFileName = dirname + '/../' + keyFile
-f = open(keyFileName, 'r')
-key = f.readline().strip()
-secret = f.readline().strip()
-f.close()
-
-pair = 'ltc_rur'
-
-sigma = Sigma(key, secret, pair)
-sigma.invest = 4050.0
-sigma.totalIndent = 3.0
-sigma.startIndent = 0.5
-sigma.minProfitPercent = 1.2
-
-cascade = sigma.createCascade()
-sigma.printCascade(cascade)
-
-# 0 - active, 1 - excuted, 2 - canceled, 3 - canceled but partial executed
-
-cou = 0
-for order in cascade['investOrders']:
-	if cou < 5:
-		order['orderId'] = 666
-		order['status'] = 1
-	cou += 1
-cascade['investOrders'][5]['orderId'] = 666
-cascade['investOrders'][5]['status'] = 0
-cascade['profitOrders'][4]['orderId'] = 666
-cascade['profitOrders'][4]['status'] = 0
-
-file = open('../ltc_rur.csc', 'w+')
-file.write(json.dumps(cascade))
-file.close()
-	
-quit()
-
-#profitIdx = len(cascade['profitOrders']) / 2
-
-#print('profitIdx: {0}'.format(profitIdx))
-
-# set in work
-"""
-for order in cascade['investOrders']:
-	order['orderId'] = 666
-	order['status'] = 1
-"""
-cascade['investOrders'][0]['orderId'] = 666
-cascade['investOrders'][0]['status'] = 1
-#cascade['investOrders'][1]['orderId'] = 666
-#cascade['investOrders'][1]['status'] = 1
-# set in work
-
-print('inv: {0} prof: {1}'.format(len(cascade['investOrders']), len(cascade['profitOrders'])))
-
-#cascade, error = sigma.moveProfitOrder(cascade)
-#print(cascade)
-#sigma.printCascade(cascade)
-#print('inv: {0} prof: {1}'.format(len(cascade['investOrders']), len(cascade['profitOrders'])))
-
-quit()
-
 from btce import Btce
 from speculator import Speculator
 
 stat = Speculator()
-exchange = Btce(key, secret)
-
-#print(exchange.getConditions())
+exchange = Btce()
 
 dt = int(time.time())
 print(dt, datetime.datetime.fromtimestamp(dt).strftime('%Y.%m.%d %H:%M:%S'))
-
-#time.gmtime(), time.strftime('%Y.%m.%d %H:%M:%S', time.gmtime())
 
 pair = raw_input('enter pair: ')
 sigma, avg = stat.getSigmaAndAvg(pair)
@@ -98,6 +29,53 @@ print('{2} from {0} to {1}'.format(res[pair]['last'] - 3 * sigma, res[pair]['las
 print('deep 3 sigma percent: {0}'.format(3 * sigma / res[pair]['last'] * 100))
 
 quit()
+
+from sigma import Sigma
+
+pair = 'btc_rur'
+
+sigma = Sigma(None, None, pair)
+sigma.invest = 9000.0
+sigma.totalIndent = 3.0
+sigma.startIndent = 0.5
+sigma.minProfitPercent = 1
+
+cascade = sigma.createCascade()
+sigma.printCascade(cascade)
+
+# 0 - active, 1 - excuted, 2 - canceled, 3 - canceled but partial executed
+cou = 0
+for order in cascade['investOrders']:
+	if cou < 5:
+		order['orderId'] = 666
+		order['status'] = 1
+	cou += 1
+#cascade['investOrders'][5]['orderId'] = 666
+#cascade['investOrders'][5]['status'] = 0
+cascade['profitOrders'][4]['orderId'] = 666
+cascade['profitOrders'][4]['status'] = 1
+
+sigma.reportProfit(cascade)
+
+quit()
+
+
+# set in work
+"""
+for order in cascade['investOrders']:
+	order['orderId'] = 666
+	order['status'] = 1
+"""
+cascade['investOrders'][0]['orderId'] = 666
+cascade['investOrders'][0]['status'] = 1
+#cascade['investOrders'][1]['orderId'] = 666
+#cascade['investOrders'][1]['status'] = 1
+# set in work
+
+print('inv: {0} prof: {1}'.format(len(cascade['investOrders']), len(cascade['profitOrders'])))
+
+quit()
+
 
 pair = 'ltc_rur'
 silent = False

@@ -324,7 +324,7 @@ class Sigma:
 		for profitOrder in cascadeStruct['profitOrders']:
 			invested += cascadeStruct['investOrders'][cou]['price'] * cascadeStruct['investOrders'][cou]['amount']
 			if self.__isCompleteOrder(profitOrder):
-				print('Stage {0} of {1}. Invested {3} of {4}. Profit: {2}. Profit percent: {5}'.format(
+				print('Stage {0} of {1}. Profit: {2}. Invested {3} of {4}. Profit percent: {5}'.format(
 					cou,
 					len(cascadeStruct['investOrders']) - 1, 
 					round(profitOrder['amount'] * profitOrder['price'] * (100 - self.conditions['fee']) / 100 - invested, self.totalPrecision),

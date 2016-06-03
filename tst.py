@@ -24,8 +24,9 @@ res, error = exchange.getTicker([pair])
 if not res:
 	print(error)
 	quit()
-	
-print('{2} from {0} to {1}'.format(res[pair]['last'] - 3 * sigma, res[pair]['last'] + 3 * sigma, pair))
+
+print('last price: {0}. sigma: {1}'.format(res[pair]['last'], sigma))	
+print('{2} {1} - {3} - {0}'.format(res[pair]['last'] - 3 * sigma, res[pair]['last'] + 3 * sigma, pair, res[pair]['last']))
 print('deep 3 sigma percent: {0}'.format(3 * sigma / res[pair]['last'] * 100))
 
 quit()

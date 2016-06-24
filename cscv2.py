@@ -79,7 +79,20 @@ if os.path.isfile(keyFileName):
 	secret = f.readline().strip()
 	f.close()
 
-sigma = Sigma(key, secret, pair)
+cfgFileName = dirName + '/../conf.cfg'
+if os.path.isfile(cfgFileName):
+	file = open(configFileName, 'r+')
+	config = json.load(file)
+	file.close()
+	if 'db' in config:
+		db = config['db']
+	if 'user' in config:
+		user = config['user']
+	if 'pswd' in config:
+		pswd = config['pswd']
+
+	
+sigma = Sigma(key, secret, pair, db, user, pswd)
 
 sigma.invest = invest
 sigma.startIndent = startIndent

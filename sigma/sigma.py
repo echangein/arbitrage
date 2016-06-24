@@ -1,7 +1,8 @@
 import time, os, json, datetime
 
 from btce import Btce
-from speculator import Speculator
+#from speculator import Speculator
+from stats import Stats
 
 class Sigma:
 	stat = None
@@ -33,13 +34,13 @@ class Sigma:
 	#  
 	#  @details Details
 	#  	
-	def __init__(self, key = None, secret = None, pair = None):
+	def __init__(self, key = None, secret = None, pair = None, db, user, pswd):
 		if not pair:
 			print('Sigma: Cant''t set init values without pair')
 		
 		self.pair = pair
 		
-		self.stat = Speculator()
+		self.stat = Stats(db, user, pswd)
 		self.exchange = Btce(key, secret)
 		
 		self.sigma, error = self.stat.getSigmaAndAvg(pair)

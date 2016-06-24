@@ -6,6 +6,7 @@ import time, os, json, sys, datetime
 
 from btce import Btce
 from speculator import Speculator
+from stats import Stats
 
 stat = Speculator()
 exchange = Btce()
@@ -19,13 +20,30 @@ if not sigma:
 	print(avg)
 	quit()
 
-
+dirName, ownFileName = os.path.split(os.path.abspath(__file__))
+configFileName = dirName + '/../conf.cfg'
+if os.path.isfile(configFileName):
+	file = open(configFileName, 'r+')
+	config = json.load(file)
+	file.close()
+	if 'db' in config:
+		db = config['db']
+	if 'user' in config:
+		user = config['user']
+	if 'pswd' in config:
+		pswd = config['pswd']
+dbStat = Stats(db, user, pswd)
+dbSigma, dbAvg = dbStat.getSigmaAndAvg(pair)
+if not dbSigma:
+	print(dbAvg)
+	quit()
+	
 res, error = exchange.getTicker([pair])
 if not res:
 	print(error)
 	quit()
 
-print('last price: {0}. sigma: {1}'.format(res[pair]['last'], sigma))	
+print('last price: {0}. sigma: {1}. dbSigma: {2}.'.format(res[pair]['last'], sigma, dbSigma))	
 print('{2} {1} - {3} - {0}'.format(res[pair]['last'] - 3 * sigma, res[pair]['last'] + 3 * sigma, pair, res[pair]['last']))
 print('deep 3 sigma percent: {0}'.format(3 * sigma / res[pair]['last'] * 100))
 

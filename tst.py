@@ -37,6 +37,14 @@ dbSigma, dbAvg = dbStat.getSigmaAndAvg(pair)
 if not dbSigma:
 	print(dbAvg)
 	quit()
+
+newSigma, error = dbStat.getSigma(pair)
+if not newSigma:
+	print(error)
+	quit()
+
+print('dbSigma: {0}, newSigma: {1}, externalSigma: {2}'.format(dbSigma, newSigma, sigma))
+quit()
 	
 res, error = exchange.getTicker([pair])
 if not res:

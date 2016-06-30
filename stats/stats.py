@@ -101,7 +101,7 @@ class Stats:
 		
 		cursor.execute(query)
 		rows = cursor.fetchall()
-		if len(rows) <> 1:
+		if len(rows) == 0:
 			return False
 		
 		return rows
@@ -354,3 +354,56 @@ class Stats:
 		
 		return sigma, avg
 	
+	def getPriceSigma(self, cursor, statIds, startTS, endTS):
+		query = u"""
+			SELECT
+				SUM(cou) cou, SUM(price_sum) price, SUM(price_2_sum) price_2
+			FROM
+				s_trade_stats
+			WHERE
+				trade_stat_id IN ({0}) AND start_ts >= {1} AND end_ts <= {2}
+		""".format(', '.join(str(id) for id in statIds), startTS, endTS)
+		
+		cursor.execute(query)
+		rows = cursor.fetchall()
+		if len(rows) <> 1:
+			return False, 'getPriceSigma: rows conut is not 1'
+		
+		return (rows[0][2] / float(rows[0][0]) - (rows[0][1] / float(rows[0][0])) ** 2) ** 0.5, True
+		
+	
+	def getSigma(self, pair = None, depth = None):
+		connect = MySQLdb.connect(
+			host = self.host,
+			user = self.user,
+			passwd = self.pswd,
+			db = self.db,
+			charset = 'utf8',
+			use_unicode = True)
+
+		cursor = connect.cursor()
+		
+		if not isinstance(pair, basestring):
+			return False, 'pair param is not string'
+			
+		pairId = self.getPairId(cursor, pair)
+		if pairId is False:
+			return False, 'uncknown pair: {0}'.format(pair)
+		
+		rows = self.getStatKeysByPairId(cursor, pairId)
+		if rows is False:
+			return False, 'StatKeyIds not found'
+		statIds = []
+		for row in rows:
+			statIds.append(row[0])
+		
+		if depth is None or not depth.isdigit():
+			depth = self.depth
+		
+		dt = int(time.time())
+		
+		sigma, message = self.getPriceSigma(cursor, statIds, dt - depth, dt)
+		
+		connect.close()
+		
+		return sigma, message

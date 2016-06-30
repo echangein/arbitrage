@@ -85,6 +85,7 @@ if os.path.isfile(cfgFileName):
 	file = open(configFileName, 'r+')
 	config = json.load(file)
 	file.close()
+	print(config)
 	if 'db' in config:
 		db = config['db']
 	if 'user' in config:

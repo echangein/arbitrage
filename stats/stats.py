@@ -309,8 +309,8 @@ class Stats:
 	
 		for statId, pairId, typeId, lastTS in self.getStatPairs(cursor):
 			self.updateStat(cursor, statId, pairId, typeId, lastTS)
+			connect.commit()
 		
-		connect.commit()
 		connect.close()
 			
 	

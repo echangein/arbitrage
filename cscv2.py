@@ -91,7 +91,9 @@ if os.path.isfile(cfgFileName):
 	if 'pswd' in config:
 		pswd = config['pswd']
 
-	
+print('debug')
+print(db)
+		
 sigma = Sigma(key, secret, pair, db, user, pswd)
 
 sigma.invest = invest

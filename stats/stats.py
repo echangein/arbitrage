@@ -128,19 +128,19 @@ class Stats:
 	def calcStats(self, cursor, pairId, typeId, lastTS = None):
 		query = u"""
 			SELECT
-0			  COUNT(*) cou, 
-1			  MIN(price) price_min, 
-2			  MAX(price) price_max,
-3			  CAST(SUBSTR(MIN(CONCAT(event_ts, '_', price)), 12) AS DECIMAL(16, 8)) price_open,
-4			  CAST(SUBSTR(MAX(CONCAT(event_ts, '_', price)), 12) AS DECIMAL(16, 8)) price_close,
-5			  SUM(amount) amount_sum,
-6			  SUM(amount*amount) amount_2_sum,
-7			  SUM(price) price_sum,
-8			  SUM(price*price) price_2_sum,
-9			  SUM(price*amount) volume_sum,
-10			  SUM(price*price*amount*amount) volume_2_sum,
-11			  MIN(event_ts) stars_ts,
-12			  MAX(event_ts) end_ts,
+			  COUNT(*) cou, 
+			  MIN(price) price_min, 
+			  MAX(price) price_max,
+			  CAST(SUBSTR(MIN(CONCAT(event_ts, '_', price)), 12) AS DECIMAL(16, 8)) price_open,
+			  CAST(SUBSTR(MAX(CONCAT(event_ts, '_', price)), 12) AS DECIMAL(16, 8)) price_close,
+			  SUM(amount) amount_sum,
+			  SUM(amount*amount) amount_2_sum,
+			  SUM(price) price_sum,
+			  SUM(price*price) price_2_sum,
+			  SUM(price*amount) volume_sum,
+			  SUM(price*price*amount*amount) volume_2_sum,
+			  MIN(event_ts) start_ts,
+			  MAX(event_ts) end_ts,
 			  FLOOR(event_ts / {2}) mark,
 			  FROM_UNIXTIME(FLOOR(event_ts / {2}) * {2})
 			FROM
@@ -177,6 +177,9 @@ class Stats:
 	#  @details Details
 	#  	
 	def isExistsStat(self, cursor, statId, lastTS):
+		if lastTS is None:
+			return False
+	
 		query = u"""
 			SELECT
 				COUNT(*)
@@ -184,7 +187,7 @@ class Stats:
 				s_trade_stats
 			WHERE
 				trade_stat_id = {0}
-				AND stars_ts = {1}
+				AND start_ts = {1}
 		""".format(statId, lastTS)
 		cursor.execute(query)
 		rows = cursor.fetchall()
@@ -217,6 +220,49 @@ class Stats:
 		cursor.execute(query)
 	
 	## 
+	#  @brief Brief
+	#  
+	#  @param [in] self Parameter_Description
+	#  @param [in] cursor Parameter_Description
+	#  @param [in] statId Parameter_Description
+	#  @param [in] vals Parameter_Description
+	#  @return Return_Description
+	#  
+	#  @details Details
+	#  
+	def updateStatDB(self, cursor, statId, vals):
+		query = u"""
+			UPDATE
+				s_trade_stats
+			SET 
+				end_ts = {1[12]},
+				cou = {1[0]},
+				price_open = {1[3]},
+				price_min = {1[1]},
+				price_max = {1[2]},
+				price_close = {1[4]},
+				amount_sum = {1[5]},
+				amount_2_sum = {1[6]},
+				price_sum = {1[7]},
+				price_2_sum = {1[8]},
+				volume_sum = {1[9]},
+				volume_2_sum = {1[10]}
+			WHERE
+				trade_stat_id = {0} AND start_ts = {1[11]}
+		""".format(statId, vals)
+		cursor.execute(query)
+
+	def insertStatDB(self, cursor, statId, vals):
+		query = u"""
+			INSERT INTO
+				s_trade_stats
+				(trade_stat_id, start_ts, end_ts, cou, price_open, price_min, price_max, price_close, amount_sum, amount_2_sum, price_sum, price_2_sum, volume_sum, volume_2_sum)
+			VALUES (
+				{0}, {1[11]}, {1[12]}, {1[0]}, {1[3]}, {1[1]}, {1[2]}, {1[4]}, {1[5]}, {1[6]}, {1[7]}, {1[8]}, {1[9]}, {1[10]})
+		""".format(statId, vals)
+		cursor.execute(query)
+	
+	## 
 	#  @brief update statistic for specified pair and type
 	#  
 	#  @param [in] self Parameter_Description
@@ -232,15 +278,15 @@ class Stats:
 	def updateStat(self, cursor, statId, pairId, typeId, lastTS):
 		
 		lastVals = None
-		for vals in calcStats(cursor, pairId, typeId, lastTS):
-			if isExistsStat(cursor, statId, lastTS):
-				updateStatDB(cursor, statId, vals)
+		for vals in self.calcStats(cursor, pairId, typeId, lastTS):
+			if self.isExistsStat(cursor, statId, lastTS):
+				self.updateStatDB(cursor, statId, vals)
 			else:
-				insertStatDB(cursor, statId, vals)
+				self.insertStatDB(cursor, statId, vals)
 			lastVals = vals
 		
 		if not lastVals is None:
-			updateStatKey(cursor, statId, lastVals)
+			self.updateStatKey(cursor, statId, lastVals)
 	
 	## 
 	#  @brief update stats for all pairs

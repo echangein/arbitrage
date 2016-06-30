@@ -81,11 +81,9 @@ if os.path.isfile(keyFileName):
 
 cfgFileName = dirName + '/../conf.cfg'
 if os.path.isfile(cfgFileName):
-	print('is file')
 	file = open(cfgFileName, 'r+')
 	config = json.load(file)
 	file.close()
-	print(config)
 	if 'db' in config:
 		db = config['db']
 	if 'user' in config:
@@ -93,9 +91,6 @@ if os.path.isfile(cfgFileName):
 	if 'pswd' in config:
 		pswd = config['pswd']
 
-print('debug')
-print(config)
-		
 sigma = Sigma(key, secret, pair, db, user, pswd)
 
 sigma.invest = invest

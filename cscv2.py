@@ -82,7 +82,7 @@ if os.path.isfile(keyFileName):
 cfgFileName = dirName + '/../conf.cfg'
 if os.path.isfile(cfgFileName):
 	print('is file')
-	file = open(configFileName, 'r+')
+	file = open(cfgFileName, 'r+')
 	config = json.load(file)
 	file.close()
 	print(config)

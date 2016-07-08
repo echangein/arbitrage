@@ -159,7 +159,7 @@ class Stats:
 					AND event_ts >= {0}
 				GROUP BY 
 					mark;
-			""".format(lastTS)
+			""".format(lastTS - self.statLen)
 		
 		query += queryTail
 		cursor.execute(query)
@@ -279,7 +279,7 @@ class Stats:
 		
 		lastVals = None
 		for vals in self.calcStats(cursor, pairId, typeId, lastTS):
-			if self.isExistsStat(cursor, statId, lastTS):
+			if self.isExistsStat(cursor, statId, vals[11]):
 				self.updateStatDB(cursor, statId, vals)
 			else:
 				self.insertStatDB(cursor, statId, vals)

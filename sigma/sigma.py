@@ -92,13 +92,14 @@ class Sigma:
 			invested += round( cascadeStruct['investOrders'][stage]['amount'] * cascadeStruct['investOrders'][stage]['price'], self.totalPrecision)
 			accepted = round(cascadeStruct['profitOrders'][stage]['amount'] * cascadeStruct['profitOrders'][stage]['price'] * (100 - self.conditions['fee']) / 100, 6)
 			profit = round(accepted - invested, 6)
-			print('{0:>3} {1[type]} {1[amount]:<12} @ {1[price]:<12}inv {2:<14} {3[type]} {3[amount]:<12} @ {3[price]:<12} acc {4:<12} pft {5}'.format(
+			print('{0:>3} {1[type]} {1[amount]:<12} @ {1[price]:<12}{6}inv {2:<14} {3[type]} {3[amount]:<12} @ {3[price]:<12} acc {4:<12} pft {5}'.format(
 				stage, 
 				cascadeStruct['investOrders'][stage], 
 				invested, 
 				cascadeStruct['profitOrders'][stage], 
 				accepted,
-				profit))
+				profit,
+				'* ' if 'orderId' in cascadeStruct['investOrders'][stage] else '  '))
 	
 	
 	#  @brief Brief
@@ -496,11 +497,34 @@ class Sigma:
 		steps = len(cascadeStruct['investOrders']) - idx
 		investQuant = cascadeStruct['options']['investQuant']
 		
-		cascadeStruct['investOrders'] = cascadeStruct['investOrders'][:idx + 1] + self.__getInvestOrders(startPrice, endPrice, steps, investQuant)[1:]
+		cascadeStruct['investOrders'] = cascadeStruct['investOrders'][:idx + 1] + self.__resizeInvestOrders(cascadeStruct['investOrders'][idx:], startPrice, endPrice, steps, investQuant)[1:]
 		
 		cascadeStruct['profitOrders'] = self.__getProfitOrders(cascadeStruct['investOrders'], cascadeStruct['profitOrders'][:idx + 1])
 	
 		return cascadeStruct
+	
+	## 
+	#  @brief Brief resize profit order, using in shift orders
+	#  
+	#  @param [in] self Parameter_Description
+	#  @param [in] orders Parameter_Description
+	#  @param [in] startPrice Parameter_Description
+	#  @param [in] endPrice Parameter_Description
+	#  @param [in] steps Parameter_Description
+	#  @return Return_Description
+	#  
+	#  @details Details
+	#  	
+	def __resizeInvestOrders(self, orders, startPrice, endPrice, steps, invest = None):
+		#TODO realize for sell profit type
+		cou = 0
+		for order in orders:
+			order['price'] = round(startPrice + (endPrice - startPrice) * cou / float(steps-1), self.conditions['decimal_places'])
+			if 'invest' in order: #TODO remove in case breathing invest
+				invest = order['invest'] #TODO stay in case breathing invest
+			order['amount'] = round(invest / order['price'], self.totalPrecision)
+			cou += 1
+		return orders
 	
 	## 
 	#  @brief move profit order to last executed invest order

@@ -369,7 +369,9 @@ class Stats:
 		if len(rows) <> 1:
 			return False, 'getPriceSigma: rows conut is not 1'
 		
-		return (rows[0][2] / float(rows[0][0]) - (rows[0][1] / float(rows[0][0])) ** 2) ** 0.5, True
+		return abs((rows[0][2] - rows[0][1] * rows[0][1] / float(rows[0][0])) / float(rows[0][0])) ** 0.5, True
+		
+		#return (rows[0][2] / float(rows[0][0]) - (rows[0][1] / float(rows[0][0])) ** 2) ** 0.5, True
 		
 	
 	def getSigma(self, pair = None, depth = None):

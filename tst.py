@@ -43,7 +43,7 @@ if not newSigma:
 	print(error)
 	quit()
 
-#print('dbSigma: {0}, newSigma: {1}, externalSigma: {2}'.format(dbSigma, newSigma, sigma))
+print('dbSigma: {0}, newSigma: {1}, externalSigma: {2}'.format(dbSigma, newSigma, sigma))
 #quit()
 	
 res, error = exchange.getTicker([pair])

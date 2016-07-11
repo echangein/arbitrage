@@ -68,6 +68,9 @@ if os.path.isfile(configFileName):
 		totalIndent = config['totalIndent']
 	if 'minProfitPercent' in config:
 		minProfitPercent = config['minProfitPercent']
+	incInvest = 0.0
+	if 'incInvest' in config:
+		incInvest = config['incInvest']
 # ================== define cascade params ================== #
 
 key = None
@@ -97,6 +100,7 @@ sigma.invest = invest
 sigma.startIndent = startIndent
 sigma.totalIndent = totalIndent
 sigma.minProfitPercent = minProfitPercent
+sigma.incInvest = incInvest
 
 if isExistsCascadeFile(cascadeFileName):
 	cascadeStruct = loadCascadeFile(cascadeFileName)

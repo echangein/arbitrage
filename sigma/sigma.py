@@ -18,6 +18,7 @@ class Sigma:
 	startIndent = 0.5
 	totalIndent = 3.0
 	minProfitPercent = 1.0
+	incInvest = 0.0
 	
 	maxStages = 150
 	activeOrdersCount = 3
@@ -92,14 +93,14 @@ class Sigma:
 			invested += round( cascadeStruct['investOrders'][stage]['amount'] * cascadeStruct['investOrders'][stage]['price'], self.totalPrecision)
 			accepted = round(cascadeStruct['profitOrders'][stage]['amount'] * cascadeStruct['profitOrders'][stage]['price'] * (100 - self.conditions['fee']) / 100, 6)
 			profit = round(accepted - invested, 6)
-			print('{0:>3} {1[type]} {1[amount]:<12} @ {1[price]:<12}{6}inv {2:<14} {3[type]} {3[amount]:<12} @ {3[price]:<12} acc {4:<12} pft {5}'.format(
+			print('{0:>3} {1[type]} {1[amount]:<12} @ {1[price]:<12}inv {2:<14} {3[type]} {3[amount]:<12} @ {3[price]:<12} acc {4:<12} pft {5}'.format(
 				stage, 
 				cascadeStruct['investOrders'][stage], 
 				invested, 
 				cascadeStruct['profitOrders'][stage], 
 				accepted,
-				profit,
-				'* ' if 'orderId' in cascadeStruct['investOrders'][stage] else '  '))
+				profit)
+			)
 	
 	
 	#  @brief Brief
@@ -114,7 +115,7 @@ class Sigma:
 		direction = -1
 		investAction = 'sell'
 		profitAction = 'buy'
-		minInvest = self.conditions['min_amount'] / (100 - self.conditions['fee']) * 100
+		minInvest = self.conditions['min_amount'] / (100 - self.conditions['fee']) * 100 * (2.0 + self.incInvest) / 2.0
 		investDiv = minInvest
 		if profitType == 'buy':
 			direction = 1
@@ -122,7 +123,7 @@ class Sigma:
 			investDiv = minInvest * self.lastPrice
 		
 		options = {
-			'version': '0.1',
+			'version': '0.2',
 			'pair': self.pair,
 			'createTS': int(time.time()),
 			'createLastPrice': self.lastPrice,
@@ -131,7 +132,8 @@ class Sigma:
 			'profitType': profitType, 
 			'startIndent': self.startIndent,
 			'totalIndent': self.totalIndent,
-			'minProfitPercent': self.minProfitPercent
+			'minProfitPercent': self.minProfitPercent,
+			'incInvest': self.incInvest
 		}
 		
 		startPrice = self.lastPrice - self.startIndent * self.sigma * direction
@@ -142,7 +144,7 @@ class Sigma:
 		
 		investQuant = self.invest / float(steps)
 		options['investQuant'] = investQuant
-		investOrders = self.__getInvestOrders(startPrice, endPrice, steps, investQuant, profitType)
+		investOrders = self.__getInvestOrders(startPrice, endPrice, steps, investQuant, self.incInvest, profitType)
 		return {
 			'options': options,
 			'investOrders': investOrders,
@@ -156,12 +158,13 @@ class Sigma:
 	#  @param [in] startPrice Parameter_Description
 	#  @param [in] endPrice Parameter_Description
 	#  @param [in] steps Parameter_Description
-	#  @param [in] investQuant Parameter_Description
+	#  @param [in] midInvest Parameter_Description
+	#  @param [in] 0 Parameter_Description
 	#  @return Return_Description
 	#  
 	#  @details Details
 	#  	
-	def __getInvestOrders(self, startPrice, endPrice, steps, investQuant, profitType = 'buy'):
+	def __getInvestOrders(self, startPrice, endPrice, steps, midInvest, incInvest = 0.0, profitType = 'buy'):
 		#TODO revers cascade
 		investAction = 'sell'
 		profitAction = 'buy'
@@ -169,15 +172,18 @@ class Sigma:
 			investAction, profitAction = profitAction, investAction
 
 		deltaPrice = (startPrice - endPrice) / float(steps)
+		startInvest = midInvest / (1 + incInvest / 2.0)
 		
 		investOrders = []
 		for stage in range(0, steps):
 			price = startPrice - deltaPrice * stage
-			amount = investQuant / price
+			invset = startInvest * (1 + incInvest * stage / (steps - 1)) 
+			amount = invset / price
 			investOrders.append({
 				'type': investAction,
 				'amount': round(amount, self.totalPrecision),
-				'price': round(price, self.conditions['decimal_places'])
+				'price': round(price, self.conditions['decimal_places']),
+				'invest': invset
 			})
 		return investOrders
 	

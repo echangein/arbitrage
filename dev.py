@@ -23,11 +23,17 @@ if os.path.isfile(configFileName):
 pair = 'btc_rur'
 
 sigma = Sigma(None, None, pair, db, user, pswd)
-sigma.invest = 5000.0
+sigma.invest = 10000
 sigma.totalIndent = 3.0
-sigma.startIndent = 0.5
+sigma.startIndent = 0.15
 sigma.minProfitPercent = 1
 
+cascade = sigma.createCascade()
+sigma.printCascade(cascade)
+
+sigma.incInvest = 1.0
+
+print('\n\rincInvest = 1.0')
 cascade = sigma.createCascade()
 sigma.printCascade(cascade)
 
@@ -35,7 +41,7 @@ cou = 0
 for investOrder in cascade['investOrders']:
 	investOrder['orderId'] = 666
 	cou += 1
-	if cou > len(cascade['investOrders']) - 3:
+	if cou > len(cascade['investOrders']) / 3:
 		break
 
 print('\n\rshiftOrders')

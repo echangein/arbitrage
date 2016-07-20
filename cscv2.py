@@ -96,6 +96,8 @@ if os.path.isfile(cfgFileName):
 
 sigma = Sigma(key, secret, pair, db, user, pswd)
 
+sigma.dirName = dirName + '/../'
+
 sigma.invest = invest
 sigma.startIndent = startIndent
 sigma.totalIndent = totalIndent
@@ -130,6 +132,10 @@ if not sigma.inWork(cascadeStruct) and sigma.needRestart(cascadeStruct):
 		print('error with cancelOrders in restart cascade: {0}'.format(error)) #reportCancelOrdersError()
 		saveCascadeFile(cascadeFileName, cascadeStruct)
 		quit()
+
+#		if hasParnet(cascadeStruct): # for reverse
+#			restoreParent(cascadeStruct)
+#			quit()
 		
 	cascadeStruct = sigma.createCascade()
 	cascadeStruct, error = sigma.checkOrders(cascadeStruct) #checkOrdersStatus
@@ -161,6 +167,10 @@ if sigma.hasProfit(cascadeStruct): #sell order complete
 # ================== cascade get profit ================== #
 
 # ================== create revers cascade ================== #
+#if not inSigma(cascadeStruct):
+#	cascadeStruct = createRevers(cascadeStruct)
+#	saveCascadeFile(cascadeFileName, cascadeStruct)
+#	quit()
 # ================== create revers cascade ================== #
 
 # ================== create order sequence ================== #

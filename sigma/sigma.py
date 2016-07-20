@@ -90,9 +90,19 @@ class Sigma:
 		invested = 0
 		accepted = 0
 		for stage in range(0, len(cascadeStruct['investOrders'])):
-			invested += round( cascadeStruct['investOrders'][stage]['amount'] * cascadeStruct['investOrders'][stage]['price'], self.totalPrecision)
+			if cascadeStruct['options']['profitType'] == 'buy':
+				investKo = 1
+			else:
+				investKo = (100 - self.conditions['fee']) / 100
+				
+			invested += round(cascadeStruct['investOrders'][stage]['amount'] * cascadeStruct['investOrders'][stage]['price'] * investKo, self.totalPrecision)
 			accepted = round(cascadeStruct['profitOrders'][stage]['amount'] * cascadeStruct['profitOrders'][stage]['price'] * (100 - self.conditions['fee']) / 100, 6)
-			profit = round(accepted - invested, 6)
+			
+			if cascadeStruct['options']['profitType'] == 'buy':
+				profit = round(accepted - invested, 6)
+			else:
+				profit = round(invested - accepted, 6)
+				
 			print('{0:>3} {1[type]} {1[amount]:<12} @ {1[price]:<12}inv {2:<14} {3[type]} {3[amount]:<12} @ {3[price]:<12} acc {4:<12} pft {5}'.format(
 				stage, 
 				cascadeStruct['investOrders'][stage], 
@@ -165,7 +175,6 @@ class Sigma:
 	#  @details Details
 	#  	
 	def __getInvestOrders(self, startPrice, endPrice, steps, midInvest, incInvest = 0.0, profitType = 'buy'):
-		#TODO revers cascade
 		investAction = 'sell'
 		profitAction = 'buy'
 		if profitType == 'buy':
@@ -178,7 +187,9 @@ class Sigma:
 		for stage in range(0, steps):
 			price = startPrice - deltaPrice * stage
 			invset = startInvest * (1 + incInvest * stage / (steps - 1)) 
-			amount = invset / price
+			amount = invset
+			if profitType == 'buy':
+				amount = invset / price
 			investOrders.append({
 				'type': investAction,
 				'amount': round(amount, self.totalPrecision),
@@ -209,14 +220,22 @@ class Sigma:
 		accepted = 0
 		idx = 0
 		for order in investOrders:
-			accepted += order['amount'] * (100 - self.conditions['fee']) / 100
-			invested += order['amount'] * order['price']
-			price = invested / accepted * (100 + self.minProfitPercent) / 100
+			if profitType == 'buy':
+				accepted += order['amount'] * (100 - self.conditions['fee']) / 100
+				invested += order['amount'] * order['price']
+				amount = accepted
+				price = invested / accepted * (100 + self.minProfitPercent) / 100
+			else:
+				accepted += order['amount'] * order['price'] * (100 - self.conditions['fee']) / 100
+				invested += order['amount']
+				amount = invested * 100 / (100 - self.conditions['fee'])
+				price = accepted / invested / (100 + self.minProfitPercent) * 100
+			
 			idx += 1
 			if idx > len(profitOrders):
 				profitOrders.append({
 					'type': profitAction,
-					'amount': round(accepted, self.totalPrecision),
+					'amount': round(amount, self.totalPrecision),
 					'price': round(price, self.conditions['decimal_places'])
 				})
 		return profitOrders
@@ -237,6 +256,7 @@ class Sigma:
 		
 		self.pair = cascadeStruct['options']['pair']
 		self.invest = cascadeStruct['options']['invest']
+		self.profitType = cascadeStruct['options']['profitType']
 		self.startIndent = cascadeStruct['options']['startIndent']
 		self.totalIndent = cascadeStruct['options']['totalIndent']
 		self.minProfitPercent = cascadeStruct['options']['minProfitPercent']

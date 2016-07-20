@@ -20,18 +20,19 @@ if os.path.isfile(configFileName):
 		pswd = config['pswd']
 
 
-pair = 'ltc_rur'
+pair = 'ltc_usd'
 
 sigma = Sigma(None, None, pair, db, user, pswd)
-sigma.invest = 3750
+sigma.invest = 16.93
 sigma.totalIndent = 3.0
-sigma.startIndent = 0.15
+sigma.startIndent = 0.2
 sigma.minProfitPercent = 1
-
-cascade = sigma.createCascade()
-sigma.printCascade(cascade)
-
 sigma.incInvest = 3.0
+
+cascade = sigma.createCascade('sell')
+sigma.printCascade(cascade)
+quit()
+
 
 print('\n\rincInvest = 1.0')
 cascade = sigma.createCascade()

@@ -252,7 +252,7 @@ class Sigma:
 		
 		self.pair = cascadeStruct['options']['pair']
 		self.invest = cascadeStruct['options']['invest']
-		if 'profitType' in cascadeStruct['options']:
+		if 'profitType' in cascadeStruct['options']: # did this really needed?
 			self.profitType = cascadeStruct['options']['profitType']
 		self.startIndent = cascadeStruct['options']['startIndent']
 		self.totalIndent = cascadeStruct['options']['totalIndent']
@@ -312,10 +312,12 @@ class Sigma:
 	#  @details Details
 	#  
 	def needRestart(self, cascadeStruct):
-		#TODO modify for sell profit type
-		if self.lastPrice > cascadeStruct['investOrders'][0]['price'] + self.sigma * self.startIndent:
+		if cascadeStruct['options']['profitType'] == 'buy' and self.lastPrice > cascadeStruct['investOrders'][0]['price'] + self.sigma * self.startIndent:
 			return True
 		
+		if cascadeStruct['options']['profitType'] == 'sell' and self.lastPrice < cascadeStruct['investOrders'][0]['price'] - self.sigma * self.startIndent:
+			return True
+			
 		return False
 	
 	## 

@@ -520,7 +520,7 @@ class Sigma:
 			endPriceDirect = 1
 	
 		startPrice = cascadeStruct['investOrders'][idx]['price']
-		endPrice = self.lastPrice + (1 + self.totalIndent) * self.sigma * endPriceDirect
+		endPrice = self.lastPrice + self.totalIndent * self.sigma * endPriceDirect
 		
 		if endPrice > startPrice and cascadeStruct['options']['profitType'] == 'buy':
 			return cascadeStruct

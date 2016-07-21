@@ -23,27 +23,28 @@ if os.path.isfile(configFileName):
 pair = 'ltc_usd'
 
 sigma = Sigma(None, None, pair, db, user, pswd)
-sigma.invest = 16.93 #87.5 #
+sigma.invest = 57.5 #10.0 #
 sigma.totalIndent = 3.0
 sigma.startIndent = 0.2
 sigma.minProfitPercent = 1.1
 sigma.incInvest = 5.0
 
-cascade = sigma.createCascade('sell')
+cascade = sigma.createCascade() #'sell')
 sigma.printCascade(cascade)
 
 cou = 0
 for investOrder in cascade['investOrders']:
 	investOrder['orderId'] = 666
 	if cou > len(cascade['investOrders']) / 2:
-		cascade['profitOrders'][cou]['orderId'] = 666
-		cascade['profitOrders'][cou]['status'] = 1
+		#cascade['profitOrders'][cou]['orderId'] = 666
+		#cascade['profitOrders'][cou]['status'] = 1
+		print('\n {0}'.format(cou))
 		break
 	cou += 1
 
-sigma.reportProfit(cascade)
+#sigma.reportProfit(cascade)
 
-cascade = sigma.resizeAfterProfit(cascade)
+cascade = sigma.shiftOrders(cascade)
 sigma.printCascade(cascade)
 
 quit()

@@ -26,11 +26,23 @@ sigma = Sigma(None, None, pair, db, user, pswd)
 sigma.invest = 16.93
 sigma.totalIndent = 3.0
 sigma.startIndent = 0.2
-sigma.minProfitPercent = 1
-sigma.incInvest = 3.0
+sigma.minProfitPercent = 1.1
+sigma.incInvest = 5.0
 
 cascade = sigma.createCascade('sell')
 sigma.printCascade(cascade)
+
+cou = 0
+for investOrder in cascade['investOrders']:
+	investOrder['orderId'] = 666
+	if cou > len(cascade['investOrders']) / 2:
+		cascade['profitOrders'][cou]['orderId'] = 666
+		cascade['profitOrders'][cou]['status'] = 1
+		break
+	cou += 1
+
+sigma.reportProfit(cascade)
+
 quit()
 
 
@@ -38,12 +50,6 @@ print('\n\rincInvest = 1.0')
 cascade = sigma.createCascade()
 sigma.printCascade(cascade)
 
-cou = 0
-for investOrder in cascade['investOrders']:
-	investOrder['orderId'] = 666
-	cou += 1
-	if cou > len(cascade['investOrders']) / 3:
-		break
 
 print('\n\rshiftOrders')
 cascade = sigma.shiftOrders(cascade)

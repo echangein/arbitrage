@@ -90,16 +90,15 @@ class Sigma:
 		invested = 0
 		accepted = 0
 		for stage in range(0, len(cascadeStruct['investOrders'])):
-			investKo = 1
+			investRatio = 1
+			profitRatio = (100 - self.conditions['fee']) / 100
 			if cascadeStruct['options']['profitType'] == 'sell':
-				investKo = (100 - self.conditions['fee']) / 100
+				investRatio, profitRatio = profitRatio, investRatio
 				
-			invested += round(cascadeStruct['investOrders'][stage]['amount'] * cascadeStruct['investOrders'][stage]['price'] * investKo, self.totalPrecision)
-			accepted = round(cascadeStruct['profitOrders'][stage]['amount'] * cascadeStruct['profitOrders'][stage]['price'] * (100 - self.conditions['fee']) / 100, 6)
+			invested += round(cascadeStruct['investOrders'][stage]['amount'] * cascadeStruct['investOrders'][stage]['price'] * investRatio, self.totalPrecision)
+			accepted = round(cascadeStruct['profitOrders'][stage]['amount'] * cascadeStruct['profitOrders'][stage]['price'] * profitRatio, 6)
 			
-			profit = round(accepted - invested, 6)
-			if cascadeStruct['options']['profitType'] == 'sell':
-				profit = round(invested - accepted, 6)
+			profit = abs(round(accepted - invested, 6))
 				
 			print('{0:>3} {1[type]} {1[amount]:<12} @ {1[price]:<12}inv {2:<14} {3[type]} {3[amount]:<12} @ {3[price]:<12} acc {4:<12} pft {5}'.format(
 				stage, 
@@ -350,12 +349,17 @@ class Sigma:
 		cou = 0
 		invested = 0
 		for profitOrder in cascadeStruct['profitOrders']:
-			invested += cascadeStruct['investOrders'][cou]['price'] * cascadeStruct['investOrders'][cou]['amount']
+			investRatio = 1
+			profitRatio = (100 - self.conditions['fee']) / 100
+			if cascadeStruct['options']['profitType'] == 'sell':
+				investRatio, profitRatio = profitRatio, investRatio
+		
+			invested += cascadeStruct['investOrders'][cou]['price'] * cascadeStruct['investOrders'][cou]['amount'] * investRatio
 			if self.__isCompleteOrder(profitOrder):
 				print('Stage {0} of {1}. Profit: {2}. Invested {3} of {4}. Profit percent: {5}'.format(
 					cou,
 					len(cascadeStruct['investOrders']) - 1, 
-					round(profitOrder['amount'] * profitOrder['price'] * (100 - self.conditions['fee']) / 100 - invested, self.totalPrecision),
+					abs(round(profitOrder['amount'] * profitOrder['price'] * profitRatio - invested, self.totalPrecision)),
 					invested,
 					cascadeStruct['options']['invest'],
 					cascadeStruct['options']['minProfitPercent']

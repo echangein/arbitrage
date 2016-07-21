@@ -345,7 +345,6 @@ class Sigma:
 	#  @details Details
 	#  		
 	def reportProfit(self, cascadeStruct):
-		#TODO modify for sell profit type
 		cou = 0
 		invested = 0
 		for profitOrder in cascadeStruct['profitOrders']:
@@ -410,7 +409,7 @@ class Sigma:
 			cou += 1
 		
 		cascadeStruct['investOrders'] = cascadeStruct['investOrders'][cou + 1:]
-		cascadeStruct['profitOrders'] = self.__getProfitOrders(cascadeStruct['investOrders'])
+		cascadeStruct['profitOrders'] = self.__getProfitOrders(cascadeStruct['investOrders'], [], cascadeStruct['options']['profitType'])
 		
 		return cascadeStruct
 		

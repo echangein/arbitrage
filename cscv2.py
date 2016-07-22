@@ -96,7 +96,8 @@ if os.path.isfile(cfgFileName):
 
 sigma = Sigma(key, secret, pair, db, user, pswd)
 
-sigma.dirName = dirName + '/../'
+sigma.pathName = dirName + '/../'
+sigma.cascadeFileName = cascadeFileName
 
 sigma.invest = invest
 sigma.startIndent = startIndent

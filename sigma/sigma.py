@@ -73,8 +73,6 @@ class Sigma:
 	#  @details Details
 	#  	
 	def printCascade(self, cascadeStruct):
-		#TODO revers cascade
-		
 		print('created: {1} pair: {0[pair]} profit type: {0[profitType]} start price: {0[createLastPrice]} start sigma: {0[createSigma]}'.format(
 			cascadeStruct['options'],
 			datetime.datetime.fromtimestamp(cascadeStruct['options']['createTS']).strftime('%Y.%m.%d %H:%M:%S')
@@ -256,6 +254,50 @@ class Sigma:
 		self.startIndent = cascadeStruct['options']['startIndent']
 		self.totalIndent = cascadeStruct['options']['totalIndent']
 		self.minProfitPercent = cascadeStruct['options']['minProfitPercent']
+	
+	## 
+	#  @brief save current cascade and create revers cascade
+	#  
+	#  @param [in] self Parameter_Description
+	#  @param [in] cascadeStruct Parameter_Description
+	#  @return Return_Description
+	#  
+	#  @details Details
+	#  	
+	def createRevers(self, cascadeStruct):
+		profitOrder = None
+		profitIdx = 0
+		for order in cascadeStruct['profitOrders']:
+			if self.__isActiveOrder(order):
+				profitOrder = order
+				break
+			profitIdx += 1
+	
+		if profitOrder is None:
+			return cascadeStruct
+	
+		res, error = self.exchange.cancelOrder(profitOrder['orderId'])
+		if not res:
+			print('createRevers error: {0}'.format(error))
+			print('MB FIX?!')
+			return cascadeStruct
+	
+		profitType = profitOrder['type']
+		bkpFileName = self.__getBkpFileName()
+		self.invest = profitOrder['amount']
+		if profitType == 'buy':
+			self.invest = profitOrder['amount'] * profitOrder['price']
+	
+		os.rename(self.path + cascadeFileName, self.path + bkpFileName)
+	
+		cascadeStruct = createCascade(profitType)
+		cascadeStruct['option']['parent'] = {
+			'bkpFileName': bkpFileName,
+			'profitIdx': profitIdx
+		}
+	
+		return cascadeStruct
+	
 	
 	## 
 	#  @brief only update order status

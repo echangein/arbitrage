@@ -96,7 +96,8 @@ if os.path.isfile(cfgFileName):
 
 sigma = Sigma(key, secret, pair, db, user, pswd)
 
-sigma.dirName = dirName + '/../'
+sigma.path = dirName + '/../'
+sigma.cascadeFileName = cascadeFileName
 
 sigma.invest = invest
 sigma.startIndent = startIndent
@@ -169,7 +170,7 @@ if sigma.hasProfit(cascadeStruct): #sell order complete
 # ================== create revers cascade ================== #
 if not sigma.inSigma(cascadeStruct):
 	print('Not in SIGMA')
-#	cascadeStruct = createRevers(cascadeStruct)
+#	cascadeStruct = sigma.createRevers(cascadeStruct)
 #	saveCascadeFile(cascadeFileName, cascadeStruct)
 #	quit()
 # ================== create revers cascade ================== #

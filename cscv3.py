@@ -167,7 +167,7 @@ if sigma.hasProfit(cascadeStruct): #sell order complete
 # ================== cascade get profit ================== #
 
 # ================== create revers cascade ================== #
-if not inSigma(cascadeStruct):
+if not sigma.inSigma(cascadeStruct):
 	print('Not in SIGMA')
 #	cascadeStruct = createRevers(cascadeStruct)
 #	saveCascadeFile(cascadeFileName, cascadeStruct)

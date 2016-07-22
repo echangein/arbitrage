@@ -256,7 +256,7 @@ class Sigma:
 		self.startIndent = cascadeStruct['options']['startIndent']
 		self.totalIndent = cascadeStruct['options']['totalIndent']
 		self.minProfitPercent = cascadeStruct['options']['minProfitPercent']
-		
+	
 	## 
 	#  @brief only update order status
 	#  
@@ -334,7 +334,45 @@ class Sigma:
 				return True
 		
 		return False
-
+	
+	## 
+	#  @brief check active orders in sigma used for need restart
+	#  
+	#  @param [in] self Parameter_Description
+	#  @param [in] cascadeStruct Parameter_Description
+	#  @return False if profit and invest active cascade orders not in sigma
+	#  
+	#  @details Details
+	#  
+	def inSigma(self, cascadeStruct):
+		hiPrice = self.lastPrice + self.totalIndent * self.sigma
+		lowPrice = self.lastPrice - self.totalIndent * self.sigma
+		
+		profitOrder = None
+		for order in cascadeStruct['profitOrders']:
+			if self.__isActiveOrder(order):
+				profitOrder = order
+				break
+		
+		if profitOrder is None:
+			return True
+		
+		if lowPrice >= profitOrder['price'] >= hiPrice:
+			return True
+		
+		investOrder = None
+		for order in cascadeStruct['investOrders']:
+			if self.__isActiveOrder(order):
+				investOrder = order
+				break
+		
+		if investOrder is None:
+			return False
+		
+		if lowPrice >= investOrder['price'] >= hiPrice:
+			return True
+		
+		return False
 	## 
 	#  @brief just print options and cascade
 	#  
@@ -345,14 +383,14 @@ class Sigma:
 	#  @details Details
 	#  		
 	def reportProfit(self, cascadeStruct):
+		investRatio = 1
+		profitRatio = (100 - self.conditions['fee']) / 100
+		if cascadeStruct['options']['profitType'] == 'sell':
+			investRatio, profitRatio = profitRatio, investRatio
+			
 		cou = 0
 		invested = 0
 		for profitOrder in cascadeStruct['profitOrders']:
-			investRatio = 1
-			profitRatio = (100 - self.conditions['fee']) / 100
-			if cascadeStruct['options']['profitType'] == 'sell':
-				investRatio, profitRatio = profitRatio, investRatio
-		
 			invested += cascadeStruct['investOrders'][cou]['price'] * cascadeStruct['investOrders'][cou]['amount'] * investRatio
 			if self.__isCompleteOrder(profitOrder):
 				print('Stage {0} of {1}. Profit: {2}. Invested {3} of {4}. Profit percent: {5}'.format(

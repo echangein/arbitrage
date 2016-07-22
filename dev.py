@@ -23,7 +23,7 @@ if os.path.isfile(configFileName):
 pair = 'ltc_btc'
 
 sigma = Sigma(None, None, pair, db, user, pswd)
-sigma.invest = 0.02896 #57.5 #10.0 #
+sigma.invest = 0.0289 #57.5 #10.0 #
 sigma.totalIndent = 3.0
 sigma.startIndent = 0.2
 sigma.minProfitPercent = 1.0

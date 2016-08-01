@@ -70,7 +70,7 @@ class Stats:
 			FROM
 				s_trades
 			WHERE
-				pair_id = {0} AND event_ts >= {1} AND event_ts <= {2}
+				pair_id = {0} AND event_ts >= {1} AND event_ts < {2}
 		""".format(pairId, startTS, endTS)
 		
 		cursor.execute(query)
@@ -361,7 +361,7 @@ class Stats:
 			FROM
 				s_trade_stats
 			WHERE
-				trade_stat_id IN ({0}) AND start_ts >= {1} AND end_ts <= {2}
+				trade_stat_id IN ({0}) AND start_ts >= {1} AND end_ts < {2}
 		""".format(', '.join(str(id) for id in statIds), startTS, endTS)
 		
 		cursor.execute(query)

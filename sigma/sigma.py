@@ -156,6 +156,47 @@ class Sigma:
 		}
 	
 	## 
+	#  @brief insert additional profit orders
+	#  
+	#  @param [in] self Parameter_Description
+	#  @param [in] cascadeStruct Parameter_Description
+	#  @return Return_Description
+	#  
+	#  @details Details
+	#  	
+	def incCascade(self, cascadeStruct):
+		if self.invest <= cascadeStruct['options']['invest']:
+			print('nothing 2 add')
+			return cascadeStruct
+		
+		investing = self.invest - cascadeStruct['options']['invest']
+		print('additional invest {0}'.format(investing))
+		
+		minInvest = cascadeStruct['investOrders'][-1]['invest']
+		steps = int(investing / minInvest)
+		invest = investing / float(steps)
+		print('add {0} invest orders by {1}'.format(steps, invest))
+		
+		startPrice = self.lastPrice
+		endPrice = self.lastPrice - self.totalIndent * self.sigma
+		deltaPrice = (startPrice - endPrice) / float(steps)
+		
+		for stage in range(0, steps):
+			price = startPrice - deltaPrice * stage
+			amount = invest / price
+			cascadeStruct['investOrders'].append({
+				'type': 'buy',
+				'amount': round(amount, self.totalPrecision),
+				'price': round(price, self.conditions['decimal_places']),
+				'invest': invest
+			})
+		
+		cascadeStruct['profitOrders'] = self.__getProfitOrders(cascadeStruct['investOrders'], cascadeStruct['profitOrders'])
+		cascadeStruct['options']['invest'] = self.invest
+		
+		return cascadeStruct
+	
+	## 
 	#  @brief generate invest orders for params
 	#  
 	#  @param [in] self Parameter_Description

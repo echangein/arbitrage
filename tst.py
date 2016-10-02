@@ -61,7 +61,7 @@ engine = Sigma(None, None, pair, db, user, pswd)
 engine.invest = float(raw_input('enter invest: '))
 engine.startIndent = float(raw_input('enter startIndent: '))
 engine.minProfitPercent = float(raw_input('enter minProfitPercent: '))
-engine.incInvest = = float(raw_input('enter incInvest: '))
+engine.incInvest = float(raw_input('enter incInvest: '))
 
 while True:
 	engine.totalIndent = float(raw_input('enter totalIndent or 0 for exit: '))

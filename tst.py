@@ -55,9 +55,21 @@ print('last price: {0}. sigma: {1}. dbSigma: {2}.'.format(res[pair]['last'], sig
 print('{2} {1} - {3} - {0}'.format(res[pair]['last'] - 3 * sigma, res[pair]['last'] + 3 * sigma, pair, res[pair]['last']))
 print('deep 3 sigma percent: {0}'.format(3 * sigma / res[pair]['last'] * 100))
 
-quit()
-
 from sigma import Sigma
+
+engine = Sigma(None, None, pair, db, user, pswd)
+engine.invest = float(raw_input('enter invest: '))
+engine.startIndent = float(raw_input('enter startIndent: '))
+engine.minProfitPercent = float(raw_input('enter minProfitPercent: '))
+
+while True:
+	engine.totalIndent = float(raw_input('enter totalIndent or 0 for exit: '))
+	if engine.totalIndent == 0:
+		break
+	cascade = engine.createCascade()
+	engine.printCascade(cascade)
+
+quit()
 
 pair = 'btc_rur'
 

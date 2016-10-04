@@ -399,7 +399,11 @@ class Stats:
 		for row in rows:
 			statIds.append(row[0])
 		
-		if depth is None or not depth.isdigit():
+		if depth is None:
+			depth = self.depth
+		
+		depth = int(depth)
+		if depth == 0:
 			depth = self.depth
 		
 		dt = int(time.time())

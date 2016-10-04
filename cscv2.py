@@ -97,7 +97,7 @@ if os.path.isfile(cfgFileName):
 	if 'pswd' in config:
 		pswd = config['pswd']
 
-sigma = Sigma(key, secret, pair, db, user, pswd)
+sigma = Sigma(key, secret, pair, db, user, pswd, sigmaDepth)
 
 sigma.pathName = dirName + '/../'
 sigma.cascadeFileName = cascadeFileName

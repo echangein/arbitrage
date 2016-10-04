@@ -71,6 +71,9 @@ if os.path.isfile(configFileName):
 	incInvest = 0.0
 	if 'incInvest' in config:
 		incInvest = config['incInvest']
+	sigmaDepth = 604800
+	if 'sigmaDepth' in config:
+		sigmaDepth = config['sigmaDepth']
 # ================== define cascade params ================== #
 
 key = None

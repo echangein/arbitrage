@@ -35,7 +35,7 @@ class Sigma:
 	#  
 	#  @details Details
 	#  	
-	def __init__(self, key = None, secret = None, pair = None, db = None, user = None, pswd = None):
+	def __init__(self, key = None, secret = None, pair = None, db = None, user = None, pswd = None, sigmaDepth = None):
 		if not pair:
 			print('Sigma: Cant''t set init values without pair')
 		
@@ -45,7 +45,7 @@ class Sigma:
 		self.exchange = Btce(key, secret)
 		
 		#self.sigma, error = self.stat.getSigmaAndAvg(pair)
-		self.sigma, error = self.stat.getSigma(pair)
+		self.sigma, error = self.stat.getSigma(pair, sigmaDepth)
 		if not self.sigma:
 			print(error)
 			quit()

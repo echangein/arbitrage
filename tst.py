@@ -57,7 +57,8 @@ print('deep 3 sigma percent: {0}'.format(3 * sigma / res[pair]['last'] * 100))
 
 from sigma import Sigma
 
-engine = Sigma(None, None, pair, db, user, pswd)
+depth = int(raw_input('enter sigma depth (604800 for week, 2592000 for month): '))
+engine = Sigma(None, None, pair, db, user, pswd, depth)
 engine.invest = float(raw_input('enter invest: '))
 engine.startIndent = float(raw_input('enter startIndent: '))
 engine.minProfitPercent = float(raw_input('enter minProfitPercent: '))

@@ -46,8 +46,8 @@ import os.path
 key = None
 secret = None
 
-if os.path.isfile('../secrets.txt'):
-	f = open('../secrets.txt', 'r')
+if os.path.isfile('../arbitrage.key'):
+	f = open('../arbitrage.key', 'r')
 	key = f.readline().strip()
 	secret = f.readline().strip()
 	f.close()
@@ -73,13 +73,13 @@ else:
 		quit()
 	key = ord(getch())
 	cont = False
-	
+
 while key != 27:
 	if (key >= ord('1')) and (key <= ord('9')):
 		variant = 0
 		selectedTrades = None
 		for trades in curSite.seqs:
-			if trades['options']['resultAmount'] > config.startAmount:
+			if 'resultAmount' in trades['options'] and trades['options']['resultAmount'] > config.startAmount:
 				variant += 1
 				if variant == (key - ord('0')):
 					selectedTrades = trades['trades']
@@ -104,7 +104,8 @@ while key != 27:
 	if (key == ord('e')) or (key == ord('E') or cont):
 		print('')
 		if not selectedTrades is None:
-			if curSite.executeSequence(selectedTrades, config.startAmount, config.startCurrency, cont):
+			#if curSite.executeSequence(selectedTrades, config.startAmount, config.startCurrency, cont):
+			if curSite.executeSequenceParallel(selectedTrades, config.startAmount, config.startCurrency, cont):
 				print('Trading sequence complete ' + Fore.GREEN + 'successfully' + Fore.RESET + '.')
 				curSite.unlinkTrades()
 				quit()

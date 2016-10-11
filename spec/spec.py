@@ -172,6 +172,65 @@ class Spec:
 			self.saveTrades(selectedTrades)
 		return True
 	
+	def executeSequenceParallel(self, selectedTrades, startAmount = None, startCurr = None, cont = False):
+		inWork = True
+		while inWork:
+			inWork = False
+			for trade in selectedTrades:
+				if not 'order_id' in trade:
+					if self.__hasOrderAmount(trade):
+						print('Create order: ' + self.formatTrade(trade))
+						orderId = self.createOrder(trade)
+						if orderId is False:
+							print(Fore.RED + 'Fail' + Fore.RESET + '.')
+							return False
+						elif orderId is None:
+							print('Already ' + Fore.GREEN + 'executed' + Fore.RESET + '.')
+							trade['order_id'] = 0
+							trade['status_id'] = 1 #executed
+						else:
+							print('Waiting for execute')
+							trade['order_id'] = orderId
+							trade['status_id'] = 0 #waiting
+							inWork = True
+						self.saveTrades(selectedTrades)
+					else:
+						inWork = True
+				else:
+					orderId = trade['order_id']
+					status = self.getOrderStatus(orderId)
+					
+					if status is False:
+						print(Fore.RED + 'Fail' + Fore.RESET + ' with get order status.')
+						return False
+					
+					if trade['status_id'] != status:
+						print('Executed order: ' + self.formatTrade(trade))
+					
+					trade['status_id'] = status
+					self.saveTrades(selectedTrades)
+					
+					if status == 2 or status == 3:
+						self.lastErrorMessage = 'Order {0} was be cancelled'.format(trade['order_id'])
+						print('')
+						return False
+					
+					if status == 0:
+						inWork = True
+			time.sleep(self.checkTimeout)
+		
+		return True
+
+	def __hasOrderAmount(self, trade):
+		if not 'action' in trade:
+			return False
+			
+		if trade['action'] == 'sell':
+			return self.checkAmount(trade['operationAmount'], trade['pair'][:3])
+		else:
+			return self.checkAmount(trade['operationAmount'] * trade['price'], trade['pair'][4:])
+			
+		
 	def saveTrades(self, trades):
 		file = open('selected_trades', 'w+')
 		file.write(json.dumps(trades))
@@ -184,7 +243,7 @@ class Spec:
 		
 		if not self.silent:
 			print self.dialogs.getLoadTradesMessage()
-			for action in selectedTrades:
+			for action in trades:
 				print(self.dialogs.formatTrade(action))
 		
 		return trades

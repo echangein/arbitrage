@@ -37,6 +37,18 @@ def setStat(fileName = None, val = 'waiting'):
 	f.write(val)
 	f.close()
 
+def isBusyKey(fileName = None):
+	return os.path.isfile(dirName + '/../' + fileName)
+
+def setBusyKey(fileName = None):
+	file = open(dirName + '/../' + fileName, 'w+')
+	file.write(json.dumps(0))
+	file.close()	
+
+def clearBusyKey(fileName = None):
+	os.remove(dirName + '/../' + fileName)
+
+
 from sigma import Sigma
 	
 # ================== define cascade params ================== #
@@ -50,6 +62,7 @@ for key, val in [s.split('=') for s in sys.argv[1:]]:
 
 cascadeFileName = configFile + '_' + keyFile + '.csc'
 statusFileName = configFile + '_' + keyFile + '.sts'
+busyKeyFileName = keyFile + '.busy'
 
 keyFileName = dirName + '/../' + keyFile
 configFileName = dirName + '/../' + configFile
@@ -75,6 +88,14 @@ if os.path.isfile(configFileName):
 	if 'sigmaDepth' in config:
 		sigmaDepth = config['sigmaDepth']
 # ================== define cascade params ================== #
+
+# ================== check busy key ================== #
+if isBusyKey(busyKeyFileName):
+	print('busy key event occuer: {0}'.format(busyKeyFileName))
+	quit()
+setBusyKey(busyKeyFileName)
+# ================== check busy key ================== #
+
 
 key = None
 secret = None
@@ -164,6 +185,7 @@ if sigma.hasProfit(cascadeStruct): #sell order complete
 			saveCascadeFile(cascadeFileName, cascadeStruct)
 			quit()
 		removeCascadeFile(cascadeFileName)
+		clearBusyKey(busyKeyFileName)
 		quit()
 #		if hasParnet(cascadeStruct): # for reverse
 #			restoreParent(cascadeStruct)
@@ -189,3 +211,4 @@ if error:
 # ================== create order sequence ================== #
 
 saveCascadeFile(cascadeFileName, cascadeStruct)
+clearBusyKey(busyKeyFileName)
